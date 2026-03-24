@@ -1,0 +1,31 @@
+services:
+  db:
+    image: postgres:15
+    container_name: qrwait-db
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_DB: qrwait
+      POSTGRES_USER: qrwait
+      POSTGRES_PASSWORD: secret
+    volumes:
+      - postgres_dev_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U qrwait -d qrwait"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    container_name: qrwait-redis
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  postgres_dev_data:
