@@ -3,11 +3,11 @@ services:
     image: postgres:15
     container_name: qrwait-db
     ports:
-      - "5432:5432"
+      - "5434:5432"
     environment:
       POSTGRES_DB: qrwait
       POSTGRES_USER: qrwait
-      POSTGRES_PASSWORD: secret
+      POSTGRES_PASSWORD: CHANGEME
     volumes:
       - postgres_dev_data:/var/lib/postgresql/data
     healthcheck:

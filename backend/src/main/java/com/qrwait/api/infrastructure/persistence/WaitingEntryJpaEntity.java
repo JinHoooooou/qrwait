@@ -1,0 +1,78 @@
+package com.qrwait.api.infrastructure.persistence;
+
+import com.qrwait.api.domain.model.WaitingEntry;
+import com.qrwait.api.domain.model.WaitingStatus;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+
+import java.time.LocalDateTime;
+import java.util.UUID;
+
+@Entity
+@Table(name = "waiting_entries")
+@Getter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+public class WaitingEntryJpaEntity {
+
+    @Id
+    @Column(columnDefinition = "uuid")
+    private UUID id;
+
+    @Column(name = "store_id", nullable = false, columnDefinition = "uuid")
+    private UUID storeId;
+
+    @Column(name = "visitor_name", nullable = false, length = 50)
+    private String visitorName;
+
+    @Column(name = "party_size", nullable = false)
+    private int partySize;
+
+    @Column(name = "waiting_number", nullable = false)
+    private int waitingNumber;
+
+    @Column(nullable = false, length = 20)
+    private String status;
+
+    @Column(name = "created_at")
+    private LocalDateTime createdAt;
+
+    private WaitingEntryJpaEntity(UUID id, UUID storeId, String visitorName, int partySize,
+                                   int waitingNumber, String status, LocalDateTime createdAt) {
+        this.id = id;
+        this.storeId = storeId;
+        this.visitorName = visitorName;
+        this.partySize = partySize;
+        this.waitingNumber = waitingNumber;
+        this.status = status;
+        this.createdAt = createdAt;
+    }
+
+    public static WaitingEntryJpaEntity from(WaitingEntry entry) {
+        return new WaitingEntryJpaEntity(
+                entry.getId(),
+                entry.getStoreId(),
+                entry.getVisitorName(),
+                entry.getPartySize(),
+                entry.getWaitingNumber(),
+                entry.getStatus().name(),
+                entry.getCreatedAt()
+        );
+    }
+
+    public WaitingEntry toDomain() {
+        return WaitingEntry.restore(
+                id,
+                storeId,
+                visitorName,
+                partySize,
+                waitingNumber,
+                WaitingStatus.valueOf(status),
+                createdAt
+        );
+    }
+}

@@ -88,9 +88,9 @@
 
 > ⏱ 15m | 선행: 0-1
 
-- [ ] 루트에 `git init`
-- [ ] `.gitignore` 설정 (Java 빌드 산출물, `node_modules`, `.env` 등)
-- [ ] 초기 커밋
+- [x] 루트에 `git init`
+- [x] `.gitignore` 설정 (Java 빌드 산출물, `node_modules`, `.env` 등)
+- [x] 초기 커밋
 
 ---
 
@@ -102,32 +102,33 @@
 
 > ⏱ 20m | 선행: 0-3
 
-- [ ] `domain/model/Store.java` 생성
+- [x] `domain/model/Store.java` 생성
     - 필드: `id (UUID)`, `name (String)`, `qrCode (String)`, `createdAt (LocalDateTime)`
     - 순수 Java 객체 (JPA 어노테이션 없음)
-- [ ] 생성자, getter 구현 (Lombok `@Value` 또는 record 고려)
-- [ ] `Store` 팩토리 메서드 `create(name)` 구현 — qrCode는 내부에서 UUID 생성
+- [x] 생성자, getter 구현 (private all-args 생성자 + public getter)
+- [x] `Store` 팩토리 메서드 `create(name)` 구현 — qrCode는 내부에서 UUID 생성
+    - 추가: `restore(id, name, qrCode, createdAt)` — 영속 계층 복원용
 
 ### 1-2. WaitingEntry 도메인 모델 구현
 
 > ⏱ 30m | 선행: 0-3
 
-- [ ] `domain/model/WaitingStatus.java` Enum 생성
+- [x] `domain/model/WaitingStatus.java` Enum 생성
     - 값: `WAITING`, `CALLED`, `ENTERED`, `CANCELLED`
-- [ ] `domain/model/WaitingEntry.java` 생성
+- [x] `domain/model/WaitingEntry.java` 생성
     - 필드: `id (UUID)`, `storeId (UUID)`, `visitorName (String)`, `partySize (int)`, `waitingNumber (int)`, `status (WaitingStatus)`,
       `createdAt (LocalDateTime)`
-- [ ] 도메인 메서드 구현: `cancel()`, `enter()`, `call()`
-    - 각 메서드에서 유효하지 않은 상태 전이 시 예외 발생 처리
+- [x] 도메인 메서드 구현: `cancel()`, `enter()`, `call()`
+    - 각 메서드에서 유효하지 않은 상태 전이 시 `IllegalStateException` 발생
 
 ### 1-3. Repository 인터페이스 정의
 
 > ⏱ 15m | 선행: 1-1, 1-2
 
-- [ ] `domain/repository/StoreRepository.java` 인터페이스 생성
+- [x] `domain/repository/StoreRepository.java` 인터페이스 생성
     - `findByQrCode(String qrCode): Optional<Store>`
     - `save(Store store): Store`
-- [ ] `domain/repository/WaitingRepository.java` 인터페이스 생성
+- [x] `domain/repository/WaitingRepository.java` 인터페이스 생성
     - `save(WaitingEntry entry): WaitingEntry`
     - `findById(UUID id): Optional<WaitingEntry>`
     - `findByStoreIdAndStatus(UUID storeId, WaitingStatus status): List<WaitingEntry>`
@@ -138,20 +139,20 @@
 
 > ⏱ 20m | 선행: 0-2
 
-- [ ] `resources/db/migration/V1__create_stores.sql` 작성 (TRD DDL 기반)
-- [ ] `resources/db/migration/V2__create_waiting_entries.sql` 작성
+- [x] `resources/db/migration/V1__create_stores.sql` 작성 (TRD DDL 기반)
+- [x] `resources/db/migration/V2__create_waiting_entries.sql` 작성
     - `waiting_entries` 테이블 + 인덱스 `idx_waiting_store_status` 포함
-- [ ] `application.yml` 에 Flyway 설정 추가
-- [ ] 마이그레이션 실행 후 테이블 생성 확인
+- [x] `application.yml` 에 Flyway 설정 추가 (0-2에서 선행 작성, build.gradle에 flyway-core/flyway-database-postgresql 의존성 추가)
+- [x] 마이그레이션 실행 후 테이블 생성 확인 (docker exec psql로 직접 검증)
 
 ### 1-5. JPA Entity 구현
 
 > ⏱ 20m | 선행: 1-3, 1-4
 
-- [ ] `infrastructure/persistence/StoreJpaEntity.java` 생성
+- [x] `infrastructure/persistence/StoreJpaEntity.java` 생성
     - `@Entity`, `@Table(name = "stores")` 어노테이션
     - 도메인 `Store` ↔ JPA Entity 간 변환 메서드 (`toDomain()`, `from(Store)`)
-- [ ] `infrastructure/persistence/WaitingEntryJpaEntity.java` 생성
+- [x] `infrastructure/persistence/WaitingEntryJpaEntity.java` 생성
     - `@Entity`, `@Table(name = "waiting_entries")` 어노테이션
     - 도메인 `WaitingEntry` ↔ JPA Entity 간 변환 메서드
 
@@ -159,29 +160,29 @@
 
 > ⏱ 15m | 선행: 1-5
 
-- [ ] `infrastructure/persistence/StoreJpaRepository.java` 생성 (`JpaRepository` 상속)
+- [x] `infrastructure/persistence/StoreJpaRepository.java` 생성 (`JpaRepository` 상속)
     - `findByQrCode(String qrCode)` 쿼리 메서드 정의
-- [ ] `infrastructure/persistence/WaitingEntryJpaRepository.java` 생성
+- [x] `infrastructure/persistence/WaitingEntryJpaRepository.java` 생성
     - `findByStoreIdAndStatus`, `countByStoreIdAndStatus` 쿼리 메서드 정의
-    - `findMaxWaitingNumberByStoreId` JPQL 쿼리 정의
+    - `findMaxWaitingNumberByStoreId` JPQL 쿼리 정의 (`COALESCE(MAX(...), 0)` — 첫 등록 시 0 반환)
 
 ### 1-7. Repository 구현체 작성
 
 > ⏱ 20m | 선행: 1-3, 1-6
 
-- [ ] `infrastructure/persistence/StoreRepositoryImpl.java` 구현
+- [x] `infrastructure/persistence/StoreRepositoryImpl.java` 구현
     - `domain/repository/StoreRepository` 인터페이스 구현
     - `StoreJpaRepository` 주입하여 JPA 위임
-- [ ] `infrastructure/persistence/WaitingRepositoryImpl.java` 구현
+- [x] `infrastructure/persistence/WaitingRepositoryImpl.java` 구현
     - `domain/repository/WaitingRepository` 인터페이스 구현
 
 ### 1-8. Repository 단위 테스트
 
 > ⏱ 30m | 선행: 1-7
 
-- [ ] `StoreRepositoryImplTest` 작성 (`@DataJpaTest`)
+- [x] `StoreRepositoryImplTest` 작성 (`@DataJpaTest`)
     - `findByQrCode` 정상 조회 / 존재하지 않는 QR코드 테스트
-- [ ] `WaitingRepositoryImplTest` 작성
+- [x] `WaitingRepositoryImplTest` 작성
     - `findByStoreIdAndStatus` 목록 조회 테스트
     - `countByStoreIdAndStatus` 카운트 테스트
 
@@ -195,24 +196,24 @@
 
 > ⏱ 20m | 선행: 1-2
 
-- [ ] `application/dto/RegisterWaitingRequest.java` 생성
+- [x] `application/dto/RegisterWaitingRequest.java` 생성
     - 필드: `visitorName (String)`, `partySize (int)`
     - `@NotBlank`, `@Min(1)`, `@Max(10)` 검증 어노테이션 추가
-- [ ] `application/dto/RegisterWaitingResponse.java` 생성
+- [x] `application/dto/RegisterWaitingResponse.java` 생성
     - 필드: `waitingId`, `waitingNumber`, `currentRank`, `totalWaiting`, `estimatedWaitMinutes`, `waitingToken`
-- [ ] `application/dto/WaitingStatusResponse.java` 생성
+- [x] `application/dto/WaitingStatusResponse.java` 생성
     - 필드: `currentRank`, `totalWaiting`, `estimatedWaitMinutes`
-- [ ] `application/dto/StoreResponse.java` 생성
+- [x] `application/dto/StoreResponse.java` 생성
     - 필드: `storeId`, `name`
 
 ### 2-2. RegisterWaitingUseCase 구현
 
 > ⏱ 30m | 선행: 1-3, 2-1
 
-- [ ] `application/usecase/RegisterWaitingUseCase.java` 인터페이스 정의
+- [x] `application/usecase/RegisterWaitingUseCase.java` 인터페이스 정의
     - `execute(UUID storeId, RegisterWaitingRequest request): RegisterWaitingResponse`
-- [ ] `application/usecase/RegisterWaitingUseCaseImpl.java` 구현
-    - 매장 존재 여부 검증
+- [x] `application/usecase/RegisterWaitingUseCaseImpl.java` 구현
+    - 매장 존재 여부 검증 (`StoreNotFoundException` — `StoreRepository.findById` 추가)
     - 다음 웨이팅 번호 계산 (현재 최댓값 + 1)
     - `WaitingEntry` 생성 및 저장
     - 현재 대기 순서(rank) 계산 및 예상 대기시간 산출 (대기팀 수 × 평균 5분)
@@ -223,79 +224,83 @@
 
 > ⏱ 20m | 선행: 1-3, 2-1
 
-- [ ] `application/usecase/GetWaitingStatusUseCase.java` 인터페이스 정의
+- [x] `application/usecase/GetWaitingStatusUseCase.java` 인터페이스 정의
     - `execute(UUID waitingId): WaitingStatusResponse`
-- [ ] `application/usecase/GetWaitingStatusUseCaseImpl.java` 구현
+- [x] `application/usecase/GetWaitingStatusUseCaseImpl.java` 구현
     - 웨이팅 조회 (없으면 `WaitingNotFoundException` 발생)
-    - WAITING 상태인 앞 팀 수 계산 → currentRank 산출
-    - 예상 대기시간 산출
+    - CANCELLED/ENTERED 상태 조회 시 예외 처리
+    - WAITING 상태인 앞 팀 수 계산 → currentRank 산출 (waitingNumber 비교)
+    - 예상 대기시간 산출 (앞 팀 수 × 5분)
 
 ### 2-4. CancelWaitingUseCase 구현
 
 > ⏱ 15m | 선행: 1-3
 
-- [ ] `application/usecase/CancelWaitingUseCase.java` 인터페이스 정의
+- [x] `application/usecase/CancelWaitingUseCase.java` 인터페이스 정의
     - `execute(UUID waitingId): void`
-- [ ] `application/usecase/CancelWaitingUseCaseImpl.java` 구현
+- [x] `application/usecase/CancelWaitingUseCaseImpl.java` 구현
     - 웨이팅 조회 후 `entry.cancel()` 호출
-    - 저장 후 SSE 브로드캐스트 트리거 (Phase 3에서 연결)
+    - 저장 후 SSE 브로드캐스트 트리거 — Phase 3에서 연결 예정 (주석으로 표시)
 
 ### 2-5. StoreController 구현
 
 > ⏱ 20m | 선행: 2-1
 
-- [ ] `presentation/controller/StoreController.java` 생성
+- [x] `presentation/controller/StoreController.java` 생성
     - `GET /api/stores/{qrCode}` — QR코드로 매장 조회, `StoreResponse` 반환
     - `GET /api/stores/{storeId}/waitings/status` — 매장 전체 대기 현황 조회
+    - 추가: `GetStoreByQrCodeUseCase`, `GetStoreWaitingStatusUseCase` 생성 (계층 원칙 준수)
 
 ### 2-6. WaitingController 구현
 
 > ⏱ 25m | 선행: 2-2, 2-3, 2-4
 
-- [ ] `presentation/controller/WaitingController.java` 생성
-    - `POST /api/stores/{storeId}/waitings` — 웨이팅 등록 (`201 Created`)
+- [x] `presentation/controller/WaitingController.java` 생성
+    - `POST /api/stores/{storeId}/waitings` — 웨이팅 등록 (`201 Created`, `Location` 헤더 포함)
     - `GET /api/waitings/{waitingId}` — 웨이팅 상세 조회
-    - `DELETE /api/waitings/{waitingId}` — 웨이팅 취소
+    - `DELETE /api/waitings/{waitingId}` — 웨이팅 취소 (`204 No Content`)
 - [ ] SSE 엔드포인트는 Phase 3에서 추가 (`GET /api/waitings/{waitingId}/stream`)
 
 ### 2-7. GlobalExceptionHandler 구현
 
 > ⏱ 20m | 선행: 2-5, 2-6
 
-- [ ] `presentation/advice/GlobalExceptionHandler.java` 생성 (`@RestControllerAdvice`)
-- [ ] `WaitingNotFoundException` → `404 Not Found` 처리
-- [ ] `StoreNotFoundException` → `404 Not Found` 처리
-- [ ] `@Valid` 검증 실패 (`MethodArgumentNotValidException`) → `400 Bad Request` 처리
-- [ ] 공통 에러 응답 포맷 정의: `{ "code": "...", "message": "..." }`
+- [x] `presentation/advice/GlobalExceptionHandler.java` 생성 (`@RestControllerAdvice`)
+- [x] `WaitingNotFoundException` → `404 Not Found` 처리
+- [x] `StoreNotFoundException` → `404 Not Found` 처리
+- [x] `@Valid` 검증 실패 (`MethodArgumentNotValidException`) → `400 Bad Request` 처리
+- [x] 공통 에러 응답 포맷 정의: `{ "code": "...", "message": "..." }` (`ErrorResponse` record)
+- [x] 추가: `IllegalStateException` → `409 Conflict` (잘못된 상태 전이 처리)
 
 ### 2-8. CORS 설정
 
 > ⏱ 10m | 선행: 2-5
 
-- [ ] `WebMvcConfigurer` 구현 또는 `@CrossOrigin` 설정
-- [ ] 개발 환경: `http://localhost:5173` 허용
-- [ ] `application.yml` 에 allowed-origins 프로퍼티로 분리
+- [x] `WebMvcConfigurer` 구현 (`WebConfig.java`)
+- [x] 개발 환경: `http://localhost:5173` 허용
+- [x] `application.yml` 에 allowed-origins 프로퍼티로 분리 (`cors.allowed-origins`)
 
 ### 2-9. UseCase 단위 테스트
 
 > ⏱ 40m | 선행: 2-2, 2-3, 2-4
 
-- [ ] `RegisterWaitingUseCaseImplTest` 작성 (Mockito)
+- [x] `RegisterWaitingUseCaseImplTest` 작성 (Mockito)
     - 정상 등록 시 waitingNumber, currentRank 계산 검증
     - 존재하지 않는 storeId 입력 시 예외 발생 검증
-- [ ] `GetWaitingStatusUseCaseImplTest` 작성
-    - currentRank 정확성 검증
+- [x] `GetWaitingStatusUseCaseImplTest` 작성
+    - currentRank 정확성 검증 (대기열 3번째 → rank=3, estimatedWait=10분)
     - 취소된 웨이팅 조회 시 예외 발생 검증
-- [ ] `CancelWaitingUseCaseImplTest` 작성
+- [x] `CancelWaitingUseCaseImplTest` 작성
+    - 정상 취소, 존재하지 않는 ID, 이미 취소된 웨이팅 재취소 3케이스
 
 ### 2-10. Controller 통합 테스트
 
 > ⏱ 30m | 선행: 2-5, 2-6, 2-7
 
-- [ ] `StoreControllerTest` 작성 (`@WebMvcTest`)
+- [x] `StoreControllerTest` 작성 (`@WebMvcTest`)
     - 존재하는 QR코드 조회 성공 케이스
     - 존재하지 않는 QR코드 → 404 응답 검증
-- [ ] `WaitingControllerTest` 작성
+- [x] `WaitingControllerTest` 작성
     - 웨이팅 등록 성공 → 201 응답 + 응답 바디 필드 검증
     - `partySize = 0` 입력 → 400 응답 검증
 
@@ -366,28 +371,28 @@
 
 > ⏱ 15m | 선행: 0-4
 
-- [ ] `react-router-dom` 으로 라우트 설정
+- [x] `react-router-dom` 으로 라우트 설정
     - `/wait` → `LandingPage`
     - `/waiting/:waitingId` → `WaitingConfirmPage`
     - `/waiting/:waitingId/status` → `WaitingStatusPage`
     - `/waiting/:waitingId/cancel` → `CancelPage`
-- [ ] 존재하지 않는 경로 → 404 페이지 추가
+- [x] 존재하지 않는 경로 → 404 페이지 추가
 
 ### 4-2. API 클라이언트 설정
 
 > ⏱ 15m | 선행: 0-4
 
-- [ ] `src/api/client.ts` 생성 (axios instance)
+- [x] `src/api/client.ts` 생성 (axios instance)
     - baseURL: `/api`
     - 공통 에러 인터셉터 설정 (4xx/5xx 처리)
-- [ ] `src/api/waiting.ts` 생성
+- [x] `src/api/waiting.ts` 생성
     - `getStore(qrCode)`, `registerWaiting(storeId, body)`, `getWaiting(waitingId)`, `cancelWaiting(waitingId)` 함수 구현
 
 ### 4-3. 전역 상태 설정 (Zustand)
 
 > ⏱ 15m | 선행: 0-4
 
-- [ ] `src/store/waitingStore.ts` 생성
+- [x] `src/store/waitingStore.ts` 생성
     - 상태: `waitingId`, `waitingNumber`, `waitingToken`, `currentRank`, `totalWaiting`, `estimatedWaitMinutes`
     - 액션: `setWaiting()`, `updateStatus()`, `clearWaiting()`
 
@@ -395,9 +400,9 @@
 
 > ⏱ 15m | 선행: 4-1
 
-- [ ] `src/components/LoadingSpinner.tsx` 구현
-- [ ] `src/components/ErrorMessage.tsx` 구현
-- [ ] `src/components/Button.tsx` 구현 (primary / secondary variant)
+- [x] `src/components/LoadingSpinner.tsx` 구현
+- [x] `src/components/ErrorMessage.tsx` 구현
+- [x] `src/components/Button.tsx` 구현 (primary / secondary variant)
 
 ---
 

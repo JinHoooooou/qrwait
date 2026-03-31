@@ -1,0 +1,32 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm create:*)",
+      "Bash(npm install:*)",
+      "Bash(curl --version)",
+      "Bash(java --version)",
+      "Bash(curl -s \"https://start.spring.io/starter.zip\" -d type=gradle-project -d language=java -d bootVersion=3.3.6 -d groupId=com.qrwait -d artifactId=api -d name=api -d packageName=com.qrwait.api -d javaVersion=21 -d dependencies=web,data-jpa,postgresql,data-redis,lombok,validation -o backend-init.zip)",
+      "Bash(tar -xf backend-init.zip -C backend/)",
+      "Bash(rm backend-init.zip)",
+      "Bash(powershell -Command \"Expand-Archive -Path backend-init.zip -DestinationPath backend -Force\")",
+      "Bash(python3 -c \"import zipfile; zipfile.ZipFile\\(''backend-init.zip''\\).extractall\\(''backend''\\)\")",
+      "Bash(python -c \"import zipfile; zipfile.ZipFile\\(''backend-init.zip''\\).extractall\\(''backend''\\)\")",
+      "Bash(curl -s \"https://start.spring.io/starter.zip\" -d type=gradle-project -d language=java -d bootVersion=3.5.0 -d groupId=com.qrwait -d artifactId=api -d name=api -d packageName=com.qrwait.api -d javaVersion=21 -d dependencies=web,data-jpa,postgresql,data-redis,lombok,validation -o backend-init.zip)",
+      "Bash(python -c \"import zipfile; print\\(zipfile.is_zipfile\\(''backend-init.zip''\\)\\)\")",
+      "Bash(cd:*)",
+      "Bash(./gradlew --version)",
+      "Bash(./gradlew dependencies:*)",
+      "Bash(docker compose:*)",
+      "Bash(docker ps:*)",
+      "Bash(./gradlew compileJava)",
+      "Bash(./gradlew flywayMigrate)",
+      "Bash(./gradlew tasks:*)",
+      "Bash(docker exec:*)",
+      "Bash(./gradlew test:*)",
+      "Bash(docker run:*)",
+      "Bash(grep -v \"^$\")",
+      "Bash(npx tsc:*)",
+      "Bash(npm run:*)"
+    ]
+  }
+}
