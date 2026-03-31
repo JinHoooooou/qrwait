@@ -318,9 +318,9 @@
 
 > ⏱ 20m | 선행: 1-3, 2-11
 
-- [ ] `application/usecase/CreateStoreUseCase.java` 인터페이스 정의
+- [x] `application/usecase/CreateStoreUseCase.java` 인터페이스 정의
     - `execute(CreateStoreRequest request): CreateStoreResponse`
-- [ ] `application/usecase/CreateStoreUseCaseImpl.java` 구현
+- [x] `application/usecase/CreateStoreUseCaseImpl.java` 구현
     - `Store.create(name)` 팩토리 메서드로 도메인 객체 생성
     - `StoreRepository.save()` 호출하여 영속화
     - `qrUrl` 조립: 설정값(base URL) + `/wait?storeId=` + `store.getId()`
