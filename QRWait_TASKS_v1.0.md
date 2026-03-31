@@ -19,13 +19,13 @@
 |-----------------------------|--------|--------------|
 | PHASE 0. 프로젝트 셋업            | 6      | 1h 30m       |
 | PHASE 1. 백엔드 — 도메인 & DB     | 8      | 2h 30m       |
-| PHASE 2. 백엔드 — 애플리케이션 & API | 14     | 4h 40m       |
+| PHASE 2. 백엔드 — 애플리케이션 & API | 15     | 5h 00m       |
 | PHASE 3. 백엔드 — 실시간 SSE      | 5      | 2h 00m       |
 | PHASE 4. 프론트엔드 — 프로젝트 셋업    | 5      | 1h 00m       |
-| PHASE 5. 프론트엔드 — 페이지 구현     | 8      | 3h 30m       |
-| PHASE 6. 연동 & 통합 테스트        | 6      | 2h 00m       |
+| PHASE 5. 프론트엔드 — 페이지 구현     | 9      | 4h 00m       |
+| PHASE 6. 연동 & 통합 테스트        | 5      | 1h 40m       |
 | PHASE 7. 배포 구성              | 5      | 1h 30m       |
-| **합계**                      | **57** | **~18h 40m** |
+| **합계**                      | **58** | **~19h 10m** |
 
 ---
 
@@ -350,6 +350,15 @@
     - `V3__seed_test_stores.sql` — 테스트용 매장 2~3건 INSERT
     - 개발 환경 전용 (`spring.flyway.locations`에 dev 프로필 분리 또는 주석 안내)
 
+### 2-15. QR 코드 이미지 생성 API
+
+> ⏱ 20m | 선행: 2-13
+
+- [ ] `GET /api/stores/{storeId}/qr` 엔드포인트 추가 (`StoreController`)
+    - ZXing(`com.google.zxing`) 라이브러리로 QR PNG 이미지 생성
+    - `ResponseEntity<byte[]>` 로 `image/png` Content-Type 반환
+- [ ] `build.gradle` 에 ZXing 의존성 추가 (`core`, `javase`)
+
 ---
 
 ## PHASE 3. 백엔드 — 실시간 SSE
@@ -545,6 +554,17 @@
 - [ ] `WaitingStatusPage` SSE 이벤트 수신 테스트
     - `waiting-update` 이벤트 수신 후 UI 갱신 확인
 
+### 5-9. OwnerPage 구현 (점주 QR 코드 생성 페이지)
+
+> ⏱ 30m | 선행: 4-2, 2-15
+
+- [ ] `src/pages/OwnerPage.tsx` 구현
+    - 매장명 입력 폼
+    - 제출 시 `POST /api/stores` 호출 → `storeId` 획득
+    - 이어서 `GET /api/stores/{storeId}/qr` 호출 → QR 이미지 화면 표시 (`<img>` 태그)
+- [ ] `App.tsx` 에 `/owner` 라우트 추가
+- [ ] `src/api/waiting.ts` 에 `createStore`, `getStoreQr` 함수 추가
+
 ---
 
 ## PHASE 6. 연동 & 통합 테스트
@@ -583,16 +603,7 @@
     - 상태 변경 API 호출 후 클라이언트 UI 갱신까지 ≤ 1초 확인
 - [ ] 모바일 브라우저 (iOS Safari, Android Chrome) 에서 전체 플로우 확인
 
-### 6-4. QR 코드 생성 유틸리티 작성
-
-> ⏱ 20m | 선행: Phase 1 완료
-
-- [ ] 백엔드: `GET /api/stores/{storeId}/qr` 엔드포인트 추가
-    - QR 코드 이미지(PNG) 또는 URL 문자열 반환
-    - `qrcode` 라이브러리 활용 (`com.google.zxing`)
-- [ ] 테스트용 매장 데이터는 2-14에서 Flyway 시드 스크립트로 작성 완료 — 여기서는 QR 이미지 생성만 담당
-
-### 6-5. API 문서 자동화
+### 6-4. API 문서 자동화
 
 > ⏱ 20m | 선행: Phase 2 완료
 
@@ -601,7 +612,7 @@
 - [ ] 주요 API에 `@Operation`, `@ApiResponse` 어노테이션 추가
 - [ ] `http://localhost:8080/swagger-ui.html` 접속 확인
 
-### 6-6. 환경변수 및 설정 파일 정리
+### 6-5. 환경변수 및 설정 파일 정리
 
 > ⏱ 10m | 선행: Phase 1~5 완료
 

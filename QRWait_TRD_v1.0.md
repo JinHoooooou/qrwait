@@ -125,6 +125,7 @@ CREATE INDEX idx_waiting_store_status ON waiting_entries (store_id, status);
 | GET    | `/api/stores/{storeId}/waitings/status` | 매장 전체 대기 현황 조회      | 없음   |
 | GET    | `/api/waitings/{waitingId}/stream`      | SSE: 실시간 순서 업데이트 구독 | 토큰   |
 | DELETE | `/api/waitings/{waitingId}`             | 웨이팅 취소              | 토큰   |
+| GET    | `/api/stores/{storeId}/qr`              | QR 코드 이미지(PNG) 반환   | 없음   |
 
 ### 웨이팅 등록 API 상세
 
@@ -230,6 +231,7 @@ com.qrwait
 
 | 페이지                | 경로                            | 역할                    |
 |--------------------|-------------------------------|-----------------------|
+| OwnerPage          | `/owner`                      | 매장명 입력 → 매장 등록 API 호출 → QR 코드 이미지 표시 |
 | LandingPage        | `/wait?storeId={id}`          | 매장 정보 표시, 웨이팅 등록 폼    |
 | WaitingConfirmPage | `/waiting/{waitingId}`        | 등록 완료 확인, 웨이팅 번호 표시   |
 | WaitingStatusPage  | `/waiting/{waitingId}/status` | 실시간 대기 순서 표시 (SSE 연결) |
