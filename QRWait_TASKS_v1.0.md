@@ -308,10 +308,10 @@
 
 > ⏱ 15m | 선행: 1-1
 
-- [ ] `application/dto/CreateStoreRequest.java` 생성
+- [x] `application/dto/CreateStoreRequest.java` 생성
     - 필드: `name (String)`
     - `@NotBlank(message = "매장 이름은 필수입니다.")` 검증 어노테이션 추가
-- [ ] `application/dto/CreateStoreResponse.java` 생성
+- [x] `application/dto/CreateStoreResponse.java` 생성
     - 필드: `storeId (UUID)`, `name (String)`, `qrUrl (String)`
 
 ### 2-12. CreateStoreUseCase 구현
