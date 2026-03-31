@@ -38,7 +38,7 @@ flowchart TD
 
     subgraph Server["Spring Boot API Server"]
         Controller["Presentation Layer\nWaitingController / StoreController"]
-        UseCase["Application Layer\nRegisterWaitingUseCase\nGetWaitingStatusUseCase"]
+        UseCase["Application Layer\nCreateStoreUseCase\nRegisterWaitingUseCase\nGetWaitingStatusUseCase"]
         Domain["Domain Layer\nWaitingEntry / Store\nWaitingDomainService"]
         Infra["Infrastructure Layer\nJPA Repository / SseEmitterRegistry"]
     end
@@ -118,6 +118,7 @@ CREATE INDEX idx_waiting_store_status ON waiting_entries (store_id, status);
 
 | Method | Endpoint                                | 설명                  | Auth |
 |--------|-----------------------------------------|---------------------|------|
+| POST   | `/api/stores`                           | 매장 등록 (QR 코드 자동 생성) | 없음   |
 | GET    | `/api/stores/{qrCode}`                  | QR코드로 매장 정보 조회      | 없음   |
 | POST   | `/api/stores/{storeId}/waitings`        | 웨이팅 등록              | 없음   |
 | GET    | `/api/waitings/{waitingId}`             | 내 웨이팅 상세 조회         | 토큰   |
@@ -148,6 +149,28 @@ Response `201 Created`:
   "totalWaiting": 5,
   "estimatedWaitMinutes": 15,
   "waitingToken": "eyJ..."
+}
+```
+
+### 매장 등록 API 상세
+
+**POST** `/api/stores`
+
+Request Body:
+
+```json
+{
+  "name": "맛있는 식당"
+}
+```
+
+Response `201 Created`:
+
+```json
+{
+  "storeId": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+  "name": "맛있는 식당",
+  "qrUrl": "https://qrwait.com/wait?storeId=a1b2c3d4-e5f6-7890-abcd-ef1234567890"
 }
 ```
 

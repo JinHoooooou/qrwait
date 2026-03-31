@@ -26,7 +26,8 @@
       "Bash(docker run:*)",
       "Bash(grep -v \"^$\")",
       "Bash(npx tsc:*)",
-      "Bash(npm run:*)"
+      "Bash(npm run:*)",
+      "Bash(grep -E \"\\\\.\\(sql|yml|yaml|properties\\)$\")"
     ]
   }
 }

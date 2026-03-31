@@ -19,13 +19,13 @@
 |-----------------------------|--------|--------------|
 | PHASE 0. 프로젝트 셋업            | 6      | 1h 30m       |
 | PHASE 1. 백엔드 — 도메인 & DB     | 8      | 2h 30m       |
-| PHASE 2. 백엔드 — 애플리케이션 & API | 10     | 3h 30m       |
+| PHASE 2. 백엔드 — 애플리케이션 & API | 14     | 4h 40m       |
 | PHASE 3. 백엔드 — 실시간 SSE      | 5      | 2h 00m       |
 | PHASE 4. 프론트엔드 — 프로젝트 셋업    | 5      | 1h 00m       |
 | PHASE 5. 프론트엔드 — 페이지 구현     | 8      | 3h 30m       |
 | PHASE 6. 연동 & 통합 테스트        | 6      | 2h 00m       |
 | PHASE 7. 배포 구성              | 5      | 1h 30m       |
-| **합계**                      | **53** | **~17h 30m** |
+| **합계**                      | **57** | **~18h 40m** |
 
 ---
 
@@ -304,6 +304,52 @@
     - 웨이팅 등록 성공 → 201 응답 + 응답 바디 필드 검증
     - `partySize = 0` 입력 → 400 응답 검증
 
+### 2-11. 매장 등록 Request/Response DTO 정의
+
+> ⏱ 15m | 선행: 1-1
+
+- [ ] `application/dto/CreateStoreRequest.java` 생성
+    - 필드: `name (String)`
+    - `@NotBlank(message = "매장 이름은 필수입니다.")` 검증 어노테이션 추가
+- [ ] `application/dto/CreateStoreResponse.java` 생성
+    - 필드: `storeId (UUID)`, `name (String)`, `qrUrl (String)`
+
+### 2-12. CreateStoreUseCase 구현
+
+> ⏱ 20m | 선행: 1-3, 2-11
+
+- [ ] `application/usecase/CreateStoreUseCase.java` 인터페이스 정의
+    - `execute(CreateStoreRequest request): CreateStoreResponse`
+- [ ] `application/usecase/CreateStoreUseCaseImpl.java` 구현
+    - `Store.create(name)` 팩토리 메서드로 도메인 객체 생성
+    - `StoreRepository.save()` 호출하여 영속화
+    - `qrUrl` 조립: 설정값(base URL) + `/wait?storeId=` + `store.getId()`
+    - `CreateStoreResponse` 반환
+
+### 2-13. StoreController에 POST 엔드포인트 추가
+
+> ⏱ 15m | 선행: 2-5, 2-12
+
+- [ ] `StoreController`에 `CreateStoreUseCase` 의존성 주입
+- [ ] `POST /api/stores` 엔드포인트 추가
+    - `@Valid @RequestBody CreateStoreRequest` 파라미터
+    - `201 Created` 응답 + `Location` 헤더 (`/api/stores/{storeId}`)
+    - `CreateStoreResponse` 반환
+
+### 2-14. 매장 등록 테스트 및 시드 데이터
+
+> ⏱ 20m | 선행: 2-13
+
+- [ ] `CreateStoreUseCaseImplTest` 작성 (Mockito)
+    - 정상 등록 시 storeId, name, qrUrl 반환 검증
+    - name 미입력 시 검증 실패 확인
+- [ ] `StoreControllerTest`에 매장 등록 테스트 추가
+    - `POST /api/stores` 성공 → 201 응답 + 응답 바디 필드 검증
+    - name 누락 → 400 응답 검증
+- [ ] 시드 데이터 Flyway 스크립트 작성
+    - `V3__seed_test_stores.sql` — 테스트용 매장 2~3건 INSERT
+    - 개발 환경 전용 (`spring.flyway.locations`에 dev 프로필 분리 또는 주석 안내)
+
 ---
 
 ## PHASE 3. 백엔드 — 실시간 SSE
@@ -544,7 +590,7 @@
 - [ ] 백엔드: `GET /api/stores/{storeId}/qr` 엔드포인트 추가
     - QR 코드 이미지(PNG) 또는 URL 문자열 반환
     - `qrcode` 라이브러리 활용 (`com.google.zxing`)
-- [ ] 테스트용 매장 데이터 시드 스크립트 작성 (`data.sql` 또는 `@PostConstruct`)
+- [ ] 테스트용 매장 데이터는 2-14에서 Flyway 시드 스크립트로 작성 완료 — 여기서는 QR 이미지 생성만 담당
 
 ### 6-5. API 문서 자동화
 
