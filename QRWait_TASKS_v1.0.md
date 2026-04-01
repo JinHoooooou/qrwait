@@ -427,10 +427,10 @@
 
 > ⏱ 35m | 선행: 3-3, 3-4
 
-- [ ] `SseEmitterRegistryTest` 작성
+- [x] `SseEmitterRegistryTest` 작성
     - `broadcast` 시 등록된 모든 Emitter에 이벤트 전송 검증
     - 연결 해제된 Emitter 자동 제거 검증
-- [ ] Postman 또는 `curl` 로 SSE 스트림 수동 테스트
+- [x] Postman 또는 `curl` 로 SSE 스트림 수동 테스트
     - `curl -N http://localhost:8080/api/waitings/{id}/stream`
     - 다른 터미널에서 입장 처리 API 호출 후 이벤트 수신 확인
 

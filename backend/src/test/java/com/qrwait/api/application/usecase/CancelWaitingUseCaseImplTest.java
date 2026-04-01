@@ -1,28 +1,30 @@
 package com.qrwait.api.application.usecase;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.BDDMockito.given;
+import static org.mockito.BDDMockito.then;
+
 import com.qrwait.api.domain.model.WaitingEntry;
 import com.qrwait.api.domain.model.WaitingNotFoundException;
 import com.qrwait.api.domain.model.WaitingStatus;
 import com.qrwait.api.domain.repository.WaitingRepository;
+import com.qrwait.api.infrastructure.sse.WaitingSseService;
+import java.time.LocalDateTime;
+import java.util.Optional;
+import java.util.UUID;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.time.LocalDateTime;
-import java.util.Optional;
-import java.util.UUID;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.BDDMockito.given;
-import static org.mockito.BDDMockito.then;
-
 @ExtendWith(MockitoExtension.class)
 class CancelWaitingUseCaseImplTest {
 
     @Mock WaitingRepository waitingRepository;
+  @Mock
+  WaitingSseService waitingSseService;
     @InjectMocks CancelWaitingUseCaseImpl useCase;
 
     @Test
