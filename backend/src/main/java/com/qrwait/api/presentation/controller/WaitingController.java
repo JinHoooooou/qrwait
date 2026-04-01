@@ -4,6 +4,7 @@ import com.qrwait.api.application.dto.RegisterWaitingRequest;
 import com.qrwait.api.application.dto.RegisterWaitingResponse;
 import com.qrwait.api.application.dto.WaitingStatusResponse;
 import com.qrwait.api.application.usecase.CancelWaitingUseCase;
+import com.qrwait.api.application.usecase.EnterWaitingUseCaseImpl;
 import com.qrwait.api.application.usecase.GetWaitingStatusUseCase;
 import com.qrwait.api.application.usecase.RegisterWaitingUseCase;
 import com.qrwait.api.infrastructure.sse.WaitingSseService;
@@ -17,6 +18,7 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -31,6 +33,7 @@ public class WaitingController {
     private final RegisterWaitingUseCase registerWaitingUseCase;
     private final GetWaitingStatusUseCase getWaitingStatusUseCase;
     private final CancelWaitingUseCase cancelWaitingUseCase;
+    private final EnterWaitingUseCaseImpl enterWaitingUseCase;
     private final WaitingSseService waitingSseService;
 
     /** 웨이팅 등록 */
@@ -64,5 +67,14 @@ public class WaitingController {
         @PathVariable UUID waitingId,
         @RequestParam UUID storeId) {
         return waitingSseService.subscribe(storeId, waitingId);
+    }
+
+    /**
+     * 시뮬레이션용 입장 처리 — 점주 대시보드 구현 전 SSE 동작 검증용
+     */
+    @PutMapping("/waitings/{waitingId}/enter")
+    public ResponseEntity<Void> enter(@PathVariable UUID waitingId) {
+        enterWaitingUseCase.execute(waitingId);
+        return ResponseEntity.noContent().build();
     }
 }

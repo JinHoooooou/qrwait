@@ -419,8 +419,8 @@
 
 > ⏱ 20m | 선행: 2-4, 3-2
 
-- [ ] `CancelWaitingUseCaseImpl` 에서 취소 완료 후 `WaitingSseService.broadcastUpdate()` 호출
-- [ ] (시뮬레이션용) `PUT /api/waitings/{waitingId}/enter` 임시 엔드포인트 추가
+- [x] `CancelWaitingUseCaseImpl` 에서 취소 완료 후 `WaitingSseService.broadcastUpdate()` 호출
+- [x] (시뮬레이션용) `PUT /api/waitings/{waitingId}/enter` 임시 엔드포인트 추가
     - 입장 처리 후 `broadcastUpdate()` 호출 (Phase 2 점주 대시보드 구현 전 테스트용)
 
 ### 3-5. SSE 동작 통합 테스트
