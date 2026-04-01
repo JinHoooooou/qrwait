@@ -551,20 +551,20 @@
 
 > ⏱ 20m | 선행: 5-1, 5-2, 5-3
 
-- [ ] `LandingPage`: 유효하지 않은 `storeId` → 에러 메시지 표시
-- [ ] `WaitingStatusPage`: SSE 연결 실패 시 자동 재연결 로직 추가 (최대 3회)
-- [ ] `WaitingStatusPage`: 웨이팅이 이미 취소/입장 완료된 경우 안내 메시지 표시
-- [ ] 네트워크 오류 공통 처리 (axios 인터셉터 활용)
+- [x] `LandingPage`: 유효하지 않은 `storeId` → 에러 메시지 표시 (5-1에서 구현됨)
+- [x] `WaitingStatusPage`: SSE 연결 실패 시 자동 재연결 로직 추가 (최대 3회, 3초 간격)
+- [x] `WaitingStatusPage`: 웨이팅이 이미 취소/입장 완료된 경우 안내 화면 표시 + session/store 초기화
+- [x] 네트워크 오류 공통 처리 — axios 인터셉터에서 백엔드 `{ message }` 추출하여 `Error`로 래핑
 
 ### 5-7. localStorage 세션 관리
 
 > ⏱ 15m | 선행: 5-1
 
-- [ ] `src/utils/session.ts` 유틸 생성
-    - `saveWaitingSession(waitingId, waitingToken)` 함수
-    - `getWaitingSession(): { waitingId, waitingToken } | null` 함수
+- [x] `src/utils/session.ts` 유틸 생성 (5-3 prep에서 구현)
+  - `saveWaitingSession(waitingId, waitingToken, storeId, waitingNumber)` 함수
+  - `getWaitingSession(): { waitingId, waitingToken, storeId, waitingNumber } | null` 함수
     - `clearWaitingSession()` 함수
-- [ ] 앱 초기 진입 시 세션 확인 → 유효한 세션 있으면 `WaitingStatusPage` 로 리다이렉트
+- [x] 앱 초기 진입 시 세션 확인 → 유효한 세션 있으면 `WaitingStatusPage` 로 리다이렉트 (5-1에서 구현)
 
 ### 5-8. 프론트엔드 테스트
 

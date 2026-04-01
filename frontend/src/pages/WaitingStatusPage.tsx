@@ -1,17 +1,19 @@
-import {useEffect, useRef, useState} from 'react'
+import {useEffect, useState} from 'react'
 import {useNavigate, useParams} from 'react-router-dom'
 import useWaitingStore from '../store/waitingStore'
 import {getWaiting} from '../api/waiting'
-import {getWaitingSession} from '../utils/session'
+import {clearWaitingSession, getWaitingSession} from '../utils/session'
 import Button from '../components/Button'
 
 type ConnectionStatus = 'connecting' | 'connected' | 'error'
+
+const MAX_RETRIES = 3
 
 function WaitingStatusPage() {
   const navigate = useNavigate()
   const {waitingId} = useParams<{ waitingId: string }>()
 
-  const {waitingNumber, storeId, currentRank, totalWaiting, estimatedWaitMinutes, updateStatus} =
+  const {waitingNumber, storeId, currentRank, totalWaiting, estimatedWaitMinutes, updateStatus, clearWaiting} =
       useWaitingStore()
 
   const session = getWaitingSession()
@@ -20,7 +22,7 @@ function WaitingStatusPage() {
 
   const [connectionStatus, setConnectionStatus] = useState<ConnectionStatus>('connecting')
   const [showCalledModal, setShowCalledModal] = useState(false)
-  const eventSourceRef = useRef<EventSource | null>(null)
+  const [expired, setExpired] = useState(false)
 
   // 세션도 없으면 루트로 리다이렉트
   useEffect(() => {
@@ -32,45 +34,100 @@ function WaitingStatusPage() {
   // 초기 상태 로드
   useEffect(() => {
     if (!waitingId) return
-    getWaiting(waitingId).then((res) => {
-      updateStatus({
-        currentRank: res.currentRank,
-        totalWaiting: res.totalWaiting,
-        estimatedWaitMinutes: res.estimatedWaitMinutes,
-      })
-    })
-  }, [waitingId, updateStatus])
-
-  // SSE 연결
-  useEffect(() => {
-    if (!waitingId || !resolvedStoreId) return
-
-    const es = new EventSource(`/api/waitings/${waitingId}/stream?storeId=${resolvedStoreId}`)
-    eventSourceRef.current = es
-
-    es.onopen = () => setConnectionStatus('connected')
-    es.onerror = () => setConnectionStatus('error')
-
-    es.addEventListener('waiting-update', () => {
-      getWaiting(waitingId).then((res) => {
-        updateStatus({
-          currentRank: res.currentRank,
-          totalWaiting: res.totalWaiting,
-          estimatedWaitMinutes: res.estimatedWaitMinutes,
+    getWaiting(waitingId)
+        .then((res) => {
+          updateStatus({
+            currentRank: res.currentRank,
+            totalWaiting: res.totalWaiting,
+            estimatedWaitMinutes: res.estimatedWaitMinutes,
+          })
         })
-      })
-    })
+        .catch(() => {
+          clearWaitingSession()
+          clearWaiting()
+          setExpired(true)
+        })
+  }, [waitingId, updateStatus, clearWaiting])
 
-    es.addEventListener('called', () => {
-      setShowCalledModal(true)
-    })
+  // SSE 연결 (재연결 최대 3회)
+  useEffect(() => {
+    if (!waitingId || !resolvedStoreId || expired) return
+
+    let unmounted = false
+    let retryCount = 0
+    let retryTimer: ReturnType<typeof setTimeout> | null = null
+    let es: EventSource | null = null
+
+    const connect = () => {
+      if (unmounted) return
+
+      es = new EventSource(`/api/waitings/${waitingId}/stream?storeId=${resolvedStoreId}`)
+
+      es.onopen = () => {
+        if (unmounted) return
+        setConnectionStatus('connected')
+        retryCount = 0
+      }
+
+      es.onerror = () => {
+        if (unmounted) return
+        es?.close()
+        if (retryCount < MAX_RETRIES) {
+          retryCount++
+          setConnectionStatus('connecting')
+          retryTimer = setTimeout(connect, 3000)
+        } else {
+          setConnectionStatus('error')
+        }
+      }
+
+      es.addEventListener('waiting-update', () => {
+        if (unmounted || !waitingId) return
+        getWaiting(waitingId)
+            .then((res) => {
+              if (!unmounted) {
+                updateStatus({
+                  currentRank: res.currentRank,
+                  totalWaiting: res.totalWaiting,
+                  estimatedWaitMinutes: res.estimatedWaitMinutes,
+                })
+              }
+            })
+            .catch(() => {
+              if (!unmounted) {
+                clearWaitingSession()
+                clearWaiting()
+                setExpired(true)
+              }
+            })
+      })
+
+      es.addEventListener('called', () => {
+        if (!unmounted) setShowCalledModal(true)
+      })
+    }
+
+    connect()
 
     return () => {
-      es.close()
+      unmounted = true
+      if (retryTimer) clearTimeout(retryTimer)
+      es?.close()
     }
-  }, [waitingId, resolvedStoreId, updateStatus])
+  }, [waitingId, resolvedStoreId, expired, updateStatus, clearWaiting])
 
   if (!resolvedStoreId) return null
+
+  if (expired) {
+    return (
+        <div style={styles.container}>
+          <div style={styles.expiredIcon}>✓</div>
+          <p style={styles.expiredTitle}>웨이팅이 종료되었습니다</p>
+          <p style={styles.expiredDesc}>취소되었거나 이미 입장이 완료된 웨이팅입니다.</p>
+          <Button onClick={() => navigate('/')}>처음으로</Button>
+        </div>
+    )
+  }
 
   return (
       <div style={styles.container}>
@@ -217,6 +274,27 @@ const styles: Record<string, React.CSSProperties> = {
   modalDesc: {
     fontSize: '0.875rem',
     color: '#6b7280',
+  },
+  expiredIcon: {
+    width: 64,
+    height: 64,
+    borderRadius: '50%',
+    backgroundColor: '#f3f4f6',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    fontSize: '2rem',
+    color: '#6b7280',
+  },
+  expiredTitle: {
+    fontSize: '1.25rem',
+    fontWeight: 700,
+    textAlign: 'center',
+  },
+  expiredDesc: {
+    fontSize: '0.875rem',
+    color: '#6b7280',
+    textAlign: 'center',
   },
 }
 
