@@ -398,7 +398,7 @@
 
 > ⏱ 20m | 선행: 3-1
 
-- [ ] `infrastructure/sse/WaitingSseService.java` 생성
+- [x] `infrastructure/sse/WaitingSseService.java` 생성
     - `subscribe(UUID storeId, UUID waitingId): SseEmitter` 메서드 구현
         - `SseEmitter` 생성 (timeout: 30분)
         - `onCompletion`, `onTimeout`, `onError` 콜백 등록 → Registry에서 제거
