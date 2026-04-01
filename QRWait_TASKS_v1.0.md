@@ -580,12 +580,13 @@
 
 > ⏱ 30m | 선행: 4-2, 2-15
 
-- [ ] `src/pages/OwnerPage.tsx` 구현
+- [x] `src/pages/OwnerPage.tsx` 구현
     - 매장명 입력 폼
     - 제출 시 `POST /api/stores` 호출 → `storeId` 획득
-    - 이어서 `GET /api/stores/{storeId}/qr` 호출 → QR 이미지 화면 표시 (`<img>` 태그)
-- [ ] `App.tsx` 에 `/owner` 라우트 추가
-- [ ] `src/api/waiting.ts` 에 `createStore`, `getStoreQr` 함수 추가
+  - `<img src={getStoreQrUrl(storeId)}>` 로 QR 이미지 표시
+  - QR 스캔 URL 및 매장 ID 안내 표시
+- [x] `App.tsx` 에 `/owner` 라우트 추가
+- [x] `src/api/waiting.ts` 에 `createStore`, `getStoreQrUrl` 함수 추가
 
 ---
 

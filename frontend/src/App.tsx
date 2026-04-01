@@ -1,8 +1,9 @@
-import { BrowserRouter, Routes, Route } from 'react-router-dom'
+import {BrowserRouter, Route, Routes} from 'react-router-dom'
 import LandingPage from './pages/LandingPage'
 import WaitingConfirmPage from './pages/WaitingConfirmPage'
 import WaitingStatusPage from './pages/WaitingStatusPage'
 import CancelPage from './pages/CancelPage'
+import OwnerPage from './pages/OwnerPage'
 import NotFoundPage from './pages/NotFoundPage'
 
 function App() {
@@ -13,6 +14,7 @@ function App() {
         <Route path="/waiting/:waitingId" element={<WaitingConfirmPage />} />
         <Route path="/waiting/:waitingId/status" element={<WaitingStatusPage />} />
         <Route path="/waiting/:waitingId/cancel" element={<CancelPage />} />
+        <Route path="/owner" element={<OwnerPage/>}/>
         <Route path="*" element={<NotFoundPage />} />
       </Routes>
     </BrowserRouter>
