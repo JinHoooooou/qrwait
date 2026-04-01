@@ -200,7 +200,7 @@
 - [x] `GetStoreByQrCodeUseCase` / `Impl` → `GetStoreByIdUseCase` / `Impl` 로 rename, 조회 방식 변경
 - [x] `StoreController.java` — `GET /api/stores/{qrCode}` → `GET /api/stores/{storeId}` (UUID 타입으로 변경)
 - [x] `V4__remove_qr_code_column.sql` 작성: `ALTER TABLE stores DROP COLUMN qr_code;`
-- [x] `V3__seed_test_stores.sql` — `qr_code` 컬럼 값 제거
+- [x] `V3__seed_test_stores.sql` — **수정 금지** (이미 적용된 마이그레이션은 변경 불가, 원본 그대로 유지)
 - [x] `StoreRepositoryImplTest` 수정 — `findByQrCode` 테스트 → `findById` 테스트로 교체
 - [x] `StoreControllerTest` 수정 — `/{qrCode}` → `/{storeId}` 경로 반영
 
@@ -487,14 +487,14 @@
 
 > ⏱ 40m | 선행: 4-1, 4-2, 4-3
 
-- [ ] URL에서 `storeId` 쿼리 파라미터 파싱
-- [ ] 매장 정보 API 호출 (`GET /api/stores/{storeId}`) 및 매장명 표시
-- [ ] 웨이팅 등록 폼 구현
+- [x] URL에서 `storeId` 쿼리 파라미터 파싱
+- [x] 매장 정보 API 호출 (`GET /api/stores/{storeId}`) 및 매장명 표시
+- [x] 웨이팅 등록 폼 구현
     - 이름 입력 필드 (최대 50자)
     - 인원수 선택 (1~10명, stepper UI)
     - '웨이팅 등록' 버튼
-- [ ] 중복 등록 방지: `localStorage` 에 `waitingToken` 존재 시 `WaitingStatusPage` 로 리다이렉트
-- [ ] 등록 성공 시 `WaitingConfirmPage` 로 이동
+- [x] 중복 등록 방지: `localStorage` 에 `waitingToken` 존재 시 `WaitingStatusPage` 로 리다이렉트
+- [x] 등록 성공 시 `WaitingConfirmPage` 로 이동
 
 ### 5-2. WaitingConfirmPage 구현
 
