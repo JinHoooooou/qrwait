@@ -161,6 +161,10 @@ function WaitingStatusPage() {
           </div>
           <div style={styles.infoItem}>
             <p style={styles.infoLabel}>앞 대기 팀</p>
+            <p style={styles.infoValue}>{currentRank != null ? `${currentRank - 1}팀` : '-'}</p>
+          </div>
+          <div style={styles.infoItem}>
+            <p style={styles.infoLabel}>총 대기 팀</p>
             <p style={styles.infoValue}>{totalWaiting != null ? `${totalWaiting}팀` : '-'}</p>
           </div>
           <div style={styles.infoItem}>
