@@ -387,7 +387,7 @@
 
 > ⏱ 30m | 선행: 0-3
 
-- [ ] `infrastructure/sse/SseEmitterRegistry.java` 생성
+- [x] `infrastructure/sse/SseEmitterRegistry.java` 생성
     - 내부 자료구조: `ConcurrentHashMap<UUID, CopyOnWriteArrayList<SseEmitter>>`
     - `register(UUID storeId, SseEmitter emitter)` 메서드 구현
     - `remove(UUID storeId, SseEmitter emitter)` 메서드 구현
