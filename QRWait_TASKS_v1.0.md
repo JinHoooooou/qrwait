@@ -500,10 +500,10 @@
 
 > ⏱ 25m | 선행: 4-1, 4-3
 
-- [ ] Zustand store에서 웨이팅 정보 표시
+- [x] Zustand store에서 웨이팅 정보 표시
     - 웨이팅 번호, 현재 대기 순서, 예상 대기시간
-- [ ] '실시간 현황 보기' 버튼 → `WaitingStatusPage` 로 이동
-- [ ] '웨이팅 취소' 버튼 → `CancelPage` 로 이동
+- [x] '실시간 현황 보기' 버튼 → `WaitingStatusPage` 로 이동
+- [x] '웨이팅 취소' 버튼 → `CancelPage` 로 이동
 
 ### 5-3. WaitingStatusPage 구현 (핵심)
 
