@@ -354,10 +354,10 @@
 
 > ⏱ 20m | 선행: 2-13
 
-- [ ] `GET /api/stores/{storeId}/qr` 엔드포인트 추가 (`StoreController`)
+- [x] `GET /api/stores/{storeId}/qr` 엔드포인트 추가 (`StoreController`)
     - ZXing(`com.google.zxing`) 라이브러리로 QR PNG 이미지 생성
     - `ResponseEntity<byte[]>` 로 `image/png` Content-Type 반환
-- [ ] `build.gradle` 에 ZXing 의존성 추가 (`core`, `javase`)
+- [x] `build.gradle` 에 ZXing 의존성 추가 (`core`, `javase`)
 
 ---
 

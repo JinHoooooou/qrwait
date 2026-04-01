@@ -6,6 +6,7 @@ import com.qrwait.api.application.dto.CreateStoreResponse;
 import com.qrwait.api.application.dto.StoreResponse;
 import com.qrwait.api.application.dto.WaitingStatusResponse;
 import com.qrwait.api.application.usecase.CreateStoreUseCase;
+import com.qrwait.api.application.usecase.GenerateQrImageUseCase;
 import com.qrwait.api.application.usecase.GetStoreByQrCodeUseCase;
 import com.qrwait.api.application.usecase.GetStoreWaitingStatusUseCase;
 import com.qrwait.api.domain.model.StoreNotFoundException;
@@ -31,6 +32,7 @@ class StoreControllerTest {
     @Autowired MockMvc mockMvc;
     @Autowired ObjectMapper objectMapper;
     @MockitoBean CreateStoreUseCase createStoreUseCase;
+    @MockitoBean GenerateQrImageUseCase generateQrImageUseCase;
     @MockitoBean GetStoreByQrCodeUseCase getStoreByQrCodeUseCase;
     @MockitoBean GetStoreWaitingStatusUseCase getStoreWaitingStatusUseCase;
 

@@ -5,10 +5,12 @@ import com.qrwait.api.application.dto.CreateStoreResponse;
 import com.qrwait.api.application.dto.StoreResponse;
 import com.qrwait.api.application.dto.WaitingStatusResponse;
 import com.qrwait.api.application.usecase.CreateStoreUseCase;
+import com.qrwait.api.application.usecase.GenerateQrImageUseCase;
 import com.qrwait.api.application.usecase.GetStoreByQrCodeUseCase;
 import com.qrwait.api.application.usecase.GetStoreWaitingStatusUseCase;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -26,6 +28,7 @@ import java.util.UUID;
 public class StoreController {
 
     private final CreateStoreUseCase createStoreUseCase;
+    private final GenerateQrImageUseCase generateQrImageUseCase;
     private final GetStoreByQrCodeUseCase getStoreByQrCodeUseCase;
     private final GetStoreWaitingStatusUseCase getStoreWaitingStatusUseCase;
 
@@ -41,6 +44,15 @@ public class StoreController {
     @GetMapping("/{qrCode}")
     public ResponseEntity<StoreResponse> getStoreByQrCode(@PathVariable String qrCode) {
         return ResponseEntity.ok(getStoreByQrCodeUseCase.execute(qrCode));
+    }
+
+    /** QR 코드 이미지 생성 */
+    @GetMapping("/{storeId}/qr")
+    public ResponseEntity<byte[]> getStoreQrImage(@PathVariable UUID storeId) {
+        byte[] qrImage = generateQrImageUseCase.execute(storeId);
+        return ResponseEntity.ok()
+                .contentType(MediaType.IMAGE_PNG)
+                .body(qrImage);
     }
 
     /** 매장 전체 대기 현황 조회 */
