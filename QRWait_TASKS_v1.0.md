@@ -531,11 +531,11 @@
 
 > ⏱ 20m | 선행: 4-2, 4-3
 
-- [ ] 취소 확인 UI ("웨이팅을 취소하시겠습니까?")
-- [ ] '확인' 버튼 → `DELETE /api/waitings/{waitingId}` 호출
-- [ ] 취소 성공 시 `localStorage` 의 `waitingToken` 삭제
-- [ ] 취소 완료 메시지 표시 후 루트(`/`) 로 이동
-- [ ] '돌아가기' 버튼 → `WaitingStatusPage` 로 이동
+- [x] 취소 확인 UI ("웨이팅을 취소하시겠습니까?")
+- [x] '확인' 버튼 → `DELETE /api/waitings/{waitingId}` 호출
+- [x] 취소 성공 시 `localStorage` 의 `waitingToken` 삭제 + Zustand store 초기화
+- [x] 취소 완료 메시지 표시 후 루트(`/`) 로 이동
+- [x] '돌아가기' 버튼 → `WaitingStatusPage` 로 이동
 
 ### 5-5. 모바일 반응형 스타일 적용
 
