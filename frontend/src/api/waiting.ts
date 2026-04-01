@@ -25,8 +25,8 @@ export interface WaitingStatusResponse {
   estimatedWaitMinutes: number
 }
 
-export const getStore = (qrCode: string) =>
-  client.get<StoreResponse>(`/stores/${qrCode}`).then((res) => res.data)
+export const getStore = (storeId: string) =>
+    client.get<StoreResponse>(`/stores/${storeId}`).then((res) => res.data)
 
 export const registerWaiting = (storeId: string, body: RegisterWaitingRequest) =>
   client.post<RegisterWaitingResponse>(`/stores/${storeId}/waitings`, body).then((res) => res.data)
