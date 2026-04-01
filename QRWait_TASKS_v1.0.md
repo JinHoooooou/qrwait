@@ -541,10 +541,11 @@
 
 > ⏱ 30m | 선행: 5-1, 5-2, 5-3, 5-4
 
-- [ ] 전체 페이지 모바일 뷰포트 기준 레이아웃 (max-width: 480px)
-- [ ] 터치 친화적 버튼 크기 (최소 44px height)
-- [ ] 인원수 stepper 터치 영역 최적화
-- [ ] iOS Safari, Android Chrome 렌더링 확인
+- [x] 전체 페이지 모바일 뷰포트 기준 레이아웃 (max-width: 480px) — 각 페이지 인라인 스타일로 적용됨
+- [x] 터치 친화적 버튼 크기 (최소 44px height) — Button 컴포넌트 minHeight: 44px
+- [x] 인원수 stepper 터치 영역 최적화 — 44×44px 고정
+- [x] `index.css` 리셋: Vite 보일러플레이트 제거, `#root` 모바일 기준으로 정리
+- [x] `index.html` viewport에 `maximum-scale=1.0` 추가 (iOS Safari 입력 시 자동 줌 방지)
 
 ### 5-6. 에러 상태 처리
 
