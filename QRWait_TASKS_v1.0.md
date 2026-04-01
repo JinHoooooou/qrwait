@@ -410,7 +410,7 @@
 
 > ⏱ 15m | 선행: 2-6, 3-2
 
-- [ ] `WaitingController` 에 SSE 엔드포인트 추가
+- [x] `WaitingController` 에 SSE 엔드포인트 추가
     - `GET /api/waitings/{waitingId}/stream`
     - `produces = MediaType.TEXT_EVENT_STREAM_VALUE`
     - `WaitingSseService.subscribe()` 호출 후 `SseEmitter` 반환
