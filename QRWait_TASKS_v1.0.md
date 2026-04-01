@@ -18,14 +18,14 @@
 | 섹션                          | 태스크 수  | 예상 소요시간      |
 |-----------------------------|--------|--------------|
 | PHASE 0. 프로젝트 셋업            | 6      | 1h 30m       |
-| PHASE 1. 백엔드 — 도메인 & DB     | 8      | 2h 30m       |
+| PHASE 1. 백엔드 — 도메인 & DB     | 9      | 3h 00m       |
 | PHASE 2. 백엔드 — 애플리케이션 & API | 15     | 5h 00m       |
 | PHASE 3. 백엔드 — 실시간 SSE      | 5      | 2h 00m       |
 | PHASE 4. 프론트엔드 — 프로젝트 셋업    | 5      | 1h 00m       |
 | PHASE 5. 프론트엔드 — 페이지 구현     | 9      | 4h 00m       |
 | PHASE 6. 연동 & 통합 테스트        | 5      | 1h 40m       |
 | PHASE 7. 배포 구성              | 5      | 1h 30m       |
-| **합계**                      | **58** | **~19h 10m** |
+| **합계**                      | **59** | **~19h 40m** |
 
 ---
 
@@ -103,11 +103,11 @@
 > ⏱ 20m | 선행: 0-3
 
 - [x] `domain/model/Store.java` 생성
-    - 필드: `id (UUID)`, `name (String)`, `qrCode (String)`, `createdAt (LocalDateTime)`
+    - 필드: `id (UUID)`, `name (String)`, `createdAt (LocalDateTime)` — ~~qrCode 제거됨 (1-9 참고)~~
     - 순수 Java 객체 (JPA 어노테이션 없음)
 - [x] 생성자, getter 구현 (private all-args 생성자 + public getter)
-- [x] `Store` 팩토리 메서드 `create(name)` 구현 — qrCode는 내부에서 UUID 생성
-    - 추가: `restore(id, name, qrCode, createdAt)` — 영속 계층 복원용
+- [x] `Store` 팩토리 메서드 `create(name)` 구현
+    - 추가: `restore(id, name, createdAt)` — 영속 계층 복원용 — ~~qrCode 파라미터 제거됨~~
 
 ### 1-2. WaitingEntry 도메인 모델 구현
 
@@ -126,7 +126,7 @@
 > ⏱ 15m | 선행: 1-1, 1-2
 
 - [x] `domain/repository/StoreRepository.java` 인터페이스 생성
-    - `findByQrCode(String qrCode): Optional<Store>`
+    - `findById(UUID id): Optional<Store>` — ~~findByQrCode 제거됨 (1-9 참고)~~
     - `save(Store store): Store`
 - [x] `domain/repository/WaitingRepository.java` 인터페이스 생성
     - `save(WaitingEntry entry): WaitingEntry`
@@ -161,7 +161,7 @@
 > ⏱ 15m | 선행: 1-5
 
 - [x] `infrastructure/persistence/StoreJpaRepository.java` 생성 (`JpaRepository` 상속)
-    - `findByQrCode(String qrCode)` 쿼리 메서드 정의
+    - ~~`findByQrCode` 제거됨~~ — `JpaRepository` 기본 `findById` 사용 (1-9 참고)
 - [x] `infrastructure/persistence/WaitingEntryJpaRepository.java` 생성
     - `findByStoreIdAndStatus`, `countByStoreIdAndStatus` 쿼리 메서드 정의
     - `findMaxWaitingNumberByStoreId` JPQL 쿼리 정의 (`COALESCE(MAX(...), 0)` — 첫 등록 시 0 반환)
@@ -181,10 +181,28 @@
 > ⏱ 30m | 선행: 1-7
 
 - [x] `StoreRepositoryImplTest` 작성 (`@DataJpaTest`)
-    - `findByQrCode` 정상 조회 / 존재하지 않는 QR코드 테스트
+    - `findById` 정상 조회 / 존재하지 않는 storeId 테스트 — ~~findByQrCode 제거됨 (1-9 참고)~~
 - [x] `WaitingRepositoryImplTest` 작성
     - `findByStoreIdAndStatus` 목록 조회 테스트
     - `countByStoreIdAndStatus` 카운트 테스트
+
+### 1-9. qrCode 필드 제거 리팩토링 (백엔드)
+
+> ⏱ 30m | 선행: 1-1 ~ 1-8
+
+> **배경:** QR 이미지에 storeId가 담긴 URL이 직접 인코딩되므로 별도 qrCode 식별자 불필요
+
+- [ ] `Store.java` — `qrCode` 필드 및 관련 생성자 파라미터 제거
+- [ ] `StoreJpaEntity.java` — `qrCode` 컬럼 매핑 제거, `toDomain()` / `from()` 수정
+- [ ] `StoreJpaRepository.java` — `findByQrCode()` 메서드 제거
+- [ ] `StoreRepository.java` — `findByQrCode()` 제거 (findById는 이미 JpaRepository에서 상속)
+- [ ] `StoreRepositoryImpl.java` — `findByQrCode()` 구현 제거
+- [ ] `GetStoreByQrCodeUseCase` / `Impl` → `GetStoreByIdUseCase` / `Impl` 로 rename, 조회 방식 변경
+- [ ] `StoreController.java` — `GET /api/stores/{qrCode}` → `GET /api/stores/{storeId}` (UUID 타입으로 변경)
+- [ ] `V4__remove_qr_code_column.sql` 작성: `ALTER TABLE stores DROP COLUMN qr_code;`
+- [ ] `V3__seed_test_stores.sql` — `qr_code` 컬럼 값 제거
+- [ ] `StoreRepositoryImplTest` 수정 — `findByQrCode` 테스트 → `findById` 테스트로 교체
+- [ ] `StoreControllerTest` 수정 — `/{qrCode}` → `/{storeId}` 경로 반영
 
 ---
 
@@ -247,9 +265,9 @@
 > ⏱ 20m | 선행: 2-1
 
 - [x] `presentation/controller/StoreController.java` 생성
-    - `GET /api/stores/{qrCode}` — QR코드로 매장 조회, `StoreResponse` 반환
+    - `GET /api/stores/{storeId}` — storeId로 매장 조회, `StoreResponse` 반환 — ~~/{qrCode} → /{storeId} 변경 (1-9 참고)~~
     - `GET /api/stores/{storeId}/waitings/status` — 매장 전체 대기 현황 조회
-    - 추가: `GetStoreByQrCodeUseCase`, `GetStoreWaitingStatusUseCase` 생성 (계층 원칙 준수)
+    - 추가: `GetStoreByIdUseCase`, `GetStoreWaitingStatusUseCase` 생성 (계층 원칙 준수) — ~~GetStoreByQrCodeUseCase → GetStoreByIdUseCase rename~~
 
 ### 2-6. WaitingController 구현
 
@@ -441,7 +459,7 @@
     - baseURL: `/api`
     - 공통 에러 인터셉터 설정 (4xx/5xx 처리)
 - [x] `src/api/waiting.ts` 생성
-    - `getStore(qrCode)`, `registerWaiting(storeId, body)`, `getWaiting(waitingId)`, `cancelWaiting(waitingId)` 함수 구현
+    - `getStore(storeId)`, `registerWaiting(storeId, body)`, `getWaiting(waitingId)`, `cancelWaiting(waitingId)` 함수 구현 — ~~qrCode → storeId 변경 (1-9 참고)~~
 
 ### 4-3. 전역 상태 설정 (Zustand)
 
@@ -470,7 +488,7 @@
 > ⏱ 40m | 선행: 4-1, 4-2, 4-3
 
 - [ ] URL에서 `storeId` 쿼리 파라미터 파싱
-- [ ] 매장 정보 API 호출 (`GET /api/stores/{qrCode}`) 및 매장명 표시
+- [ ] 매장 정보 API 호출 (`GET /api/stores/{storeId}`) 및 매장명 표시
 - [ ] 웨이팅 등록 폼 구현
     - 이름 입력 필드 (최대 50자)
     - 인원수 선택 (1~10명, stepper UI)

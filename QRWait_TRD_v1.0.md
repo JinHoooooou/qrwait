@@ -80,7 +80,7 @@ flowchart TD
 
 | 엔티티                | 주요 필드                                                                                     | 설명                                             |
 |--------------------|-------------------------------------------------------------------------------------------|------------------------------------------------|
-| Store (매장)         | id (UUID), name, qrCode (String)                                                          | QR 코드 값은 매장 등록 시 UUID로 생성                      |
+| Store (매장)         | id (UUID), name                                                                           | QR URL에 storeId를 직접 사용하므로 별도 qrCode 필드 없음      |
 | WaitingEntry (웨이팅) | id (UUID), storeId, visitorName, partySize, waitingNumber (int), status (ENUM), createdAt | status: WAITING / CALLED / ENTERED / CANCELLED |
 
 ### DDL
@@ -91,7 +91,6 @@ CREATE TABLE stores
 (
     id         UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     name       VARCHAR(100)       NOT NULL,
-    qr_code    VARCHAR(36) UNIQUE NOT NULL,
     created_at TIMESTAMP        DEFAULT now()
 );
 
@@ -119,7 +118,7 @@ CREATE INDEX idx_waiting_store_status ON waiting_entries (store_id, status);
 | Method | Endpoint                                | 설명                  | Auth |
 |--------|-----------------------------------------|---------------------|------|
 | POST   | `/api/stores`                           | 매장 등록 (QR 코드 자동 생성) | 없음   |
-| GET    | `/api/stores/{qrCode}`                  | QR코드로 매장 정보 조회      | 없음   |
+| GET    | `/api/stores/{storeId}`                 | storeId로 매장 정보 조회    | 없음   |
 | POST   | `/api/stores/{storeId}/waitings`        | 웨이팅 등록              | 없음   |
 | GET    | `/api/waitings/{waitingId}`             | 내 웨이팅 상세 조회         | 토큰   |
 | GET    | `/api/stores/{storeId}/waitings/status` | 매장 전체 대기 현황 조회      | 없음   |
