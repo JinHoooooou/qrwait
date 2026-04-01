@@ -2,6 +2,7 @@ package com.qrwait.api.presentation.controller;
 
 import com.qrwait.api.application.dto.StoreResponse;
 import com.qrwait.api.application.dto.WaitingStatusResponse;
+import com.qrwait.api.application.usecase.CreateStoreUseCase;
 import com.qrwait.api.application.usecase.GetStoreByQrCodeUseCase;
 import com.qrwait.api.application.usecase.GetStoreWaitingStatusUseCase;
 import com.qrwait.api.domain.model.StoreNotFoundException;
@@ -22,6 +23,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 class StoreControllerTest {
 
     @Autowired MockMvc mockMvc;
+    @MockitoBean CreateStoreUseCase createStoreUseCase;
     @MockitoBean GetStoreByQrCodeUseCase getStoreByQrCodeUseCase;
     @MockitoBean GetStoreWaitingStatusUseCase getStoreWaitingStatusUseCase;
 

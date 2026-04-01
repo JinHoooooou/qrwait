@@ -330,8 +330,8 @@
 
 > ⏱ 15m | 선행: 2-5, 2-12
 
-- [ ] `StoreController`에 `CreateStoreUseCase` 의존성 주입
-- [ ] `POST /api/stores` 엔드포인트 추가
+- [x] `StoreController`에 `CreateStoreUseCase` 의존성 주입
+- [x] `POST /api/stores` 엔드포인트 추가
     - `@Valid @RequestBody CreateStoreRequest` 파라미터
     - `201 Created` 응답 + `Location` 헤더 (`/api/stores/{storeId}`)
     - `CreateStoreResponse` 반환
