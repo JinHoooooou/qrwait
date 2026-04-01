@@ -340,13 +340,13 @@
 
 > ⏱ 20m | 선행: 2-13
 
-- [ ] `CreateStoreUseCaseImplTest` 작성 (Mockito)
+- [x] `CreateStoreUseCaseImplTest` 작성 (Mockito)
     - 정상 등록 시 storeId, name, qrUrl 반환 검증
     - name 미입력 시 검증 실패 확인
-- [ ] `StoreControllerTest`에 매장 등록 테스트 추가
+- [x] `StoreControllerTest`에 매장 등록 테스트 추가
     - `POST /api/stores` 성공 → 201 응답 + 응답 바디 필드 검증
     - name 누락 → 400 응답 검증
-- [ ] 시드 데이터 Flyway 스크립트 작성
+- [x] 시드 데이터 Flyway 스크립트 작성
     - `V3__seed_test_stores.sql` — 테스트용 매장 2~3건 INSERT
     - 개발 환경 전용 (`spring.flyway.locations`에 dev 프로필 분리 또는 주석 안내)
 
