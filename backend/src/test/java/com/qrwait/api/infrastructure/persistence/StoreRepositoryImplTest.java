@@ -1,6 +1,10 @@
 package com.qrwait.api.infrastructure.persistence;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import com.qrwait.api.domain.model.Store;
+import java.util.Optional;
+import java.util.UUID;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.flyway.FlywayAutoConfiguration;
@@ -8,39 +12,30 @@ import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabas
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Import;
 
-import java.util.Optional;
-
-import static org.assertj.core.api.Assertions.assertThat;
-
 @DataJpaTest
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 @Import({FlywayAutoConfiguration.class, StoreRepositoryImpl.class})
 class StoreRepositoryImplTest {
 
-    @Autowired
-    private StoreRepositoryImpl storeRepository;
+  @Autowired
+  private StoreRepositoryImpl storeRepository;
 
-    @Test
-    void findByQrCode_whenExists_returnsStore() {
-        // given
-        Store store = Store.create("테스트 식당");
-        storeRepository.save(store);
+  @Test
+  void findById_whenExists_returnsStore() {
+    Store store = Store.create("테스트 식당");
+    Store saved = storeRepository.save(store);
 
-        // when
-        Optional<Store> result = storeRepository.findByQrCode(store.getQrCode());
+    Optional<Store> result = storeRepository.findById(saved.getId());
 
-        // then
-        assertThat(result).isPresent();
-        assertThat(result.get().getName()).isEqualTo("테스트 식당");
-        assertThat(result.get().getQrCode()).isEqualTo(store.getQrCode());
-    }
+    assertThat(result).isPresent();
+    assertThat(result.get().getName()).isEqualTo("테스트 식당");
+    assertThat(result.get().getId()).isEqualTo(saved.getId());
+  }
 
-    @Test
-    void findByQrCode_whenNotExists_returnsEmpty() {
-        // when
-        Optional<Store> result = storeRepository.findByQrCode("non-existent-qr");
+  @Test
+  void findById_whenNotExists_returnsEmpty() {
+    Optional<Store> result = storeRepository.findById(UUID.randomUUID());
 
-        // then
-        assertThat(result).isEmpty();
-    }
+    assertThat(result).isEmpty();
+  }
 }

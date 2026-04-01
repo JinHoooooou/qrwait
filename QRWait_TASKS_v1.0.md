@@ -192,17 +192,17 @@
 
 > **배경:** QR 이미지에 storeId가 담긴 URL이 직접 인코딩되므로 별도 qrCode 식별자 불필요
 
-- [ ] `Store.java` — `qrCode` 필드 및 관련 생성자 파라미터 제거
-- [ ] `StoreJpaEntity.java` — `qrCode` 컬럼 매핑 제거, `toDomain()` / `from()` 수정
-- [ ] `StoreJpaRepository.java` — `findByQrCode()` 메서드 제거
-- [ ] `StoreRepository.java` — `findByQrCode()` 제거 (findById는 이미 JpaRepository에서 상속)
-- [ ] `StoreRepositoryImpl.java` — `findByQrCode()` 구현 제거
-- [ ] `GetStoreByQrCodeUseCase` / `Impl` → `GetStoreByIdUseCase` / `Impl` 로 rename, 조회 방식 변경
-- [ ] `StoreController.java` — `GET /api/stores/{qrCode}` → `GET /api/stores/{storeId}` (UUID 타입으로 변경)
-- [ ] `V4__remove_qr_code_column.sql` 작성: `ALTER TABLE stores DROP COLUMN qr_code;`
-- [ ] `V3__seed_test_stores.sql` — `qr_code` 컬럼 값 제거
-- [ ] `StoreRepositoryImplTest` 수정 — `findByQrCode` 테스트 → `findById` 테스트로 교체
-- [ ] `StoreControllerTest` 수정 — `/{qrCode}` → `/{storeId}` 경로 반영
+- [x] `Store.java` — `qrCode` 필드 및 관련 생성자 파라미터 제거
+- [x] `StoreJpaEntity.java` — `qrCode` 컬럼 매핑 제거, `toDomain()` / `from()` 수정
+- [x] `StoreJpaRepository.java` — `findByQrCode()` 메서드 제거
+- [x] `StoreRepository.java` — `findByQrCode()` 제거 (findById는 이미 JpaRepository에서 상속)
+- [x] `StoreRepositoryImpl.java` — `findByQrCode()` 구현 제거
+- [x] `GetStoreByQrCodeUseCase` / `Impl` → `GetStoreByIdUseCase` / `Impl` 로 rename, 조회 방식 변경
+- [x] `StoreController.java` — `GET /api/stores/{qrCode}` → `GET /api/stores/{storeId}` (UUID 타입으로 변경)
+- [x] `V4__remove_qr_code_column.sql` 작성: `ALTER TABLE stores DROP COLUMN qr_code;`
+- [x] `V3__seed_test_stores.sql` — `qr_code` 컬럼 값 제거
+- [x] `StoreRepositoryImplTest` 수정 — `findByQrCode` 테스트 → `findById` 테스트로 교체
+- [x] `StoreControllerTest` 수정 — `/{qrCode}` → `/{storeId}` 경로 반영
 
 ---
 
