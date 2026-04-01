@@ -3,10 +3,17 @@ const SESSION_KEY = 'qrwait_session'
 interface WaitingSession {
   waitingId: string
   waitingToken: string
+  storeId: string
+  waitingNumber: number
 }
 
-export const saveWaitingSession = (waitingId: string, waitingToken: string) => {
-  localStorage.setItem(SESSION_KEY, JSON.stringify({waitingId, waitingToken}))
+export const saveWaitingSession = (
+    waitingId: string,
+    waitingToken: string,
+    storeId: string,
+    waitingNumber: number,
+) => {
+  localStorage.setItem(SESSION_KEY, JSON.stringify({waitingId, waitingToken, storeId, waitingNumber}))
 }
 
 export const getWaitingSession = (): WaitingSession | null => {

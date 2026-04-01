@@ -1,9 +1,10 @@
-import { create } from 'zustand'
+import {create} from 'zustand'
 
 interface WaitingState {
   waitingId: string | null
   waitingNumber: number | null
   waitingToken: string | null
+  storeId: string | null
   currentRank: number | null
   totalWaiting: number | null
   estimatedWaitMinutes: number | null
@@ -14,6 +15,7 @@ interface WaitingActions {
     waitingId: string
     waitingNumber: number
     waitingToken: string
+    storeId: string
     currentRank: number
     totalWaiting: number
     estimatedWaitMinutes: number
@@ -30,6 +32,7 @@ const initialState: WaitingState = {
   waitingId: null,
   waitingNumber: null,
   waitingToken: null,
+  storeId: null,
   currentRank: null,
   totalWaiting: null,
   estimatedWaitMinutes: null,

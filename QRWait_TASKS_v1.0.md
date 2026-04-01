@@ -509,20 +509,23 @@
 
 > ⏱ 60m | 선행: 4-2, 4-3
 
-- [ ] 페이지 진입 시 `GET /api/waitings/{waitingId}` 호출하여 초기 상태 로드
-- [ ] SSE 연결 구현
-    - `EventSource` 생성: `/api/waitings/${waitingId}/stream`
-    - `waiting-update` 이벤트 수신 → Zustand store 업데이트 → UI 갱신
+- [x] 페이지 진입 시 `GET /api/waitings/{waitingId}` 호출하여 초기 상태 로드
+- [x] SSE 연결 구현
+  - `EventSource` 생성: `/api/waitings/${waitingId}/stream?storeId=${storeId}`
+  - `waiting-update` 이벤트 수신 → API 재조회 → Zustand store 업데이트 → UI 갱신
     - `called` 이벤트 수신 → "입장해 주세요!" 모달 표시
     - 컴포넌트 언마운트 시 `eventSource.close()` 호출
-- [ ] 표시 UI 구현
+- [x] 표시 UI 구현
     - 내 웨이팅 번호 (크게 표시)
     - 현재 대기 순서 (예: "현재 3번째")
     - 앞에 대기 중인 팀 수
     - 예상 대기시간
     - 연결 상태 인디케이터 (연결 중 / 실시간 업데이트 중)
-- [ ] 새로고침 시 `waitingId` 로 API 재조회하여 상태 복원
-- [ ] '웨이팅 취소' 버튼 → `CancelPage` 로 이동
+- [x] 새로고침 시 session(localStorage)에서 storeId/waitingNumber 복원, API로 현황 재조회
+- [x] '웨이팅 취소' 버튼 → `CancelPage` 로 이동
+- [x] (prep) `session.ts` — `storeId`, `waitingNumber` 필드 추가
+- [x] (prep) `waitingStore.ts` — `storeId` 상태 추가
+- [x] (prep) `LandingPage.tsx` — 등록 시 `storeId` store/session에 저장
 
 ### 5-4. CancelPage 구현
 
