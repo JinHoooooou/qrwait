@@ -9,7 +9,9 @@ client.interceptors.response.use(
   (error) => {
     const message =
         error.response?.data?.message ?? '요청 처리 중 오류가 발생했습니다.'
-    return Promise.reject(new Error(message))
+    const err = new Error(message) as Error & { status?: number }
+    err.status = error.response?.status
+    return Promise.reject(err)
   }
 )
 

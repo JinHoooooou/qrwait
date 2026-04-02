@@ -23,13 +23,15 @@ function WaitingStatusPage() {
   const [connectionStatus, setConnectionStatus] = useState<ConnectionStatus>('connecting')
   const [showCalledModal, setShowCalledModal] = useState(false)
   const [expired, setExpired] = useState(false)
+  const [initialized, setInitialized] = useState(false)
+  const [loadError, setLoadError] = useState<string | null>(null)
 
-  // 세션도 없으면 루트로 리다이렉트
+  // API 응답 이후에만 리다이렉트 평가 (Bug A 수정)
   useEffect(() => {
-    if (!resolvedStoreId) {
+    if (!resolvedStoreId && initialized && !expired) {
       navigate('/', {replace: true})
     }
-  }, [resolvedStoreId, navigate])
+  }, [resolvedStoreId, initialized, expired, navigate])
 
   // 초기 상태 로드
   useEffect(() => {
@@ -42,11 +44,19 @@ function WaitingStatusPage() {
             estimatedWaitMinutes: res.estimatedWaitMinutes,
           })
         })
-        .catch(() => {
-          clearWaitingSession()
-          clearWaiting()
-          setExpired(true)
+        .catch((err: unknown) => {
+          const status = (err as { status?: number }).status
+          if (status === 404) {
+            // 정상 종료 (취소/입장 완료) → 세션 삭제 + expired 화면
+            clearWaitingSession()
+            clearWaiting()
+            setExpired(true)
+          } else {
+            // 일시적 오류 (네트워크 에러, 5xx) → 세션 유지 + 에러 메시지
+            setLoadError('서버에 연결할 수 없습니다. 잠시 후 새로고침해 주세요.')
+          }
         })
+        .finally(() => setInitialized(true))
   }, [waitingId, updateStatus, clearWaiting])
 
   // SSE 연결 (재연결 최대 3회)
@@ -116,7 +126,17 @@ function WaitingStatusPage() {
     }
   }, [waitingId, resolvedStoreId, expired, updateStatus, clearWaiting])
 
-  if (!resolvedStoreId) return null
+  if (!initialized) return null
+
+  if (loadError) {
+    return (
+        <div style={styles.container}>
+          <p style={styles.expiredTitle}>연결 오류</p>
+          <p style={styles.expiredDesc}>{loadError}</p>
+          <Button onClick={() => window.location.reload()}>새로고침</Button>
+        </div>
+    )
+  }
 
   if (expired) {
     return (

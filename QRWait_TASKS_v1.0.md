@@ -646,23 +646,17 @@
 
 > **배경:** 6-2 예외 시나리오 테스트에서 발견된 두 가지 버그
 
-#### Bug A — 취소된 웨이팅으로 직접 접속 시 "종료 안내" 화면 미표시
+#### Bug A — 취소된 웨이팅으로 직접 접속 시 "종료 안내" 화면 미표시 ✅ 수정 완료
 
 - **파일:** `src/pages/WaitingStatusPage.tsx`
-- **증상:** 웨이팅 취소 후 `/waiting/{waitingId}/status` 직접 접속 시 "웨이팅이 종료되었습니다" 화면 대신 루트(`/`)로 리다이렉트됨
-- **원인:** 취소 완료 시 `clearWaitingSession()` + `clearWaiting()`으로 세션이 삭제되어 `resolvedStoreId`가 null이 됨. `resolvedStoreId` null 체크 useEffect가
-  `getWaiting()` API 응답(404)보다 먼저 실행되어 `expired` 상태가 되기 전에 리다이렉트
-- **수정 방향:** `resolvedStoreId`가 없더라도 `waitingId`가 URL에 있으면 API를 먼저 조회하고, 404 응답 시 expired 화면을 표시하도록 로직 순서 조정. 또는 storeId null 조건을 `expired` 상태와 함께
-  평가하여 리다이렉트 조건을 엄격하게 제한
+- **수정:** `initialized` 상태 추가. 리다이렉트 조건을 `!resolvedStoreId && initialized && !expired`로 강화.
+  API 응답 전 리다이렉트 차단, `.finally()`에서 `setInitialized(true)` 호출
 
-#### Bug B — 서버 일시 다운 시 세션 삭제로 재연결 불가
+#### Bug B — 서버 일시 다운 시 세션 삭제로 재연결 불가 ✅ 수정 완료
 
-- **파일:** `src/pages/WaitingStatusPage.tsx`
-- **증상:** WaitingStatusPage에서 서버 재시작 등으로 일시적 네트워크 에러 발생 후 새로고침하면 세션이 삭제되어 루트로 리다이렉트됨. DB는 여전히 WAITING 상태임에도 복구 불가
-- **원인:** 초기 API 로드의 `.catch()` 블록이 404(웨이팅 없음)와 네트워크 에러(서버 다운)를 구분하지 않고 동일하게 `clearWaitingSession()` + `clearWaiting()` 실행
-- **수정 방향:** HTTP 상태 코드 기준으로 분기 처리
-  - `404` → 정상적인 종료(취소/입장) → 세션 삭제 + expired 화면 표시
-  - 네트워크 에러 / `5xx` → 일시적 오류 → 세션 유지 + 에러 메시지 표시 (재시도 유도)
+- **파일:** `src/api/client.ts`, `src/pages/WaitingStatusPage.tsx`
+- **수정:** 인터셉터에서 `err.status = error.response?.status` 보존.
+  catch 분기: `404` → 세션 삭제 + expired 화면 / 그 외 → 세션 유지 + 에러 메시지 표시
 
 ---
 
