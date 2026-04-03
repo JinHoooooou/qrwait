@@ -674,20 +674,20 @@
 
 > ⏱ 15m | 선행: Phase 2 완료
 
-- [ ] `backend/Dockerfile` 작성 (멀티 스테이지 빌드)
+- [x] `backend/Dockerfile` 작성 (멀티 스테이지 빌드)
     - Build stage: `gradle build -x test`
     - Run stage: `eclipse-temurin:21-jre-alpine` 베이스 이미지
-- [ ] `.dockerignore` 작성
-- [ ] `docker build` 로 이미지 빌드 확인
+- [x] `.dockerignore` 작성
+- [x] `docker build` 로 이미지 빌드 확인
 
 ### 7-2. 프론트엔드 Dockerfile 작성
 
 > ⏱ 15m | 선행: Phase 5 완료
 
-- [ ] `frontend/Dockerfile` 작성 (멀티 스테이지 빌드)
+- [x] `frontend/Dockerfile` 작성 (멀티 스테이지 빌드)
     - Build stage: `node:20-alpine` + `npm run build`
     - Run stage: `nginx:alpine` + 빌드 산출물 복사
-- [ ] `frontend/nginx.conf` 작성
+- [x] `frontend/nginx.conf` 작성
     - SPA 라우팅 처리 (`try_files $uri /index.html`)
     - `/api/` 요청 백엔드로 프록시 설정
 
@@ -695,27 +695,27 @@
 
 > ⏱ 20m | 선행: 7-1, 7-2
 
-- [ ] 루트에 `docker-compose.yml` 작성 (TRD 배포 구성 기반)
-    - `api`, `frontend`, `db`, `redis` 서비스 정의
+- [x] 루트에 `docker-compose.yml` 작성 (TRD 배포 구성 기반)
+  - `backend`, `frontend`, `db`, `redis` 서비스 정의
     - 서비스 간 healthcheck 및 `depends_on` 설정
     - `postgres_data` 볼륨 설정
-- [ ] `.env.example` 파일 작성 (필수 환경변수 목록)
+- [x] `.env.example` 파일 작성 (필수 환경변수 목록)
 
 ### 7-4. 전체 스택 Docker Compose 기동 확인
 
 > ⏱ 20m | 선행: 7-3
 
-- [ ] `docker-compose up --build` 실행
-- [ ] 각 서비스 로그 확인 (DB 마이그레이션 완료, API 서버 기동, Nginx 기동)
-- [ ] `http://localhost` 접속 후 전체 플로우 동작 확인
-- [ ] `docker-compose down -v` 후 재기동 시 데이터 초기화 여부 확인 (볼륨 설정 검증)
+- [x] `docker-compose up --build` 실행
+- [x] 각 서비스 로그 확인 (DB 마이그레이션 완료, API 서버 기동, Nginx 기동)
+- [x] `http://localhost` 접속 후 전체 플로우 동작 확인
+- [x] `docker-compose down -v` 후 재기동 시 데이터 초기화 여부 확인 (볼륨 설정 검증)
 
 ### 7-5. 루트 README.md 최종 업데이트
 
 > ⏱ 20m | 선행: 7-4
 
-- [ ] 프로젝트 소개 및 주요 기능 기술
-- [ ] 로컬 개발 환경 실행 방법 (`docker-compose.dev.yml`)
-- [ ] 프로덕션 배포 방법 (`docker-compose.yml`)
-- [ ] 환경변수 설명 테이블 추가
-- [ ] API 문서 접근 경로 안내 (Swagger UI)
+- [x] 프로젝트 소개 및 주요 기능 기술
+- [x] 로컬 개발 환경 실행 방법 (`docker-compose.dev.yml`)
+- [x] 프로덕션 배포 방법 (`docker-compose.yml`)
+- [x] 환경변수 설명 테이블 추가
+- [x] API 문서 접근 경로 안내 (Swagger UI)
