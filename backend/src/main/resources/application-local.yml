@@ -1,0 +1,17 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5434/qrwait
+    username: qrwait
+    password: CHANGEME
+    driver-class-name: org.postgresql.Driver
+
+  data:
+    redis:
+      host: localhost
+      port: 6379
+
+cors:
+  allowed-origins: http://localhost:5173
+
+app:
+  base-url: http://localhost:5173

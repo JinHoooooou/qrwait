@@ -44,3 +44,7 @@ tasks.named('test') {
 	useJUnitPlatform()
 	jvmArgs '-XX:+EnableDynamicAgentLoading'
 }
+
+bootRun {
+	args = ["--spring.profiles.active=${project.findProperty('profile') ?: 'local'}"]
+}

@@ -636,9 +636,15 @@
 
 > ⏱ 10m | 선행: Phase 1~5 완료
 
-- [ ] `application.yml` → `application-local.yml` / `application-prod.yml` 분리
-- [ ] 민감 정보 (DB 비밀번호 등) `.env` 파일로 분리
-- [ ] 프론트엔드 `.env.local` / `.env.production` 분리 (`VITE_API_BASE_URL`)
+- [x] `application.yml` → 공통 설정만 유지 (server, jpa, flyway, springdoc)
+- [x] `application-local.yml` 생성 — 로컬 개발용 (datasource, redis, cors, base-url) → git 포함
+- [x] `application-prod.yml.example` 생성 — 프로덕션 템플릿, 환경변수 참조 형태 → git 포함
+- [x] `application-prod.yml` → `.gitignore` 추가 (실제 프로덕션 설정은 커밋 금지)
+- [x] `build.gradle` `bootRun` 기본 프로필 `local`로 설정 (`-Pprofile=prod` 으로 변경 가능)
+- [x] `frontend/.env.development` 생성 — `VITE_API_TARGET=http://localhost:8080` → git 포함
+- [x] `frontend/.env.production.example` 생성 — 프로덕션 템플릿 → git 포함
+- [x] `frontend/.env.production` → `.gitignore` 추가
+- [x] `vite.config.ts` — 프록시 타겟을 `VITE_API_TARGET` 환경변수로 읽도록 수정
 
 ### 6-6. 통합 테스트 중 발견된 버그 수정 (프론트엔드)
 
