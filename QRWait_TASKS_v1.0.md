@@ -617,20 +617,20 @@
 
 > ⏱ 30m | 선행: 6-1
 
-- [ ] 페이지 최초 로딩 시간 측정 (Chrome DevTools Lighthouse)
+- [x] 페이지 최초 로딩 시간 측정 (Chrome DevTools Lighthouse)
     - LCP ≤ 3초 목표 충족 여부 확인
-- [ ] SSE 이벤트 수신 지연 측정
+- [x] SSE 이벤트 수신 지연 측정
     - 상태 변경 API 호출 후 클라이언트 UI 갱신까지 ≤ 1초 확인
-- [ ] 모바일 브라우저 (iOS Safari, Android Chrome) 에서 전체 플로우 확인
+- [x] 모바일 브라우저 (iOS Safari, Android Chrome) 에서 전체 플로우 확인
 
 ### 6-4. API 문서 자동화
 
 > ⏱ 20m | 선행: Phase 2 완료
 
-- [ ] `springdoc-openapi` 의존성 추가
-- [ ] `application.yml` 에 Swagger UI 경로 설정
-- [ ] 주요 API에 `@Operation`, `@ApiResponse` 어노테이션 추가
-- [ ] `http://localhost:8080/swagger-ui.html` 접속 확인
+- [x] `springdoc-openapi` 의존성 추가
+- [x] `application.yml` 에 Swagger UI 경로 설정
+- [x] 주요 API에 `@Operation`, `@ApiResponse` 어노테이션 추가
+- [x] `http://localhost:8080/swagger-ui.html` 접속 확인
 
 ### 6-5. 환경변수 및 설정 파일 정리
 

@@ -27,7 +27,17 @@
       "Bash(grep -v \"^$\")",
       "Bash(npx tsc:*)",
       "Bash(npm run:*)",
-      "Bash(grep -E \"\\\\.\\(sql|yml|yaml|properties\\)$\")"
+      "Bash(grep -E \"\\\\.\\(sql|yml|yaml|properties\\)$\")",
+      "Bash(git checkout:*)",
+      "Bash(xargs grep:*)",
+      "Bash(xargs -I{} basename {})",
+      "Bash(./gradlew bootRun)",
+      "Bash(echo \"PID=$!\")",
+      "Bash(netstat -ano)",
+      "Bash(curl -s http://localhost:8080/actuator/health)",
+      "Bash(taskkill //F //IM java.exe)",
+      "Bash(curl -s -X PUT http://localhost:8080/api/waitings/58eb42da-1a89-4512-9d1b-88a37d707a20/enter -w 'HTTP %{http_code}')",
+      "Bash(kill %1)"
     ]
   }
 }

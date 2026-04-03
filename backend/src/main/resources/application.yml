@@ -31,3 +31,9 @@ cors:
 
 app:
   base-url: http://localhost:5173
+
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html
+  api-docs:
+    path: /v3/api-docs
