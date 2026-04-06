@@ -21,8 +21,7 @@ public class StoreRepositoryImpl implements StoreRepository {
 
   @Override
   public Optional<Store> findByOwnerId(UUID ownerId) {
-    // TODO 1-5: DB 컬럼 추가 후 구현 (현재 owner_id 컬럼 없음)
-    throw new UnsupportedOperationException("owner_id 컬럼 추가 후 구현 예정");
+    return storeJpaRepository.findByOwnerId(ownerId).map(StoreJpaEntity::toDomain);
   }
 
   @Override

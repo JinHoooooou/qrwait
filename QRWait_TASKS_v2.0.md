@@ -133,34 +133,14 @@
 
 > ⏱ 25m | 선행: 0-3
 
-- [ ] `V5__create_owners.sql` 작성
-  ```sql
-  CREATE TABLE owners (
-    id            UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    email         VARCHAR(255) UNIQUE NOT NULL,
-    password_hash VARCHAR(255) NOT NULL,
-    created_at    TIMESTAMP DEFAULT now()
-  );
-  ```
-- [ ] `V6__alter_stores_add_owner.sql` 작성
-    - `owner_id UUID REFERENCES owners(id)` 컬럼 추가
-    - `address VARCHAR(255)` 컬럼 추가
-    - `status VARCHAR(20) DEFAULT 'OPEN'` 컬럼 추가
-    - 기존 시드 데이터 stores에 임시 owner_id 처리 방안 포함 (개발 환경 전용)
-- [ ] `V7__create_store_settings.sql` 작성
-  ```sql
-  CREATE TABLE store_settings (
-    id                   UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    store_id             UUID UNIQUE NOT NULL REFERENCES stores(id),
-    table_count          INT NOT NULL DEFAULT 5,
-    avg_turnover_minutes INT NOT NULL DEFAULT 30,
-    open_time            TIME,
-    close_time           TIME,
-    alert_threshold      INT NOT NULL DEFAULT 10,
-    alert_enabled        BOOLEAN NOT NULL DEFAULT true
-  );
-  ```
-- [ ] 마이그레이션 실행 후 테이블 생성 확인
+- [x] V1__init.sql에 통합 (V5~V7 별도 파일 대신)
+  - `owners` 테이블 추가
+  - `stores` 테이블에 `owner_id`, `address`, `status` 컬럼 추가
+  - `store_settings` 테이블 추가
+  - 시드 데이터: 개발용 더미 owner(UUID all-zero) + 기존 stores에 owner_id 연결
+  - `StoreJpaEntity` TODO 해소 — owner_id, address, status 컬럼 활성화
+  - `StoreRepositoryImpl.findByOwnerId()` 실제 구현 완료
+- [x] 마이그레이션 실행 후 테이블 생성 확인 (owners, stores, store_settings, waiting_entries)
 
 ### 1-6. JPA Entity 추가/수정
 

@@ -39,7 +39,11 @@
       "Bash(curl -s -X PUT http://localhost:8080/api/waitings/58eb42da-1a89-4512-9d1b-88a37d707a20/enter -w 'HTTP %{http_code}')",
       "Bash(kill %1)",
       "Bash(grep -E \"tests completed|FAILED$\")",
-      "Bash(find /c/dev/study_study/qr-wait/backend/build/reports/tests/test -name \"*.xml\" -exec grep -l 'tests=' {} \\\\;)"
+      "Bash(find /c/dev/study_study/qr-wait/backend/build/reports/tests/test -name \"*.xml\" -exec grep -l 'tests=' {} \\\\;)",
+      "Bash(./gradlew flywayClean flywayMigrate)",
+      "Bash(./gradlew bootRun --args='--spring.profiles.active=local')",
+      "Read(//tmp/**)",
+      "Bash(pkill -f \"bootRun\")"
     ]
   }
 }
