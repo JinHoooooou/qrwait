@@ -169,9 +169,9 @@
 
 > ⏱ 20m | 선행: 1-4, 1-7
 
-- [ ] `infrastructure/persistence/OwnerRepositoryImpl.java` 생성
-- [ ] `infrastructure/persistence/StoreSettingsRepositoryImpl.java` 생성
-- [ ] `infrastructure/persistence/StoreRepositoryImpl.java` 수정 — `findByOwnerId` 구현 추가
+- [x] `infrastructure/persistence/OwnerRepositoryImpl.java` 생성
+- [x] `infrastructure/persistence/StoreSettingsRepositoryImpl.java` 생성
+- [x] `infrastructure/persistence/StoreRepositoryImpl.java` 수정 — `findByOwnerId` 구현 추가 (1-5에서 완료)
 
 ### 1-9. 도메인/Repository 단위 테스트
 
