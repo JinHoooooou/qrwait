@@ -118,15 +118,16 @@
 
 > ⏱ 15m | 선행: 1-1, 1-2
 
-- [ ] `domain/repository/OwnerRepository.java` 생성
+- [x] `domain/repository/OwnerRepository.java` 생성
     - `save(Owner owner): Owner`
     - `findByEmail(String email): Optional<Owner>`
     - `findById(UUID id): Optional<Owner>`
-- [ ] `domain/repository/StoreSettingsRepository.java` 생성
+- [x] `domain/repository/StoreSettingsRepository.java` 생성
     - `save(StoreSettings settings): StoreSettings`
     - `findByStoreId(UUID storeId): Optional<StoreSettings>`
-- [ ] `domain/repository/StoreRepository.java` 수정
+- [x] `domain/repository/StoreRepository.java` 수정
     - `findByOwnerId(UUID ownerId): Optional<Store>` 추가
+  - `StoreRepositoryImpl.findByOwnerId()` — 1-5 DB 컬럼 추가 전까지 UnsupportedOperationException
 
 ### 1-5. Flyway 마이그레이션 작성
 
