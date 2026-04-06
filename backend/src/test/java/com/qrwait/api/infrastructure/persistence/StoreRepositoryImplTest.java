@@ -22,7 +22,7 @@ class StoreRepositoryImplTest {
 
   @Test
   void findById_whenExists_returnsStore() {
-    Store store = Store.create("테스트 식당");
+    Store store = Store.create(null, "테스트 식당", null);
     Store saved = storeRepository.save(store);
 
     Optional<Store> result = storeRepository.findById(saved.getId());

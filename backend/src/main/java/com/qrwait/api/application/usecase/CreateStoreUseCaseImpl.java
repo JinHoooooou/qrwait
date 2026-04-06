@@ -13,19 +13,20 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class CreateStoreUseCaseImpl implements CreateStoreUseCase {
 
-    private final StoreRepository storeRepository;
+  private final StoreRepository storeRepository;
 
-    @Value("${app.base-url}")
-    private String baseUrl;
+  @Value("${app.base-url}")
+  private String baseUrl;
 
-    @Override
-    @Transactional
-    public CreateStoreResponse execute(CreateStoreRequest request) {
-        Store store = Store.create(request.getName());
-        Store saved = storeRepository.save(store);
+  @Override
+  @Transactional
+  public CreateStoreResponse execute(CreateStoreRequest request) {
+    // TODO Phase 3: JWT에서 추출한 ownerId로 교체
+    Store store = Store.create(null, request.getName(), null);
+    Store saved = storeRepository.save(store);
 
-        String qrUrl = baseUrl + "/wait?storeId=" + saved.getId();
+    String qrUrl = baseUrl + "/wait?storeId=" + saved.getId();
 
-        return new CreateStoreResponse(saved.getId(), saved.getName(), qrUrl);
-    }
+    return new CreateStoreResponse(saved.getId(), saved.getName(), qrUrl);
+  }
 }

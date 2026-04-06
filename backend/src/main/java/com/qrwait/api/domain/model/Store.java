@@ -8,24 +8,32 @@ import lombok.Getter;
 public class Store {
 
   private final UUID id;
+  private final UUID ownerId;
   private final String name;
+  private final String address;
+  private final StoreStatus status;
   private final LocalDateTime createdAt;
 
-  private Store(UUID id, String name, LocalDateTime createdAt) {
+  private Store(UUID id, UUID ownerId, String name, String address,
+      StoreStatus status, LocalDateTime createdAt) {
     this.id = id;
+    this.ownerId = ownerId;
     this.name = name;
+    this.address = address;
+    this.status = status;
     this.createdAt = createdAt;
   }
 
-  public static Store create(String name) {
-    return new Store(UUID.randomUUID(), name, LocalDateTime.now());
+  public static Store create(UUID ownerId, String name, String address) {
+    return new Store(UUID.randomUUID(), ownerId, name, address, StoreStatus.OPEN, LocalDateTime.now());
   }
 
-  /**
-   * 영속 계층에서 복원할 때 사용
-   */
-  public static Store restore(UUID id, String name, LocalDateTime createdAt) {
-    return new Store(id, name, createdAt);
+  public static Store restore(UUID id, UUID ownerId, String name, String address,
+      StoreStatus status, LocalDateTime createdAt) {
+    return new Store(id, ownerId, name, address, status, createdAt);
   }
 
+  public Store changeStatus(StoreStatus newStatus) {
+    return Store.restore(id, ownerId, name, address, newStatus, createdAt);
+  }
 }

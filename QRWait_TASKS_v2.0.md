@@ -105,13 +105,14 @@
 
 > ⏱ 15m | 선행: 0-2
 
-- [ ] `domain/model/StoreStatus.java` Enum 생성
+- [x] `domain/model/StoreStatus.java` Enum 생성
     - 값: `OPEN`, `BREAK`, `FULL`, `CLOSED`
-- [ ] `domain/model/Store.java` 수정
+- [x] `domain/model/Store.java` 수정
     - `ownerId (UUID)`, `address (String)`, `status (StoreStatus)` 필드 추가
     - `create(ownerId, name, address)` 팩토리 메서드 수정
-    - 도메인 메서드: `changeStatus(StoreStatus newStatus)` 추가
-    - 상태 전이 유효성 검증 (예: CLOSED → BREAK는 불필요하므로 예외 발생)
+  - 도메인 메서드: `changeStatus(StoreStatus newStatus)` 추가 — 불변 설계, 새 Store 객체 반환
+  - 상태 전이 제한 없음: CLOSED는 당일 운영 상태이므로 다음 날 OPEN 전환 허용. 상태 전이 제한은 UseCase 레벨에서 처리
+  - `StoreJpaEntity`, `CreateStoreUseCaseImpl`, 테스트 4개 — 시그니처 변경에 맞게 수정 (ownerId/address는 1-5 DB 컬럼 추가 전까지 null)
 
 ### 1-4. Repository 인터페이스 추가
 
