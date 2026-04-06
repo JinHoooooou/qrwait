@@ -50,21 +50,21 @@
 
 > ⏱ 10m | 선행: 0-1
 
-- [ ] `presentation/security/` 패키지 생성
-- [ ] `domain/model/` — `Owner.java`, `StoreSettings.java` 파일 생성 위치 확인
-- [ ] `domain/repository/` — `OwnerRepository.java`, `StoreSettingsRepository.java` 파일 생성 위치 확인
-- [ ] `application/usecase/` — 신규 UseCase 파일 생성 위치 확인
-- [ ] `infrastructure/persistence/` — 신규 JPA Entity 파일 생성 위치 확인
+- [x] `presentation/security/` 패키지 생성
+- [x] `domain/model/` — `Owner.java`, `StoreSettings.java` 파일 생성 위치 확인
+- [x] `domain/repository/` — `OwnerRepository.java`, `StoreSettingsRepository.java` 파일 생성 위치 확인
+- [x] `application/usecase/` — 신규 UseCase 파일 생성 위치 확인
+- [x] `infrastructure/persistence/` — 신규 JPA Entity 파일 생성 위치 확인
 
 ### 0-3. Flyway 마이그레이션 버전 확인
 
 > ⏱ 10m | 선행: 0-1
 
-- [ ] 기존 마이그레이션 파일 버전 확인 (V1 ~ V4)
-- [ ] 다음 마이그레이션은 V5부터 시작하도록 번호 계획
-    - V5: owners 테이블 생성
-    - V6: stores 테이블 변경 (owner_id 추가, businessType/openTime/closeTime 제거)
-    - V7: store_settings 테이블 생성
+- [x] 기존 마이그레이션 파일 버전 확인 (V1 ~ V4)
+- [x] 마이그레이션 전략 변경: 팀원이 1명이므로 V1 단일 파일로 통합
+  - V2~V4 삭제, `V1__init.sql`에 stores + waiting_entries + 시드 데이터 통합
+  - 이후 스키마 변경은 V1 업데이트 방식으로 진행 (운영 배포 직전 확정)
+  - **1-5 태스크**: V5~V7 생성 대신 V1에 owners, store_settings, stores 변경 추가로 수정
 
 ### 0-4. Spring Security 기본 설정 (임시 전체 허용)
 
