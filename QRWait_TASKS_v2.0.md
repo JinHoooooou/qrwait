@@ -146,13 +146,13 @@
 
 > ⏱ 25m | 선행: 1-4, 1-5
 
-- [ ] `infrastructure/persistence/OwnerJpaEntity.java` 생성
+- [x] `infrastructure/persistence/OwnerJpaEntity.java` 생성
     - `toDomain()`, `from(Owner)` 변환 메서드
-- [ ] `infrastructure/persistence/StoreSettingsJpaEntity.java` 생성
+- [x] `infrastructure/persistence/StoreSettingsJpaEntity.java` 생성
     - `toDomain()`, `from(StoreSettings)` 변환 메서드
-- [ ] `infrastructure/persistence/StoreJpaEntity.java` 수정
-    - `ownerId`, `address`, `status` 컬럼 매핑 추가
-    - `toDomain()`, `from(Store)` 변환 메서드 수정
+- [x] `infrastructure/persistence/StoreJpaEntity.java` 수정
+  - `ownerId`, `address`, `status` 컬럼 매핑 추가 (1-5에서 완료)
+  - `toDomain()`, `from(Store)` 변환 메서드 수정 (1-5에서 완료)
 
 ### 1-7. JpaRepository 추가/수정
 
