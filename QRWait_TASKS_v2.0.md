@@ -94,10 +94,10 @@
 
 > ⏱ 20m | 선행: 0-2
 
-- [ ] `domain/model/StoreSettings.java` 생성
+- [x] `domain/model/StoreSettings.java` 생성
     - 필드: `id (UUID)`, `storeId (UUID)`, `tableCount (int)`, `avgTurnoverMinutes (int)`, `openTime (LocalTime)`, `closeTime (LocalTime)`,
       `alertThreshold (int)`, `alertEnabled (boolean)`
-    - 팩토리 메서드: `createDefault(storeId)` — 기본값으로 생성
+  - 팩토리 메서드: `createDefault(storeId)` — 기본값으로 생성 (tableCount=5, avgTurnoverMinutes=30, alertThreshold=10, alertEnabled=true)
     - 복원 메서드: `restore(...)`
     - 예상 대기시간 계산 메서드: `calculateEstimatedWait(int aheadCount)` → `avgTurnoverMinutes / tableCount * aheadCount`
 
