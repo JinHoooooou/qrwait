@@ -16,15 +16,18 @@ import com.qrwait.api.application.usecase.GenerateQrImageUseCase;
 import com.qrwait.api.application.usecase.GetStoreByIdUseCase;
 import com.qrwait.api.application.usecase.GetStoreWaitingStatusUseCase;
 import com.qrwait.api.domain.model.StoreNotFoundException;
+import com.qrwait.api.presentation.security.SecurityConfig;
 import java.util.UUID;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
 @WebMvcTest(StoreController.class)
+@Import(SecurityConfig.class)
 class StoreControllerTest {
 
   @Autowired

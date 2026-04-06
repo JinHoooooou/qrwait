@@ -70,8 +70,9 @@
 
 > ⏱ 10m | 선행: 0-1
 
-- [ ] `SecurityConfig.java` 생성 — 초기에는 모든 경로 허용으로 설정 (JWT Filter 구현 후 단계적으로 적용)
-- [ ] 기존 손님 API가 Security 추가로 401을 반환하지 않는지 확인
+- [x] `SecurityConfig.java` 생성 — 초기에는 모든 경로 허용으로 설정 (JWT Filter 구현 후 단계적으로 적용)
+- [x] 기존 손님 API가 Security 추가로 401을 반환하지 않는지 확인
+  - `@WebMvcTest`가 `SecurityConfig`를 자동 로드하지 않는 문제 → 두 Controller 테스트에 `@Import(SecurityConfig.class)` 추가로 해결
 
 ---
 
