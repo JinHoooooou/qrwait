@@ -158,12 +158,12 @@
 
 > ⏱ 15m | 선행: 1-6
 
-- [ ] `infrastructure/persistence/OwnerJpaRepository.java` 생성
+- [x] `infrastructure/persistence/OwnerJpaRepository.java` 생성
     - `findByEmail(String email)` 쿼리 메서드
-- [ ] `infrastructure/persistence/StoreSettingsJpaRepository.java` 생성
+- [x] `infrastructure/persistence/StoreSettingsJpaRepository.java` 생성
     - `findByStoreId(UUID storeId)` 쿼리 메서드
-- [ ] `infrastructure/persistence/StoreJpaRepository.java` 수정
-    - `findByOwnerId(UUID ownerId)` 쿼리 메서드 추가
+- [x] `infrastructure/persistence/StoreJpaRepository.java` 수정
+  - `findByOwnerId(UUID ownerId)` 쿼리 메서드 추가 (1-5에서 완료)
 
 ### 1-8. Repository 구현체 추가/수정
 
