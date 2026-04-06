@@ -177,12 +177,12 @@
 
 > ⏱ 20m | 선행: 1-8
 
-- [ ] `OwnerRepositoryImplTest` 작성 (`@DataJpaTest`)
+- [x] `OwnerRepositoryImplTest` 작성 (`@DataJpaTest`)
     - `findByEmail` 정상 조회 / 존재하지 않는 이메일 테스트
-- [ ] `StoreSettingsRepositoryImplTest` 작성
+- [x] `StoreSettingsRepositoryImplTest` 작성
     - `findByStoreId` 정상 조회 테스트
-- [ ] `StoreTest` 작성 (순수 단위 테스트)
-    - `changeStatus()` 상태 전이 유효성 검증 테스트
+- [x] `StoreTest` 작성 (순수 단위 테스트)
+  - `changeStatus()` 새 객체 반환 및 원본 불변 검증, 모든 상태 전이 가능 확인, 필드 보존 확인
     - `StoreSettings.calculateEstimatedWait()` 계산 결과 검증
 
 ---
