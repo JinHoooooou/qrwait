@@ -206,7 +206,7 @@
 
 > ⏱ 20m | 선행: 0-1
 
-- [ ] `infrastructure/redis/RefreshTokenRepository.java` 생성
+- [x] `infrastructure/redis/RefreshTokenRepository.java` 생성
     - `save(UUID ownerId, String refreshToken, long expirySeconds)`
     - `findByOwnerId(UUID ownerId): Optional<String>`
     - `delete(UUID ownerId)`
