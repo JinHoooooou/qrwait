@@ -195,7 +195,7 @@
 
 > ⏱ 30m | 선행: 0-1
 
-- [ ] `presentation/security/JwtTokenProvider.java` 생성
+- [x] `presentation/security/JwtTokenProvider.java` 생성
     - Access Token 생성: `generateAccessToken(UUID ownerId): String`
     - Refresh Token 생성: `generateRefreshToken(UUID ownerId): String`
     - 토큰 검증: `validateToken(String token): boolean`
