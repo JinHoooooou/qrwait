@@ -84,7 +84,7 @@
 
 > ⏱ 20m | 선행: 0-2
 
-- [ ] `domain/model/Owner.java` 생성
+- [x] `domain/model/Owner.java` 생성
     - 필드: `id (UUID)`, `email (String)`, `passwordHash (String)`, `createdAt (LocalDateTime)`
     - 순수 Java 객체 (JPA 어노테이션 없음)
     - 팩토리 메서드: `create(email, passwordHash)`
