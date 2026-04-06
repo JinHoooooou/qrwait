@@ -36,9 +36,9 @@
 
 > ⏱ 15m
 
-- [ ] `spring-boot-starter-security` 추가
-- [ ] `io.jsonwebtoken:jjwt-api`, `jjwt-impl`, `jjwt-jackson` (0.12.x) 추가
-- [ ] `application.yml`에 JWT 설정 추가
+- [x] `spring-boot-starter-security` 추가
+- [x] `io.jsonwebtoken:jjwt-api`, `jjwt-impl`, `jjwt-jackson` (0.12.x) 추가
+- [x] `application.yml`에 JWT 설정 추가
   ```yaml
   jwt:
     secret: ${JWT_SECRET}

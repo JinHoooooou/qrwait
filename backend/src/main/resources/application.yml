@@ -22,3 +22,8 @@ springdoc:
     path: /swagger-ui.html
   api-docs:
     path: /v3/api-docs
+
+jwt:
+  secret: ${JWT_SECRET}
+  access-expiry: 3600      # 1시간 (초)
+  refresh-expiry: 604800   # 7일 (초)

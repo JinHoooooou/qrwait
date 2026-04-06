@@ -26,3 +26,8 @@ cors:
 
 app:
   base-url: http://localhost:5173
+
+jwt:
+  secret: test-secret-key-for-unit-tests-only-not-for-production
+  access-expiry: 3600
+  refresh-expiry: 604800
