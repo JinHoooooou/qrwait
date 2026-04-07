@@ -250,10 +250,10 @@
 
 > ⏱ 20m | 선행: 2-2, 2-4
 
-- [ ] `LogoutOwnerUseCaseImpl` 구현 — Redis에서 Refresh Token 삭제
-- [ ] `RefreshTokenUseCaseImpl` 구현
-    - HttpOnly Cookie에서 Refresh Token 추출
-    - Redis에서 유효성 검증
+- [x] `LogoutOwnerUseCaseImpl` 구현 — Redis에서 Refresh Token 삭제
+- [x] `RefreshTokenUseCaseImpl` 구현
+  - HttpOnly Cookie에서 Refresh Token 추출 (컨트롤러에서 추출 후 String으로 전달)
+  - Redis에서 유효성 검증 (토큰 존재 여부 + 저장값 일치 여부)
     - 새 Access Token 발급
 
 ### 2-6. JwtAuthFilter 구현
