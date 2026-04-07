@@ -216,13 +216,13 @@
 
 > ⏱ 25m | 선행: 1-4, 2-1
 
-- [ ] `application/dto/SignUpRequest.java` 생성
+- [x] `application/dto/SignUpRequest.java` 생성
     - 필드: `email`, `password`, `storeName`, `address`
     - `@Email`, `@NotBlank`, `@Size(min=8)` 검증 어노테이션
-- [ ] `application/dto/SignUpResponse.java` 생성
+- [x] `application/dto/SignUpResponse.java` 생성
     - 필드: `ownerId`, `storeId`, `qrUrl`
-- [ ] `application/usecase/SignUpOwnerUseCase.java` 인터페이스 정의
-- [ ] `application/usecase/SignUpOwnerUseCaseImpl.java` 구현
+- [x] `application/usecase/SignUpOwnerUseCase.java` 인터페이스 정의
+- [x] `application/usecase/SignUpOwnerUseCaseImpl.java` 구현
     - 이메일 중복 검증
     - BCrypt로 비밀번호 해싱
     - `Owner` 생성 및 저장
