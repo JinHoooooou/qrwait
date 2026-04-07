@@ -234,16 +234,16 @@
 
 > ⏱ 20m | 선행: 1-4, 2-1, 2-2
 
-- [ ] `application/dto/LoginRequest.java` 생성
-- [ ] `application/dto/LoginResponse.java` 생성
-    - 필드: `accessToken`, `ownerId`, `storeId`
-- [ ] `application/usecase/LoginOwnerUseCase.java` 인터페이스 정의
-- [ ] `application/usecase/LoginOwnerUseCaseImpl.java` 구현
+- [x] `application/dto/LoginRequest.java` 생성
+- [x] `application/dto/LoginResponse.java` 생성
+  - 필드: `accessToken`, `refreshToken`, `ownerId`, `storeId` (컨트롤러가 refreshToken을 HttpOnly Cookie로 설정)
+- [x] `application/usecase/LoginOwnerUseCase.java` 인터페이스 정의
+- [x] `application/usecase/LoginOwnerUseCaseImpl.java` 구현
     - 이메일로 Owner 조회 (없으면 `InvalidCredentialsException`)
     - BCrypt로 비밀번호 검증
     - Access Token, Refresh Token 생성
     - Refresh Token → Redis 저장
-    - Refresh Token → HttpOnly Cookie 설정
+  - Refresh Token → HttpOnly Cookie 설정 (컨트롤러 2-6에서 처리)
     - Access Token → 응답 바디 반환
 
 ### 2-5. LogoutUseCase / RefreshTokenUseCase 구현
