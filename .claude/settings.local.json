@@ -44,7 +44,8 @@
       "Bash(./gradlew bootRun --args='--spring.profiles.active=local')",
       "Read(//tmp/**)",
       "Bash(pkill -f \"bootRun\")",
-      "Bash(grep -l \"record\\\\|class\" /c/dev/study_study/qr-wait/backend/src/main/java/com/qrwait/api/application/dto/*.java)"
+      "Bash(grep -l \"record\\\\|class\" /c/dev/study_study/qr-wait/backend/src/main/java/com/qrwait/api/application/dto/*.java)",
+      "Bash(openssl rand:*)"
     ]
   }
 }
