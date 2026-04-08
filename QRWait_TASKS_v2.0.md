@@ -486,15 +486,16 @@
 
 > ⏱ 30m | 선행: Phase 2 완료
 
-- [ ] `src/store/ownerStore.ts` 생성
+- [x] `src/store/ownerStore.ts` 생성
     - 상태: `ownerId`, `storeId`, `accessToken`
-    - 액션: `setAuth()`, `clearAuth()`
-- [ ] `src/api/ownerClient.ts` 생성 (점주 전용 axios instance)
+  - 액션: `setAuth()`, `setAccessToken()`, `clearAuth()`
+- [x] `src/api/ownerClient.ts` 생성 (점주 전용 axios instance)
     - `Authorization: Bearer {accessToken}` 헤더 자동 첨부
     - 401 응답 시 `/api/auth/refresh` 자동 재시도 인터셉터
     - refresh 실패 시 `/owner/login` 리다이렉트
-- [ ] `src/api/owner.ts` 생성 — 점주 API 함수 정의
-- [ ] 앱 초기 로드 시 `/api/auth/refresh` 호출하여 Access Token 복구
+  - 동시 401 요청 처리를 위한 failedQueue 패턴 적용
+- [x] `src/api/owner.ts` 생성 — 점주 API 함수 정의 (signUp, login, logout, refreshToken)
+- [x] 앱 초기 로드 시 `/api/auth/refresh` 호출하여 Access Token 복구 (App.tsx)
 
 ### 5-2. 점주 전용 라우트 설정
 
