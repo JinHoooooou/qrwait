@@ -15,6 +15,8 @@ import com.qrwait.api.application.usecase.EnterWaitingUseCaseImpl;
 import com.qrwait.api.application.usecase.GetWaitingStatusUseCase;
 import com.qrwait.api.application.usecase.RegisterWaitingUseCase;
 import com.qrwait.api.infrastructure.sse.WaitingSseService;
+import com.qrwait.api.presentation.security.JwtAuthFilter;
+import com.qrwait.api.presentation.security.JwtTokenProvider;
 import com.qrwait.api.presentation.security.SecurityConfig;
 import java.util.UUID;
 import org.junit.jupiter.api.Test;
@@ -26,52 +28,59 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
 @WebMvcTest(WaitingController.class)
-@Import(SecurityConfig.class)
+@Import({SecurityConfig.class, JwtAuthFilter.class})
 class WaitingControllerTest {
 
-    @Autowired MockMvc mockMvc;
-    @Autowired ObjectMapper objectMapper;
-    @MockitoBean RegisterWaitingUseCase registerWaitingUseCase;
-    @MockitoBean GetWaitingStatusUseCase getWaitingStatusUseCase;
-    @MockitoBean CancelWaitingUseCase cancelWaitingUseCase;
+  @Autowired
+  MockMvc mockMvc;
+  @Autowired
+  ObjectMapper objectMapper;
+  @MockitoBean
+  JwtTokenProvider jwtTokenProvider;
+  @MockitoBean
+  RegisterWaitingUseCase registerWaitingUseCase;
+  @MockitoBean
+  GetWaitingStatusUseCase getWaitingStatusUseCase;
+  @MockitoBean
+  CancelWaitingUseCase cancelWaitingUseCase;
   @MockitoBean
   EnterWaitingUseCaseImpl enterWaitingUseCase;
   @MockitoBean
   WaitingSseService waitingSseService;
 
-    @Test
-    void register_성공_201반환_응답바디_검증() throws Exception {
-        UUID storeId = UUID.randomUUID();
-        UUID waitingId = UUID.randomUUID();
+  @Test
+  void register_성공_201반환_응답바디_검증() throws Exception {
+    UUID storeId = UUID.randomUUID();
+    UUID waitingId = UUID.randomUUID();
 
-        given(registerWaitingUseCase.execute(eq(storeId), any()))
-                .willReturn(new RegisterWaitingResponse(waitingId, 3, 3, 3, 15, "token-abc"));
+    given(registerWaitingUseCase.execute(eq(storeId), any()))
+        .willReturn(new RegisterWaitingResponse(waitingId, 3, 3, 3, 15, "token-abc"));
 
-        RegisterWaitingRequest request = new RegisterWaitingRequest();
-        request.setVisitorName("홍길동");
-        request.setPartySize(2);
+    RegisterWaitingRequest request = new RegisterWaitingRequest();
+    request.setVisitorName("홍길동");
+    request.setPartySize(2);
 
-        mockMvc.perform(post("/api/stores/{storeId}/waitings", storeId)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(request)))
-                .andExpect(status().isCreated())
-                .andExpect(jsonPath("$.waitingNumber").value(3))
-                .andExpect(jsonPath("$.currentRank").value(3))
-                .andExpect(jsonPath("$.waitingToken").value("token-abc"));
-    }
+    mockMvc.perform(post("/api/stores/{storeId}/waitings", storeId)
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(objectMapper.writeValueAsString(request)))
+        .andExpect(status().isCreated())
+        .andExpect(jsonPath("$.waitingNumber").value(3))
+        .andExpect(jsonPath("$.currentRank").value(3))
+        .andExpect(jsonPath("$.waitingToken").value("token-abc"));
+  }
 
-    @Test
-    void register_partySizeZero_400반환() throws Exception {
-        UUID storeId = UUID.randomUUID();
+  @Test
+  void register_partySizeZero_400반환() throws Exception {
+    UUID storeId = UUID.randomUUID();
 
-        RegisterWaitingRequest request = new RegisterWaitingRequest();
-        request.setVisitorName("홍길동");
-        request.setPartySize(0);
+    RegisterWaitingRequest request = new RegisterWaitingRequest();
+    request.setVisitorName("홍길동");
+    request.setPartySize(0);
 
-        mockMvc.perform(post("/api/stores/{storeId}/waitings", storeId)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(request)))
-                .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.code").value("INVALID_REQUEST"));
-    }
+    mockMvc.perform(post("/api/stores/{storeId}/waitings", storeId)
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(objectMapper.writeValueAsString(request)))
+        .andExpect(status().isBadRequest())
+        .andExpect(jsonPath("$.code").value("INVALID_REQUEST"));
+  }
 }

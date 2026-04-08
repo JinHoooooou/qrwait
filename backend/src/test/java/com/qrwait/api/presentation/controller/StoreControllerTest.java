@@ -16,6 +16,8 @@ import com.qrwait.api.application.usecase.GenerateQrImageUseCase;
 import com.qrwait.api.application.usecase.GetStoreByIdUseCase;
 import com.qrwait.api.application.usecase.GetStoreWaitingStatusUseCase;
 import com.qrwait.api.domain.model.StoreNotFoundException;
+import com.qrwait.api.presentation.security.JwtAuthFilter;
+import com.qrwait.api.presentation.security.JwtTokenProvider;
 import com.qrwait.api.presentation.security.SecurityConfig;
 import java.util.UUID;
 import org.junit.jupiter.api.Test;
@@ -27,13 +29,15 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
 @WebMvcTest(StoreController.class)
-@Import(SecurityConfig.class)
+@Import({SecurityConfig.class, JwtAuthFilter.class})
 class StoreControllerTest {
 
   @Autowired
   MockMvc mockMvc;
   @Autowired
   ObjectMapper objectMapper;
+  @MockitoBean
+  JwtTokenProvider jwtTokenProvider;
   @MockitoBean
   CreateStoreUseCase createStoreUseCase;
   @MockitoBean

@@ -270,9 +270,9 @@
 
 > ⏱ 20m | 선행: 2-6
 
-- [ ] `SecurityConfig.java` 완성
+- [x] `SecurityConfig.java` 완성
     - `/api/auth/**`, `/api/stores/**`, `/api/waitings/**` → 인증 없이 허용 (손님 API)
-    - `/api/owner/**` → JWT 인증 필수
+  - `/api/owner/**` → JWT 인증 필수 (`hasRole("OWNER")`)
     - `JwtAuthFilter`를 `UsernamePasswordAuthenticationFilter` 앞에 등록
     - CSRF 비활성화 (REST API)
     - Session stateless 설정
