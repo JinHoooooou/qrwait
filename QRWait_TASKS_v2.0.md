@@ -501,13 +501,17 @@
 
 > ⏱ 15m | 선행: 5-1
 
-- [ ] `App.tsx`에 점주 라우트 추가
+- [x] `App.tsx`에 점주 라우트 추가
     - `/owner/signup` → `OwnerSignupPage`
     - `/owner/login` → `OwnerLoginPage`
     - `/owner/onboarding` → `OnboardingPage`
     - `/owner/dashboard` → `DashboardPage`
     - `/owner/settings` → `StoreSettingsPage`
-- [ ] `PrivateRoute` 컴포넌트 구현 — 미인증 시 `/owner/login`으로 리다이렉트
+- [x] `PrivateRoute` 컴포넌트 구현 — 미인증 시 `/owner/login`으로 리다이렉트
+- [x] 루트(`/`) 접근 시 리다이렉트 처리
+  - 로그인 상태 → `/owner/dashboard`
+  - 비로그인 상태 → `/owner/login`
+- [x] 기존 `OwnerPage.tsx` 파일 제거
 
 ### 5-3. OwnerSignupPage 구현
 
