@@ -260,10 +260,10 @@
 
 > ⏱ 20m | 선행: 2-1
 
-- [ ] `presentation/security/JwtAuthFilter.java` 생성 (`OncePerRequestFilter` 상속)
+- [x] `presentation/security/JwtAuthFilter.java` 생성 (`OncePerRequestFilter` 상속)
     - `Authorization: Bearer {token}` 헤더 파싱
     - `JwtTokenProvider.validateToken()` 검증
-    - 검증 성공 시 `SecurityContextHolder`에 인증 정보 설정
+  - 검증 성공 시 `SecurityContextHolder`에 인증 정보 설정 (`ROLE_OWNER`, principal=ownerId)
     - 토큰 없거나 유효하지 않으면 다음 필터로 통과 (익명 요청 허용)
 
 ### 2-7. SecurityConfig 완성
