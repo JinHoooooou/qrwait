@@ -1,7 +1,10 @@
 package com.qrwait.api.presentation.advice;
 
+import com.qrwait.api.domain.model.DuplicateEmailException;
+import com.qrwait.api.domain.model.InvalidCredentialsException;
 import com.qrwait.api.domain.model.StoreNotFoundException;
 import com.qrwait.api.domain.model.WaitingNotFoundException;
+import java.util.stream.Collectors;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -9,10 +12,20 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
-import java.util.stream.Collectors;
-
 @RestControllerAdvice
 public class GlobalExceptionHandler {
+
+    @ExceptionHandler(InvalidCredentialsException.class)
+    @ResponseStatus(HttpStatus.UNAUTHORIZED)
+    public ErrorResponse handleInvalidCredentials(InvalidCredentialsException e) {
+        return ErrorResponse.of("INVALID_CREDENTIALS", e.getMessage());
+    }
+
+    @ExceptionHandler(DuplicateEmailException.class)
+    @ResponseStatus(HttpStatus.CONFLICT)
+    public ErrorResponse handleDuplicateEmail(DuplicateEmailException e) {
+        return ErrorResponse.of("DUPLICATE_EMAIL", e.getMessage());
+    }
 
     @ExceptionHandler(WaitingNotFoundException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)

@@ -281,16 +281,16 @@
 
 > ⏱ 25m | 선행: 2-3, 2-4, 2-5
 
-- [ ] `presentation/controller/AuthController.java` 생성
+- [x] `presentation/controller/AuthController.java` 생성
     - `POST /api/auth/signup`
-    - `POST /api/auth/login`
-    - `POST /api/auth/logout`
-    - `POST /api/auth/refresh`
-- [ ] `GlobalExceptionHandler` 수정 — `InvalidCredentialsException` → 401 처리
-- [ ] `AuthControllerTest` 작성 (`@WebMvcTest`)
+  - `POST /api/auth/login` — refreshToken → HttpOnly Cookie, accessToken → 응답 바디
+  - `POST /api/auth/logout` — Redis 삭제 + 쿠키 만료
+  - `POST /api/auth/refresh` — 쿠키에서 refreshToken 추출 후 새 accessToken 발급
+- [x] `GlobalExceptionHandler` 수정 — `InvalidCredentialsException` → 401, `DuplicateEmailException` → 409 처리
+- [x] `AuthControllerTest` 작성 (`@WebMvcTest`)
     - 회원가입 성공 → 201 + storeId, qrUrl 반환 검증
     - 중복 이메일 회원가입 → 409 반환 검증
-    - 로그인 성공 → 200 + accessToken 반환 검증
+  - 로그인 성공 → 200 + accessToken 반환 검증, HttpOnly Cookie 설정 확인
     - 잘못된 비밀번호 → 401 반환 검증
 
 ---
