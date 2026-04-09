@@ -328,7 +328,7 @@
 
 > ⏱ 20m | 선행: 1-4, 3-1
 
-- [ ] `UpdateStoreSettingsUseCase` 인터페이스 + Impl 구현
+- [x] `UpdateStoreSettingsUseCase` 인터페이스 + Impl 구현
     - storeId 소유권 검증 (ownerId 매칭)
     - `StoreSettings` 조회 후 필드 업데이트
     - 저장 후 `StoreSettingsResponse` 반환

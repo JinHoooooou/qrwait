@@ -39,6 +39,12 @@ public class StoreSettings {
         openTime, closeTime, alertThreshold, alertEnabled);
   }
 
+  public StoreSettings update(int tableCount, int avgTurnoverMinutes, LocalTime openTime,
+      LocalTime closeTime, int alertThreshold, boolean alertEnabled) {
+    return new StoreSettings(id, storeId, tableCount, avgTurnoverMinutes,
+        openTime, closeTime, alertThreshold, alertEnabled);
+  }
+
   public int calculateEstimatedWait(int aheadCount) {
     return avgTurnoverMinutes / tableCount * aheadCount;
   }
