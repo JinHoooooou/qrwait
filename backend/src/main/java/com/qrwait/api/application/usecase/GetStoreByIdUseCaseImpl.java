@@ -21,6 +21,6 @@ public class GetStoreByIdUseCaseImpl implements GetStoreByIdUseCase {
     Store store = storeRepository.findById(storeId)
         .orElseThrow(() -> new StoreNotFoundException(storeId.toString()));
 
-    return new StoreResponse(store.getId(), store.getName());
+    return new StoreResponse(store.getId(), store.getName(), store.getAddress(), store.getStatus());
   }
 }

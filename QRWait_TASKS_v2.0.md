@@ -303,17 +303,17 @@
 
 > ⏱ 20m | 선행: 1-2, 1-3
 
-- [ ] `application/dto/StoreResponse.java` 수정 — `address`, `status` 필드 추가
-- [ ] `application/dto/StoreSettingsResponse.java` 생성
+- [x] `application/dto/StoreResponse.java` 수정 — `address`, `status` 필드 추가
+- [x] `application/dto/StoreSettingsResponse.java` 생성
     - 필드: `tableCount`, `avgTurnoverMinutes`, `openTime`, `closeTime`, `alertThreshold`, `alertEnabled`, `estimatedWaitFormulaExample`
-- [ ] `application/dto/UpdateStoreSettingsRequest.java` 생성
+- [x] `application/dto/UpdateStoreSettingsRequest.java` 생성
     - 필드: `tableCount`, `avgTurnoverMinutes`, `openTime`, `closeTime`, `alertThreshold`, `alertEnabled`
     - `@Min`, `@Max` 검증 어노테이션
-- [ ] `application/dto/UpdateStoreStatusRequest.java` 생성
+- [x] `application/dto/UpdateStoreStatusRequest.java` 생성
     - 필드: `status (StoreStatus)`
-- [ ] `application/dto/OwnerWaitingResponse.java` 생성 (점주 대기 목록용)
+- [x] `application/dto/OwnerWaitingResponse.java` 생성 (점주 대기 목록용)
     - 필드: `waitingId`, `waitingNumber`, `visitorName`, `partySize`, `status`, `elapsedMinutes`
-- [ ] `application/dto/DailySummaryResponse.java` 생성
+- [x] `application/dto/DailySummaryResponse.java` 생성
     - 필드: `totalRegistered`, `totalEntered`, `totalNoShow`, `totalCancelled`, `currentWaiting`
 
 ### 3-2. GetMyStoreUseCase 구현

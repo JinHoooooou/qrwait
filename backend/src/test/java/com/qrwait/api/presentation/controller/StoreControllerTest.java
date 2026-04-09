@@ -16,6 +16,7 @@ import com.qrwait.api.application.usecase.GenerateQrImageUseCase;
 import com.qrwait.api.application.usecase.GetStoreByIdUseCase;
 import com.qrwait.api.application.usecase.GetStoreWaitingStatusUseCase;
 import com.qrwait.api.domain.model.StoreNotFoundException;
+import com.qrwait.api.domain.model.StoreStatus;
 import com.qrwait.api.presentation.security.JwtAuthFilter;
 import com.qrwait.api.presentation.security.JwtTokenProvider;
 import com.qrwait.api.presentation.security.SecurityConfig;
@@ -81,7 +82,7 @@ class StoreControllerTest {
   void getStore_존재하는_storeId_200반환() throws Exception {
     UUID storeId = UUID.randomUUID();
     given(getStoreByIdUseCase.execute(storeId))
-        .willReturn(new StoreResponse(storeId, "테스트 식당"));
+        .willReturn(new StoreResponse(storeId, "테스트 식당", "서울시 강남구", StoreStatus.OPEN));
 
     mockMvc.perform(get("/api/stores/" + storeId))
         .andExpect(status().isOk())
