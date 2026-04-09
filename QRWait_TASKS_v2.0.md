@@ -382,7 +382,7 @@
 
 > ⏱ 30m | 선행: 3-2 ~ 3-7
 
-- [ ] `presentation/controller/OwnerController.java` 생성
+- [x] `presentation/controller/OwnerController.java` 생성
     - `GET /api/owner/stores/me` — 내 매장 정보 조회
     - `PUT /api/owner/stores/me` — 매장 정보 수정 (이름, 주소)
     - `GET /api/owner/stores/me/settings` — 매장 설정 조회
@@ -393,7 +393,7 @@
     - `POST /api/owner/waitings/{waitingId}/call` — 손님 호출
     - `POST /api/owner/waitings/{waitingId}/enter` — 입장 처리
     - `POST /api/owner/waitings/{waitingId}/noshow` — 노쇼 처리
-- [ ] 모든 엔드포인트에서 `SecurityContextHolder`에서 ownerId 추출하는 헬퍼 메서드 구현
+- [x] 모든 엔드포인트에서 `SecurityContextHolder`에서 ownerId 추출하는 헬퍼 메서드 구현
 
 ### 3-9. RegisterWaitingUseCase 수정 — 매장 상태 검증 추가
 

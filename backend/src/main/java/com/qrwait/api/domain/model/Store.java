@@ -36,4 +36,8 @@ public class Store {
   public Store changeStatus(StoreStatus newStatus) {
     return Store.restore(id, ownerId, name, address, newStatus, createdAt);
   }
+
+  public Store updateInfo(String newName, String newAddress) {
+    return Store.restore(id, ownerId, newName, newAddress, status, createdAt);
+  }
 }
