@@ -296,30 +296,30 @@ public void noShow(UUID ownerId, UUID waitingId)
 
 ### STEP 5. 기존 레이어별 패키지 제거
 
-- [ ] `application/` 패키지 완전 제거 (비어 있는지 확인 후)
-- [ ] `domain/` 패키지 완전 제거
-- [ ] `infrastructure/` 패키지 완전 제거
-- [ ] `presentation/` 패키지 완전 제거 (security는 shared로 이동 완료 확인)
-- [ ] 빌드 성공 확인
-- [ ] 전체 테스트 실행 확인
+- [x] `application/` 패키지 완전 제거 (비어 있는지 확인 후)
+- [x] `domain/` 패키지 완전 제거
+- [x] `infrastructure/` 패키지 완전 제거
+- [x] `presentation/` 패키지 완전 제거 (security는 shared로 이동 완료 확인)
+- [x] 빌드 성공 확인
+- [x] 전체 테스트 실행 확인
 
 **완료 후:**
 
-- [ ] 본 문서 STEP 5 체크박스 업데이트
+- [x] 본 문서 STEP 5 체크박스 업데이트
 - 커밋 메시지: `refactor: remove legacy layer-based package structure`
 
 ### STEP 6. `CreateStoreUseCase` 제거
 
 > 현재 `CreateStoreUseCase`는 Phase 2에서 `SignUpOwnerUseCase`로 대체되었습니다. 시뮬레이션용으로만 남아 있어 제거합니다.
 
-- [ ] `StoreController`에서 `POST /api/stores` 엔드포인트 제거
-- [ ] `CreateStoreUseCase`, `CreateStoreUseCaseImpl`, `CreateStoreRequest/Response` 제거
-- [ ] 관련 테스트 제거
-- [ ] 전체 테스트 실행 확인
+- [x] `StoreController`에서 `POST /api/stores` 엔드포인트 제거
+- [x] `CreateStoreUseCase`, `CreateStoreUseCaseImpl`, `CreateStoreRequest/Response` 제거
+- [x] 관련 테스트 제거
+- [x] 전체 테스트 실행 확인
 
 **완료 후:**
 
-- [ ] 본 문서 STEP 6 체크박스 업데이트
+- [x] 본 문서 STEP 6 체크박스 업데이트
 - 커밋 메시지: `refactor: remove CreateStoreUseCase replaced by SignUpOwnerUseCase`
 
 ### STEP 7. 최종 검증
