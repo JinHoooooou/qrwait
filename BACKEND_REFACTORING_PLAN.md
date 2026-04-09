@@ -260,22 +260,22 @@ public void noShow(UUID ownerId, UUID waitingId)
 
 ### STEP 3. `store` 도메인 패키지 구성
 
-- [ ] `store/domain/` 생성 → `Store`, `StoreSettings`, `StoreStatus`, `StoreNotFoundException`, `StoreNotAvailableException`, `StoreRepository`,
+- [x] `store/domain/` 생성 → `Store`, `StoreSettings`, `StoreStatus`, `StoreNotFoundException`, `StoreNotAvailableException`, `StoreRepository`,
   `StoreSettingsRepository` 이동
-- [ ] `store/infrastructure/` 생성 → Store/StoreSettings 관련 JPA 클래스 이동
-- [ ] `store/application/dto/` 생성 → 매장 관련 DTO 이동 (`StoreResponse`, `StoreSettingsResponse`, `UpdateStoreInfoRequest`, `UpdateStoreSettingsRequest`,
+- [x] `store/infrastructure/` 생성 → Store/StoreSettings 관련 JPA 클래스 이동
+- [x] `store/application/dto/` 생성 → 매장 관련 DTO 이동 (`StoreResponse`, `StoreSettingsResponse`, `UpdateStoreInfoRequest`, `UpdateStoreSettingsRequest`,
   `UpdateStoreStatusRequest`)
-- [ ] `StoreService` 클래스 생성 — `GetMyStoreUseCase`, `UpdateStoreInfoUseCase`, `UpdateStoreStatusUseCase`, `GetStoreByIdUseCase`,
+- [x] `StoreService` 클래스 생성 — `GetMyStoreUseCase`, `UpdateStoreInfoUseCase`, `UpdateStoreStatusUseCase`, `GetStoreByIdUseCase`,
   `GenerateQrImageUseCase`, `GetStoreWaitingStatusUseCase` 통합
-- [ ] `StoreSettingsService` 클래스 생성 — `GetStoreSettingsUseCase`, `UpdateStoreSettingsUseCase` 통합
-- [ ] 기존 UseCase 인터페이스 및 구현체 제거
-- [ ] `store/presentation/` 생성 → `StoreController` 이동, `OwnerStoreController` 분리 생성
-- [ ] 관련 테스트 클래스 이동 및 import 수정
-- [ ] 전체 테스트 실행 확인
+- [x] `StoreSettingsService` 클래스 생성 — `GetStoreSettingsUseCase`, `UpdateStoreSettingsUseCase` 통합
+- [x] 기존 UseCase 인터페이스 및 구현체 제거
+- [x] `store/presentation/` 생성 → `StoreController` 이동, `OwnerStoreController` 분리 생성
+- [x] 관련 테스트 클래스 이동 및 import 수정
+- [x] 전체 테스트 실행 확인
 
 **완료 후:**
 
-- [ ] 본 문서 STEP 3 체크박스 업데이트
+- [x] 본 문서 STEP 3 체크박스 업데이트
 - 커밋 메시지: `refactor: reorganize store domain into vertical slice package`
 
 ### STEP 4. `owner` 도메인 패키지 구성

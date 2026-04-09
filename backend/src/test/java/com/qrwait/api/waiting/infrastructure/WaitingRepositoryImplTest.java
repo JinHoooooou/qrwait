@@ -2,8 +2,8 @@ package com.qrwait.api.waiting.infrastructure;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.qrwait.api.domain.model.Store;
-import com.qrwait.api.infrastructure.persistence.StoreRepositoryImpl;
+import com.qrwait.api.store.domain.Store;
+import com.qrwait.api.store.infrastructure.StoreRepositoryImpl;
 import com.qrwait.api.waiting.domain.WaitingEntry;
 import com.qrwait.api.waiting.domain.WaitingStatus;
 import java.util.List;

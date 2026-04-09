@@ -2,8 +2,8 @@ package com.qrwait.api.shared.web;
 
 import com.qrwait.api.domain.model.DuplicateEmailException;
 import com.qrwait.api.domain.model.InvalidCredentialsException;
-import com.qrwait.api.domain.model.StoreNotAvailableException;
-import com.qrwait.api.domain.model.StoreNotFoundException;
+import com.qrwait.api.store.domain.StoreNotAvailableException;
+import com.qrwait.api.store.domain.StoreNotFoundException;
 import com.qrwait.api.waiting.domain.WaitingNotFoundException;
 import java.util.stream.Collectors;
 import org.springframework.http.HttpStatus;

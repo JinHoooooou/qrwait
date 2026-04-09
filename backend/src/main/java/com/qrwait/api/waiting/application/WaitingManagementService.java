@@ -1,8 +1,7 @@
 package com.qrwait.api.waiting.application;
 
-import com.qrwait.api.domain.model.Store;
-import com.qrwait.api.domain.model.StoreNotFoundException;
-import com.qrwait.api.domain.repository.StoreRepository;
+import com.qrwait.api.store.application.StoreService;
+import com.qrwait.api.store.domain.StoreNotFoundException;
 import com.qrwait.api.waiting.application.dto.DailySummaryResponse;
 import com.qrwait.api.waiting.application.dto.OwnerWaitingResponse;
 import com.qrwait.api.waiting.domain.WaitingEntry;
@@ -23,7 +22,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class WaitingManagementService {
 
   private final WaitingRepository waitingRepository;
-  private final StoreRepository storeRepository;
+  private final StoreService storeService;
 
   @Transactional(readOnly = true)
   public List<OwnerWaitingResponse> getWaitingList(UUID ownerId) {
@@ -58,11 +57,9 @@ public class WaitingManagementService {
     WaitingEntry entry = waitingRepository.findById(waitingId)
         .orElseThrow(() -> new WaitingNotFoundException(waitingId));
 
-    Store store = storeRepository.findById(entry.getStoreId())
-        .orElseThrow(() -> new StoreNotFoundException(entry.getStoreId().toString()));
-
-    if (!store.getOwnerId().equals(ownerId)) {
-      throw new StoreNotFoundException(entry.getStoreId().toString());
+    UUID ownerStoreId = resolveStoreId(ownerId);
+    if (!ownerStoreId.equals(entry.getStoreId())) {
+      throw new StoreNotFoundException("ownerId=" + ownerId);
     }
 
     entry.call();
@@ -76,11 +73,9 @@ public class WaitingManagementService {
     WaitingEntry entry = waitingRepository.findById(waitingId)
         .orElseThrow(() -> new WaitingNotFoundException(waitingId));
 
-    Store store = storeRepository.findById(entry.getStoreId())
-        .orElseThrow(() -> new StoreNotFoundException(entry.getStoreId().toString()));
-
-    if (!store.getOwnerId().equals(ownerId)) {
-      throw new StoreNotFoundException(entry.getStoreId().toString());
+    UUID ownerStoreId = resolveStoreId(ownerId);
+    if (!ownerStoreId.equals(entry.getStoreId())) {
+      throw new StoreNotFoundException("ownerId=" + ownerId);
     }
 
     entry.enter();
@@ -94,11 +89,9 @@ public class WaitingManagementService {
     WaitingEntry entry = waitingRepository.findById(waitingId)
         .orElseThrow(() -> new WaitingNotFoundException(waitingId));
 
-    Store store = storeRepository.findById(entry.getStoreId())
-        .orElseThrow(() -> new StoreNotFoundException(entry.getStoreId().toString()));
-
-    if (!store.getOwnerId().equals(ownerId)) {
-      throw new StoreNotFoundException(entry.getStoreId().toString());
+    UUID ownerStoreId = resolveStoreId(ownerId);
+    if (!ownerStoreId.equals(entry.getStoreId())) {
+      throw new StoreNotFoundException("ownerId=" + ownerId);
     }
 
     entry.noShow();
@@ -108,9 +101,7 @@ public class WaitingManagementService {
   }
 
   private UUID resolveStoreId(UUID ownerId) {
-    return storeRepository.findByOwnerId(ownerId)
-        .orElseThrow(() -> new StoreNotFoundException(ownerId.toString()))
-        .getId();
+    return storeService.getMyStore(ownerId).storeId();
   }
 
   private OwnerWaitingResponse toOwnerWaitingResponse(WaitingEntry entry) {

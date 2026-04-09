@@ -6,8 +6,8 @@ import static org.mockito.BDDMockito.given;
 
 import com.qrwait.api.application.dto.CreateStoreRequest;
 import com.qrwait.api.application.dto.CreateStoreResponse;
-import com.qrwait.api.domain.model.Store;
-import com.qrwait.api.domain.repository.StoreRepository;
+import com.qrwait.api.store.domain.Store;
+import com.qrwait.api.store.domain.StoreRepository;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;

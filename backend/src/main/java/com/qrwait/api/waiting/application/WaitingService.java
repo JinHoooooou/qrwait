@@ -1,12 +1,12 @@
 package com.qrwait.api.waiting.application;
 
-import com.qrwait.api.domain.model.Store;
-import com.qrwait.api.domain.model.StoreNotAvailableException;
-import com.qrwait.api.domain.model.StoreNotFoundException;
-import com.qrwait.api.domain.model.StoreStatus;
-import com.qrwait.api.domain.repository.StoreRepository;
-import com.qrwait.api.domain.repository.StoreSettingsRepository;
 import com.qrwait.api.shared.sse.WaitingSseService;
+import com.qrwait.api.store.domain.Store;
+import com.qrwait.api.store.domain.StoreNotAvailableException;
+import com.qrwait.api.store.domain.StoreNotFoundException;
+import com.qrwait.api.store.domain.StoreRepository;
+import com.qrwait.api.store.domain.StoreSettingsRepository;
+import com.qrwait.api.store.domain.StoreStatus;
 import com.qrwait.api.waiting.application.dto.RegisterWaitingRequest;
 import com.qrwait.api.waiting.application.dto.RegisterWaitingResponse;
 import com.qrwait.api.waiting.application.dto.WaitingStatusResponse;
@@ -93,5 +93,12 @@ public class WaitingService {
     waitingRepository.save(entry);
 
     waitingSseService.broadcastUpdate(entry.getStoreId());
+  }
+
+  @Transactional(readOnly = true)
+  public WaitingStatusResponse getStoreWaitingStatus(UUID storeId) {
+    int totalWaiting = waitingRepository.countByStoreIdAndStatus(storeId, WaitingStatus.WAITING);
+    int estimatedWaitMinutes = totalWaiting * 5;
+    return new WaitingStatusResponse(totalWaiting, totalWaiting, estimatedWaitMinutes);
   }
 }

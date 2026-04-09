@@ -2,8 +2,8 @@ package com.qrwait.api.application.usecase;
 
 import com.qrwait.api.application.dto.CreateStoreRequest;
 import com.qrwait.api.application.dto.CreateStoreResponse;
-import com.qrwait.api.domain.model.Store;
-import com.qrwait.api.domain.repository.StoreRepository;
+import com.qrwait.api.store.domain.Store;
+import com.qrwait.api.store.domain.StoreRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
