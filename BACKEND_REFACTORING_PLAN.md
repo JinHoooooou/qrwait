@@ -280,18 +280,18 @@ public void noShow(UUID ownerId, UUID waitingId)
 
 ### STEP 4. `owner` 도메인 패키지 구성
 
-- [ ] `owner/domain/` 생성 → `Owner`, `InvalidCredentialsException`, `DuplicateEmailException`, `OwnerRepository` 이동
-- [ ] `owner/infrastructure/` 생성 → `OwnerJpaEntity`, `OwnerJpaRepository`, `OwnerRepositoryImpl` 이동
-- [ ] `owner/application/dto/` 생성 → 인증 관련 DTO 이동 (`SignUpRequest/Response`, `LoginRequest/Response`, `AccessTokenResponse`)
-- [ ] `OwnerService` 클래스 생성 — `SignUpOwnerUseCase`, `LoginOwnerUseCase`, `LogoutOwnerUseCase`, `RefreshTokenUseCase` 통합
-- [ ] 기존 UseCase 인터페이스 및 구현체 제거
-- [ ] `owner/presentation/` 생성 → `AuthController` 이동
-- [ ] 관련 테스트 클래스 이동 및 import 수정
-- [ ] 전체 테스트 실행 확인
+- [x] `owner/domain/` 생성 → `Owner`, `InvalidCredentialsException`, `DuplicateEmailException`, `OwnerRepository` 이동
+- [x] `owner/infrastructure/` 생성 → `OwnerJpaEntity`, `OwnerJpaRepository`, `OwnerRepositoryImpl` 이동
+- [x] `owner/application/dto/` 생성 → 인증 관련 DTO 이동 (`SignUpRequest/Response`, `LoginRequest/Response`, `AccessTokenResponse`)
+- [x] `OwnerService` 클래스 생성 — `SignUpOwnerUseCase`, `LoginOwnerUseCase`, `LogoutOwnerUseCase`, `RefreshTokenUseCase` 통합
+- [x] 기존 UseCase 인터페이스 및 구현체 제거
+- [x] `owner/presentation/` 생성 → `AuthController` 이동
+- [x] 관련 테스트 클래스 이동 및 import 수정
+- [x] 전체 테스트 실행 확인
 
 **완료 후:**
 
-- [ ] 본 문서 STEP 4 체크박스 업데이트
+- [x] 본 문서 STEP 4 체크박스 업데이트
 - 커밋 메시지: `refactor: reorganize owner domain into vertical slice package`
 
 ### STEP 5. 기존 레이어별 패키지 제거

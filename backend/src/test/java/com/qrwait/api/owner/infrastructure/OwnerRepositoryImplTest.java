@@ -1,8 +1,8 @@
-package com.qrwait.api.infrastructure.persistence;
+package com.qrwait.api.owner.infrastructure;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.qrwait.api.domain.model.Owner;
+import com.qrwait.api.owner.domain.Owner;
 import java.util.Optional;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

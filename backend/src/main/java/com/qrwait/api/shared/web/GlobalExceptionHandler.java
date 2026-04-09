@@ -1,7 +1,7 @@
 package com.qrwait.api.shared.web;
 
-import com.qrwait.api.domain.model.DuplicateEmailException;
-import com.qrwait.api.domain.model.InvalidCredentialsException;
+import com.qrwait.api.owner.domain.DuplicateEmailException;
+import com.qrwait.api.owner.domain.InvalidCredentialsException;
 import com.qrwait.api.store.domain.StoreNotAvailableException;
 import com.qrwait.api.store.domain.StoreNotFoundException;
 import com.qrwait.api.waiting.domain.WaitingNotFoundException;

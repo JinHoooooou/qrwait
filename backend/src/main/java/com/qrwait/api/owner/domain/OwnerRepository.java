@@ -1,6 +1,5 @@
-package com.qrwait.api.domain.repository;
+package com.qrwait.api.owner.domain;
 
-import com.qrwait.api.domain.model.Owner;
 import java.util.Optional;
 import java.util.UUID;
 

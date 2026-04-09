@@ -1,4 +1,4 @@
-package com.qrwait.api.application.dto;
+package com.qrwait.api.owner.application.dto;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;

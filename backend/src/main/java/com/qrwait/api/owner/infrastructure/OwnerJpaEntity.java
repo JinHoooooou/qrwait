@@ -1,6 +1,6 @@
-package com.qrwait.api.infrastructure.persistence;
+package com.qrwait.api.owner.infrastructure;
 
-import com.qrwait.api.domain.model.Owner;
+import com.qrwait.api.owner.domain.Owner;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;

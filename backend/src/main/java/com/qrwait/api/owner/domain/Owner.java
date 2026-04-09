@@ -1,4 +1,4 @@
-package com.qrwait.api.domain.model;
+package com.qrwait.api.owner.domain;
 
 import java.time.LocalDateTime;
 import java.util.UUID;

@@ -1,7 +1,7 @@
-package com.qrwait.api.infrastructure.persistence;
+package com.qrwait.api.owner.infrastructure;
 
-import com.qrwait.api.domain.model.Owner;
-import com.qrwait.api.domain.repository.OwnerRepository;
+import com.qrwait.api.owner.domain.Owner;
+import com.qrwait.api.owner.domain.OwnerRepository;
 import java.util.Optional;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;

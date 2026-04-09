@@ -1,14 +1,11 @@
-package com.qrwait.api.presentation.controller;
+package com.qrwait.api.owner.presentation;
 
-import com.qrwait.api.application.dto.AccessTokenResponse;
-import com.qrwait.api.application.dto.LoginRequest;
-import com.qrwait.api.application.dto.LoginResponse;
-import com.qrwait.api.application.dto.SignUpRequest;
-import com.qrwait.api.application.dto.SignUpResponse;
-import com.qrwait.api.application.usecase.LoginOwnerUseCase;
-import com.qrwait.api.application.usecase.LogoutOwnerUseCase;
-import com.qrwait.api.application.usecase.RefreshTokenUseCase;
-import com.qrwait.api.application.usecase.SignUpOwnerUseCase;
+import com.qrwait.api.owner.application.OwnerService;
+import com.qrwait.api.owner.application.dto.AccessTokenResponse;
+import com.qrwait.api.owner.application.dto.LoginRequest;
+import com.qrwait.api.owner.application.dto.LoginResponse;
+import com.qrwait.api.owner.application.dto.SignUpRequest;
+import com.qrwait.api.owner.application.dto.SignUpResponse;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
@@ -31,38 +28,35 @@ public class AuthController {
 
   static final String REFRESH_TOKEN_COOKIE = "refresh_token";
 
-  private final SignUpOwnerUseCase signUpOwnerUseCase;
-  private final LoginOwnerUseCase loginOwnerUseCase;
-  private final LogoutOwnerUseCase logoutOwnerUseCase;
-  private final RefreshTokenUseCase refreshTokenUseCase;
+  private final OwnerService ownerService;
 
   @Value("${jwt.refresh-expiry}")
   private int refreshExpirySeconds;
 
   @PostMapping("/signup")
   public ResponseEntity<SignUpResponse> signUp(@Valid @RequestBody SignUpRequest request) {
-    SignUpResponse response = signUpOwnerUseCase.execute(request);
+    SignUpResponse response = ownerService.signUp(request);
     URI location = URI.create("/api/owner/stores/" + response.storeId());
     return ResponseEntity.created(location).body(response);
   }
 
   @PostMapping("/login")
   public ResponseEntity<LoginResponse> login(@Valid @RequestBody LoginRequest request, HttpServletResponse httpResponse) {
-    LoginResponse response = loginOwnerUseCase.execute(request);
+    LoginResponse response = ownerService.login(request);
     setRefreshTokenCookie(httpResponse, response.refreshToken());
     return ResponseEntity.ok(response);
   }
 
   @PostMapping("/logout")
   public ResponseEntity<Void> logout(@AuthenticationPrincipal UUID ownerId, HttpServletResponse httpResponse) {
-    logoutOwnerUseCase.execute(ownerId);
+    ownerService.logout(ownerId);
     clearRefreshTokenCookie(httpResponse);
     return ResponseEntity.noContent().build();
   }
 
   @PostMapping("/refresh")
   public ResponseEntity<AccessTokenResponse> refresh(@CookieValue(REFRESH_TOKEN_COOKIE) String refreshToken) {
-    String newAccessToken = refreshTokenUseCase.execute(refreshToken);
+    String newAccessToken = ownerService.refresh(refreshToken);
     return ResponseEntity.ok(new AccessTokenResponse(newAccessToken));
   }
 

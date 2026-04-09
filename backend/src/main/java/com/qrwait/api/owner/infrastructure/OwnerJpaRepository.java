@@ -1,4 +1,4 @@
-package com.qrwait.api.infrastructure.persistence;
+package com.qrwait.api.owner.infrastructure;
 
 import java.util.Optional;
 import java.util.UUID;
