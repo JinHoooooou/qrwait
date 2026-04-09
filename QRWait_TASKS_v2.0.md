@@ -347,7 +347,7 @@
 
 > ⏱ 20m | 선행: 1-4, 3-1
 
-- [ ] `GetOwnerWaitingListUseCase` 인터페이스 + Impl 구현
+- [x] `GetOwnerWaitingListUseCase` 인터페이스 + Impl 구현
     - storeId의 WAITING / CALLED 상태 목록 조회
     - 각 항목에 `elapsedMinutes` 계산 (`now - createdAt`)
     - `List<OwnerWaitingResponse>` 반환

@@ -3,12 +3,11 @@ package com.qrwait.api.infrastructure.persistence;
 import com.qrwait.api.domain.model.WaitingEntry;
 import com.qrwait.api.domain.model.WaitingStatus;
 import com.qrwait.api.domain.repository.WaitingRepository;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Repository;
-
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Repository;
 
 @Repository
 @RequiredArgsConstructor
@@ -31,6 +30,15 @@ public class WaitingRepositoryImpl implements WaitingRepository {
     public List<WaitingEntry> findByStoreIdAndStatus(UUID storeId, WaitingStatus status) {
         return waitingEntryJpaRepository.findByStoreIdAndStatus(storeId, status.name())
                 .stream()
+            .map(WaitingEntryJpaEntity::toDomain)
+            .toList();
+    }
+
+  @Override
+  public List<WaitingEntry> findActiveByStoreId(UUID storeId) {
+    List<String> activeStatuses = List.of(WaitingStatus.WAITING.name(), WaitingStatus.CALLED.name());
+    return waitingEntryJpaRepository.findByStoreIdAndStatusInOrderByCreatedAtAsc(storeId, activeStatuses)
+        .stream()
                 .map(WaitingEntryJpaEntity::toDomain)
                 .toList();
     }
