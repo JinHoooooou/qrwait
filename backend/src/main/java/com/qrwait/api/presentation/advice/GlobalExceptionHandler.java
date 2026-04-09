@@ -2,6 +2,7 @@ package com.qrwait.api.presentation.advice;
 
 import com.qrwait.api.domain.model.DuplicateEmailException;
 import com.qrwait.api.domain.model.InvalidCredentialsException;
+import com.qrwait.api.domain.model.StoreNotAvailableException;
 import com.qrwait.api.domain.model.StoreNotFoundException;
 import com.qrwait.api.domain.model.WaitingNotFoundException;
 import java.util.stream.Collectors;
@@ -47,6 +48,12 @@ public class GlobalExceptionHandler {
                 .collect(Collectors.joining(", "));
         return ErrorResponse.of("INVALID_REQUEST", message);
     }
+
+  @ExceptionHandler(StoreNotAvailableException.class)
+  @ResponseStatus(HttpStatus.CONFLICT)
+  public ErrorResponse handleStoreNotAvailable(StoreNotAvailableException e) {
+    return ErrorResponse.of("STORE_NOT_AVAILABLE", e.getMessage());
+  }
 
     @ExceptionHandler(IllegalStateException.class)
     @ResponseStatus(HttpStatus.CONFLICT)

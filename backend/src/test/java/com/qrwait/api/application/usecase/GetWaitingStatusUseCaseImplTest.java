@@ -8,6 +8,7 @@ import com.qrwait.api.application.dto.WaitingStatusResponse;
 import com.qrwait.api.domain.model.WaitingEntry;
 import com.qrwait.api.domain.model.WaitingNotFoundException;
 import com.qrwait.api.domain.model.WaitingStatus;
+import com.qrwait.api.domain.repository.StoreSettingsRepository;
 import com.qrwait.api.domain.repository.WaitingRepository;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -24,6 +25,8 @@ class GetWaitingStatusUseCaseImplTest {
 
   @Mock
   WaitingRepository waitingRepository;
+  @Mock
+  StoreSettingsRepository storeSettingsRepository;
   @InjectMocks
   GetWaitingStatusUseCaseImpl useCase;
 

@@ -399,10 +399,10 @@
 
 > ⏱ 15m | 선행: 1-3
 
-- [ ] `RegisterWaitingUseCaseImpl` 수정
+- [x] `RegisterWaitingUseCaseImpl` 수정
     - 매장 조회 후 `store.getStatus() != OPEN`이면 `StoreNotAvailableException` 발생
-- [ ] `GlobalExceptionHandler`에 `StoreNotAvailableException` → 409 처리 추가
-- [ ] `GetWaitingStatusUseCaseImpl` 수정
+- [x] `GlobalExceptionHandler`에 `StoreNotAvailableException` → 409 처리 추가
+- [x] `GetWaitingStatusUseCaseImpl` 수정
     - 예상 대기시간 계산을 `StoreSettings.calculateEstimatedWait()` 메서드로 교체
     - `StoreSettingsRepository.findByStoreId()` 조회 추가
 

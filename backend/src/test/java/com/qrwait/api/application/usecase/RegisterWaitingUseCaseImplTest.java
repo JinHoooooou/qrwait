@@ -8,11 +8,14 @@ import static org.mockito.BDDMockito.given;
 import com.qrwait.api.application.dto.RegisterWaitingRequest;
 import com.qrwait.api.application.dto.RegisterWaitingResponse;
 import com.qrwait.api.domain.model.Store;
+import com.qrwait.api.domain.model.StoreNotAvailableException;
 import com.qrwait.api.domain.model.StoreNotFoundException;
+import com.qrwait.api.domain.model.StoreStatus;
 import com.qrwait.api.domain.model.WaitingEntry;
 import com.qrwait.api.domain.model.WaitingStatus;
 import com.qrwait.api.domain.repository.StoreRepository;
 import com.qrwait.api.domain.repository.WaitingRepository;
+import java.time.LocalDateTime;
 import java.util.Optional;
 import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
@@ -66,11 +69,19 @@ class RegisterWaitingUseCaseImplTest {
 
   @Test
   void execute_존재하지않는_storeId_예외발생() {
-    // given
     given(storeRepository.findById(storeId)).willReturn(Optional.empty());
 
-    // when & then
     assertThatThrownBy(() -> useCase.execute(storeId, request))
         .isInstanceOf(StoreNotFoundException.class);
+  }
+
+  @Test
+  void execute_매장_OPEN아닐때_예외발생() {
+    Store closedStore = Store.restore(storeId, UUID.randomUUID(), "테스트 식당", "서울",
+        StoreStatus.CLOSED, LocalDateTime.now());
+    given(storeRepository.findById(storeId)).willReturn(Optional.of(closedStore));
+
+    assertThatThrownBy(() -> useCase.execute(storeId, request))
+        .isInstanceOf(StoreNotAvailableException.class);
   }
 }

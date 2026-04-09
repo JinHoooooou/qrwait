@@ -4,19 +4,20 @@ import com.qrwait.api.application.dto.WaitingStatusResponse;
 import com.qrwait.api.domain.model.WaitingEntry;
 import com.qrwait.api.domain.model.WaitingNotFoundException;
 import com.qrwait.api.domain.model.WaitingStatus;
+import com.qrwait.api.domain.repository.StoreSettingsRepository;
 import com.qrwait.api.domain.repository.WaitingRepository;
+import java.util.List;
+import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
-import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
 public class GetWaitingStatusUseCaseImpl implements GetWaitingStatusUseCase {
 
     private final WaitingRepository waitingRepository;
+  private final StoreSettingsRepository storeSettingsRepository;
 
     @Override
     @Transactional(readOnly = true)
@@ -41,8 +42,10 @@ public class GetWaitingStatusUseCaseImpl implements GetWaitingStatusUseCase {
         int currentRank = (int) ahead + 1;
         int totalWaiting = waitingList.size();
 
-        // 3. 예상 대기시간 산출 (앞 팀 수 × 평균 5분)
-        int estimatedWaitMinutes = (int) ahead * 5;
+      // 3. 예상 대기시간 산출 (StoreSettings 기반)
+      int estimatedWaitMinutes = storeSettingsRepository.findByStoreId(entry.getStoreId())
+          .map(settings -> settings.calculateEstimatedWait((int) ahead))
+          .orElse((int) ahead * 5);
 
         return new WaitingStatusResponse(currentRank, totalWaiting, estimatedWaitMinutes);
     }
