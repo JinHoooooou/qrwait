@@ -320,7 +320,7 @@
 
 > ⏱ 15m | 선행: 1-4, 3-1
 
-- [ ] `GetMyStoreUseCase` 인터페이스 + Impl 구현
+- [x] `GetMyStoreUseCase` 인터페이스 + Impl 구현
     - ownerId로 Store 조회 (없으면 `StoreNotFoundException`)
     - `StoreResponse` 반환
 
