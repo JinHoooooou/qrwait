@@ -337,7 +337,7 @@
 
 > ⏱ 20m | 선행: 1-3, 1-4
 
-- [ ] `UpdateStoreStatusUseCase` 인터페이스 + Impl 구현
+- [x] `UpdateStoreStatusUseCase` 인터페이스 + Impl 구현
     - storeId 소유권 검증
     - `store.changeStatus(newStatus)` 호출
     - 저장 후 SSE 브로드캐스트 트리거 — 손님 화면에 상태 변경 이벤트 전송
