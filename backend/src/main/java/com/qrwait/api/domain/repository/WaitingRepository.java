@@ -2,6 +2,7 @@ package com.qrwait.api.domain.repository;
 
 import com.qrwait.api.domain.model.WaitingEntry;
 import com.qrwait.api.domain.model.WaitingStatus;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -17,6 +18,8 @@ public interface WaitingRepository {
   List<WaitingEntry> findActiveByStoreId(UUID storeId);
 
     int countByStoreIdAndStatus(UUID storeId, WaitingStatus status);
+
+  long countByStoreIdAndStatusAndDate(UUID storeId, WaitingStatus status, LocalDate date);
 
     int findNextWaitingNumber(UUID storeId);
 }

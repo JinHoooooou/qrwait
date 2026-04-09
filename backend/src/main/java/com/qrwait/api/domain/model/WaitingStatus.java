@@ -4,5 +4,6 @@ public enum WaitingStatus {
     WAITING,
     CALLED,
     ENTERED,
+  NO_SHOW,
     CANCELLED
 }

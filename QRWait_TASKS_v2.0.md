@@ -356,7 +356,7 @@
 
 > ⏱ 15m | 선행: 1-4, 3-1
 
-- [ ] `GetDailySummaryUseCase` 인터페이스 + Impl 구현
+- [x] `GetDailySummaryUseCase` 인터페이스 + Impl 구현
     - 오늘 날짜 기준으로 storeId의 상태별 건수 집계
     - `WaitingRepository`에 `countByStoreIdAndStatusAndDate()` 메서드 추가
     - `DailySummaryResponse` 반환

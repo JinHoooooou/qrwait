@@ -3,6 +3,8 @@ package com.qrwait.api.infrastructure.persistence;
 import com.qrwait.api.domain.model.WaitingEntry;
 import com.qrwait.api.domain.model.WaitingStatus;
 import com.qrwait.api.domain.repository.WaitingRepository;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -47,6 +49,13 @@ public class WaitingRepositoryImpl implements WaitingRepository {
     public int countByStoreIdAndStatus(UUID storeId, WaitingStatus status) {
         return waitingEntryJpaRepository.countByStoreIdAndStatus(storeId, status.name());
     }
+
+  @Override
+  public long countByStoreIdAndStatusAndDate(UUID storeId, WaitingStatus status, LocalDate date) {
+    LocalDateTime startOfDay = date.atStartOfDay();
+    LocalDateTime endOfDay = date.plusDays(1).atStartOfDay();
+    return waitingEntryJpaRepository.countByStoreIdAndStatusAndDate(storeId, status.name(), startOfDay, endOfDay);
+  }
 
     @Override
     public int findNextWaitingNumber(UUID storeId) {
