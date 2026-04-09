@@ -241,21 +241,21 @@ public void noShow(UUID ownerId, UUID waitingId)
 
 > 의존성이 가장 적은 도메인부터 시작합니다.
 
-- [ ] `waiting/domain/` 생성 → `WaitingEntry`, `WaitingStatus`, `WaitingNotFoundException`, `WaitingRepository` 이동
-- [ ] `waiting/infrastructure/` 생성 → `WaitingEntryJpaEntity`, `WaitingEntryJpaRepository`, `WaitingRepositoryImpl` 이동
-- [ ] `waiting/application/dto/` 생성 → 웨이팅 관련 DTO 이동 (`RegisterWaitingRequest/Response`, `WaitingStatusResponse`, `OwnerWaitingResponse`,
+- [x] `waiting/domain/` 생성 → `WaitingEntry`, `WaitingStatus`, `WaitingNotFoundException`, `WaitingRepository` 이동
+- [x] `waiting/infrastructure/` 생성 → `WaitingEntryJpaEntity`, `WaitingEntryJpaRepository`, `WaitingRepositoryImpl` 이동
+- [x] `waiting/application/dto/` 생성 → 웨이팅 관련 DTO 이동 (`RegisterWaitingRequest/Response`, `WaitingStatusResponse`, `OwnerWaitingResponse`,
   `DailySummaryResponse`)
-- [ ] `WaitingService` 클래스 생성 — `RegisterWaitingUseCase`, `GetWaitingStatusUseCase`, `CancelWaitingUseCase` 통합
-- [ ] `WaitingManagementService` 클래스 생성 — `CallWaitingUseCase`, `EnterWaitingUseCase`, `NoShowWaitingUseCase`, `GetOwnerWaitingListUseCase`,
+- [x] `WaitingService` 클래스 생성 — `RegisterWaitingUseCase`, `GetWaitingStatusUseCase`, `CancelWaitingUseCase` 통합
+- [x] `WaitingManagementService` 클래스 생성 — `CallWaitingUseCase`, `EnterWaitingUseCase`, `NoShowWaitingUseCase`, `GetOwnerWaitingListUseCase`,
   `GetDailySummaryUseCase` 통합
-- [ ] 기존 UseCase 인터페이스 및 구현체 제거
-- [ ] `waiting/presentation/` 생성 → `WaitingController` 이동, `OwnerWaitingController` 분리 생성
-- [ ] 관련 테스트 클래스 이동 및 import 수정
-- [ ] 전체 테스트 실행 확인
+- [x] 기존 UseCase 인터페이스 및 구현체 제거
+- [x] `waiting/presentation/` 생성 → `WaitingController` 이동, `OwnerWaitingController` 분리 생성
+- [x] 관련 테스트 클래스 이동 및 import 수정
+- [x] 전체 테스트 실행 확인
 
 **완료 후:**
 
-- [ ] 본 문서 STEP 2 체크박스 업데이트
+- [x] 본 문서 STEP 2 체크박스 업데이트
 - 커밋 메시지: `refactor: reorganize waiting domain into vertical slice package`
 
 ### STEP 3. `store` 도메인 패키지 구성

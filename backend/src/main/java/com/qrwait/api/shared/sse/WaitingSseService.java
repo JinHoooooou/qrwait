@@ -1,8 +1,8 @@
 package com.qrwait.api.shared.sse;
 
-import com.qrwait.api.application.dto.WaitingStatusResponse;
-import com.qrwait.api.domain.model.WaitingStatus;
-import com.qrwait.api.domain.repository.WaitingRepository;
+import com.qrwait.api.waiting.application.dto.WaitingStatusResponse;
+import com.qrwait.api.waiting.domain.WaitingRepository;
+import com.qrwait.api.waiting.domain.WaitingStatus;
 import java.io.IOException;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;

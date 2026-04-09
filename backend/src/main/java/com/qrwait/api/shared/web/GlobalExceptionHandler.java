@@ -4,7 +4,7 @@ import com.qrwait.api.domain.model.DuplicateEmailException;
 import com.qrwait.api.domain.model.InvalidCredentialsException;
 import com.qrwait.api.domain.model.StoreNotAvailableException;
 import com.qrwait.api.domain.model.StoreNotFoundException;
-import com.qrwait.api.domain.model.WaitingNotFoundException;
+import com.qrwait.api.waiting.domain.WaitingNotFoundException;
 import java.util.stream.Collectors;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.FieldError;
