@@ -13,7 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
-public class EnterWaitingUseCaseImpl implements EnterWaitingUseCase {
+public class NoShowWaitingUseCaseImpl implements NoShowWaitingUseCase {
 
   private final WaitingRepository waitingRepository;
   private final StoreRepository storeRepository;
@@ -31,7 +31,7 @@ public class EnterWaitingUseCaseImpl implements EnterWaitingUseCase {
       throw new StoreNotFoundException(entry.getStoreId().toString());
     }
 
-    entry.enter();
+    entry.noShow();
     waitingRepository.save(entry);
 
     // TODO: Phase 4에서 SSE 추가 — 매장 전체 브로드캐스트

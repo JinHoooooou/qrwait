@@ -365,17 +365,17 @@
 
 > ⏱ 30m | 선행: 1-4
 
-- [ ] `CallWaitingUseCase` 인터페이스 + Impl 구현
+- [x] `CallWaitingUseCase` 인터페이스 + Impl 구현
     - storeId 소유권 검증
     - `entry.call()` 호출 (WAITING → CALLED)
     - 저장 후 해당 손님 SSE 채널에 `called` 이벤트 발송
-- [ ] `EnterWaitingUseCase` 인터페이스 + Impl 구현 (기존 시뮬레이션용 대체)
+- [x] `EnterWaitingUseCase` 인터페이스 + Impl 구현 (기존 시뮬레이션용 대체)
     - storeId 소유권 검증
     - `entry.enter()` 호출 (CALLED → ENTERED)
     - 저장 후 매장 전체 SSE 브로드캐스트
-- [ ] `NoShowWaitingUseCase` 인터페이스 + Impl 구현
+- [x] `NoShowWaitingUseCase` 인터페이스 + Impl 구현
     - storeId 소유권 검증
-    - `entry.cancel()` 호출 (→ CANCELLED)
+  - `entry.noShow()` 호출 (→ NO_SHOW)
     - 저장 후 매장 전체 SSE 브로드캐스트
 
 ### 3-8. OwnerController 구현

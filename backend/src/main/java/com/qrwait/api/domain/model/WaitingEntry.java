@@ -1,9 +1,8 @@
 package com.qrwait.api.domain.model;
 
-import lombok.Getter;
-
 import java.time.LocalDateTime;
 import java.util.UUID;
+import lombok.Getter;
 
 @Getter
 public class WaitingEntry {
@@ -74,4 +73,15 @@ public class WaitingEntry {
         }
         this.status = WaitingStatus.CANCELLED;
     }
+
+  /**
+   * CALLED → NO_SHOW
+   */
+  public void noShow() {
+    if (status != WaitingStatus.CALLED) {
+      throw new IllegalStateException(
+          "noShow() 는 CALLED 상태에서만 가능합니다. 현재 상태: " + status);
+    }
+    this.status = WaitingStatus.NO_SHOW;
+  }
 }
