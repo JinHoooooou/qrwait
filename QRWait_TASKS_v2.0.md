@@ -526,10 +526,10 @@
 
 > ⏱ 20m | 선행: 5-2
 
-- [ ] 이메일, 비밀번호 입력 폼
-- [ ] `POST /api/auth/login` 호출
-- [ ] 성공 시 Access Token → ownerStore 저장, `DashboardPage`로 이동
-- [ ] 회원가입 페이지 링크
+- [x] 이메일, 비밀번호 입력 폼
+- [x] `POST /api/auth/login` 호출
+- [x] 성공 시 Access Token → ownerStore 저장, `DashboardPage`로 이동
+- [x] 회원가입 페이지 링크
 
 ### 5-5. OnboardingPage 구현
 
