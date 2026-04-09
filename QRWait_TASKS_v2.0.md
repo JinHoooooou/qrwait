@@ -535,11 +535,11 @@
 
 > ⏱ 25m | 선행: 5-3
 
-- [ ] 단계별 가이드 UI (3단계)
+- [x] 단계별 가이드 UI (3단계)
     - 1단계: QR 코드 확인 및 PNG 다운로드 버튼
-    - 2단계: 테이블 수 / 팀당 평균 이용시간 초기 설정
+  - 2단계: 테이블 수 / 팀당 평균 이용시간 초기 설정 (`PUT /api/owner/stores/me/settings` — Phase 3 완료 후 동작)
     - 3단계: 대시보드 사용법 안내
-- [ ] 완료 시 `DashboardPage`로 이동
+- [x] 완료 시 `DashboardPage`로 이동
 
 ### 5-6. DashboardPage 구현 (핵심)
 

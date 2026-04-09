@@ -39,3 +39,11 @@ export const logout = (): Promise<void> =>
 
 export const refreshToken = (): Promise<{ accessToken: string; ownerId: string; storeId: string }> =>
     axios.post('/api/auth/refresh', {}, {withCredentials: true}).then((res) => res.data)
+
+export interface UpdateStoreSettingsRequest {
+  tableCount: number
+  avgTurnoverMinutes: number
+}
+
+export const updateStoreSettings = (body: UpdateStoreSettingsRequest): Promise<void> =>
+    ownerClient.put('/owner/stores/me/settings', body).then((res) => res.data)
