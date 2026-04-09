@@ -1,4 +1,4 @@
-package com.qrwait.api.presentation.security;
+package com.qrwait.api.shared.security;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;

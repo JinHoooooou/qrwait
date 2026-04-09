@@ -1,6 +1,6 @@
 package com.qrwait.api.application.usecase;
 
-import com.qrwait.api.infrastructure.redis.RefreshTokenRepository;
+import com.qrwait.api.shared.redis.RefreshTokenRepository;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;

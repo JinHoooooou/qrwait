@@ -1,4 +1,4 @@
-package com.qrwait.api.infrastructure.redis;
+package com.qrwait.api.shared.redis;
 
 import java.util.Optional;
 import java.util.UUID;

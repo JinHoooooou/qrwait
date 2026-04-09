@@ -46,7 +46,13 @@
       "Bash(pkill -f \"bootRun\")",
       "Bash(grep -l \"record\\\\|class\" /c/dev/study_study/qr-wait/backend/src/main/java/com/qrwait/api/application/dto/*.java)",
       "Bash(openssl rand:*)",
-      "Bash(grep:*)"
+      "Bash(grep:*)",
+      "Bash(find /c/dev/study_study/qr-wait/backend/src/main/java/com/qrwait/api/application /c/dev/study_study/qr-wait/backend/src/main/java/com/qrwait/api/presentation/controller -name '*.java' -exec sed -i 's/com\\\\.qrwait\\\\.api\\\\.presentation\\\\.security/com.qrwait.api.shared.security/g' '{}' ';')",
+      "Bash(find /c/dev/study_study/qr-wait/backend/src/test/java/com/qrwait/api -name '*.java' -exec sed -i 's/com\\\\.qrwait\\\\.api\\\\.presentation\\\\.security/com.qrwait.api.shared.security/g' '{}' ';')",
+      "Bash(find /c/dev/study_study/qr-wait/backend/src/main/java/com/qrwait/api/application /c/dev/study_study/qr-wait/backend/src/main/java/com/qrwait/api/presentation/controller -name '*.java' -exec sed -i 's/com\\\\.qrwait\\\\.api\\\\.infrastructure\\\\.sse/com.qrwait.api.shared.sse/g' '{}' ';')",
+      "Bash(find /c/dev/study_study/qr-wait/backend/src/test/java/com/qrwait/api -name '*.java' -exec sed -i 's/com\\\\.qrwait\\\\.api\\\\.infrastructure\\\\.sse/com.qrwait.api.shared.sse/g' '{}' ';')",
+      "Bash(find /c/dev/study_study/qr-wait/backend/src/main/java/com/qrwait/api/application /c/dev/study_study/qr-wait/backend/src/main/java/com/qrwait/api/presentation/controller -name '*.java' -exec sed -i 's/com\\\\.qrwait\\\\.api\\\\.infrastructure\\\\.redis/com.qrwait.api.shared.redis/g' '{}' ';')",
+      "Bash(./gradlew compileJava compileTestJava)"
     ]
   }
 }

@@ -5,8 +5,8 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.BDDMockito.given;
 
 import com.qrwait.api.domain.model.InvalidCredentialsException;
-import com.qrwait.api.infrastructure.redis.RefreshTokenRepository;
-import com.qrwait.api.presentation.security.JwtTokenProvider;
+import com.qrwait.api.shared.redis.RefreshTokenRepository;
+import com.qrwait.api.shared.security.JwtTokenProvider;
 import java.util.Optional;
 import java.util.UUID;
 import org.junit.jupiter.api.Test;

@@ -4,10 +4,9 @@ import com.qrwait.api.application.dto.RegisterWaitingRequest;
 import com.qrwait.api.application.dto.RegisterWaitingResponse;
 import com.qrwait.api.application.dto.WaitingStatusResponse;
 import com.qrwait.api.application.usecase.CancelWaitingUseCase;
-import com.qrwait.api.application.usecase.EnterWaitingUseCaseImpl;
 import com.qrwait.api.application.usecase.GetWaitingStatusUseCase;
 import com.qrwait.api.application.usecase.RegisterWaitingUseCase;
-import com.qrwait.api.infrastructure.sse.WaitingSseService;
+import com.qrwait.api.shared.sse.WaitingSseService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
@@ -22,7 +21,6 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -38,7 +36,6 @@ public class WaitingController {
     private final RegisterWaitingUseCase registerWaitingUseCase;
     private final GetWaitingStatusUseCase getWaitingStatusUseCase;
     private final CancelWaitingUseCase cancelWaitingUseCase;
-    private final EnterWaitingUseCaseImpl enterWaitingUseCase;
     private final WaitingSseService waitingSseService;
 
   @Operation(summary = "웨이팅 등록", description = "매장에 웨이팅을 등록합니다. 등록 성공 시 waitingId와 대기 순번을 반환합니다.")
@@ -87,11 +84,4 @@ public class WaitingController {
         return waitingSseService.subscribe(storeId, waitingId);
     }
 
-  @Operation(summary = "[시뮬레이션] 입장 처리", description = "SSE 동작 검증용 입장 처리 API. 점주 대시보드 구현 전까지 사용합니다.")
-  @ApiResponse(responseCode = "204", description = "입장 처리 성공")
-    @PutMapping("/waitings/{waitingId}/enter")
-    public ResponseEntity<Void> enter(@PathVariable UUID waitingId) {
-        enterWaitingUseCase.execute(waitingId);
-        return ResponseEntity.noContent().build();
-    }
 }

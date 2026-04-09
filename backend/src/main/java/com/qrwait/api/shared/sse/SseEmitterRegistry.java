@@ -1,4 +1,4 @@
-package com.qrwait.api.infrastructure.sse;
+package com.qrwait.api.shared.sse;
 
 import java.io.IOException;
 import java.util.List;

@@ -1,4 +1,4 @@
-package com.qrwait.api.infrastructure.sse;
+package com.qrwait.api.shared.sse;
 
 import com.qrwait.api.application.dto.WaitingStatusResponse;
 import com.qrwait.api.domain.model.WaitingStatus;

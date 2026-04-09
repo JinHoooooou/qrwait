@@ -2,7 +2,7 @@ package com.qrwait.api.application.usecase;
 
 import static org.mockito.Mockito.verify;
 
-import com.qrwait.api.infrastructure.redis.RefreshTokenRepository;
+import com.qrwait.api.shared.redis.RefreshTokenRepository;
 import java.util.UUID;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

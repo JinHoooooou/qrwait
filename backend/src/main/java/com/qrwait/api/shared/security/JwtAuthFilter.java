@@ -1,4 +1,4 @@
-package com.qrwait.api.presentation.security;
+package com.qrwait.api.shared.security;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;

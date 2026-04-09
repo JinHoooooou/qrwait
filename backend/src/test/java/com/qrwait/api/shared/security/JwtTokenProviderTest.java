@@ -1,4 +1,4 @@
-package com.qrwait.api.presentation.security;
+package com.qrwait.api.shared.security;
 
 import static org.assertj.core.api.Assertions.assertThat;
 

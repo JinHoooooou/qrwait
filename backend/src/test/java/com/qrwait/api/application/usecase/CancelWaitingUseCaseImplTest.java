@@ -9,7 +9,7 @@ import com.qrwait.api.domain.model.WaitingEntry;
 import com.qrwait.api.domain.model.WaitingNotFoundException;
 import com.qrwait.api.domain.model.WaitingStatus;
 import com.qrwait.api.domain.repository.WaitingRepository;
-import com.qrwait.api.infrastructure.sse.WaitingSseService;
+import com.qrwait.api.shared.sse.WaitingSseService;
 import java.time.LocalDateTime;
 import java.util.Optional;
 import java.util.UUID;

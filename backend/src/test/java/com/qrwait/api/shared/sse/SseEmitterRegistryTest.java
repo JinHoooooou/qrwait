@@ -1,4 +1,4 @@
-package com.qrwait.api.infrastructure.sse;
+package com.qrwait.api.shared.sse;
 
 import static org.assertj.core.api.Assertions.assertThatNoException;
 import static org.mockito.ArgumentMatchers.any;

@@ -3,7 +3,7 @@ package com.qrwait.api.application.usecase;
 import com.qrwait.api.domain.model.WaitingEntry;
 import com.qrwait.api.domain.model.WaitingNotFoundException;
 import com.qrwait.api.domain.repository.WaitingRepository;
-import com.qrwait.api.infrastructure.sse.WaitingSseService;
+import com.qrwait.api.shared.sse.WaitingSseService;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;

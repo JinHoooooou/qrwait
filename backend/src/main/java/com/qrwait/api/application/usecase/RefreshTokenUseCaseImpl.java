@@ -1,8 +1,8 @@
 package com.qrwait.api.application.usecase;
 
 import com.qrwait.api.domain.model.InvalidCredentialsException;
-import com.qrwait.api.infrastructure.redis.RefreshTokenRepository;
-import com.qrwait.api.presentation.security.JwtTokenProvider;
+import com.qrwait.api.shared.redis.RefreshTokenRepository;
+import com.qrwait.api.shared.security.JwtTokenProvider;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
