@@ -586,9 +586,9 @@
 
 > ⏱ 20m | 선행: 5-6
 
-- [ ] 대시보드 최초 접속 시 브라우저 알림 권한 요청
-- [ ] `alert-threshold-reached` SSE 이벤트 수신 시 `Notification API`로 OS 알림 발송
-- [ ] 알림 권한 거부 시 대시보드 내 배너로 대체 표시
+- [x] 대시보드 최초 접속 시 브라우저 알림 권한 요청
+- [x] `alert-threshold-reached` SSE 이벤트 수신 시 `Notification API`로 OS 알림 발송
+- [x] 알림 권한 거부 시 대시보드 내 배너로 대체 표시 (닫기 버튼 포함)
 
 ---
 

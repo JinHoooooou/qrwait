@@ -46,6 +46,8 @@ function DashboardPage() {
   const [loadError, setLoadError] = useState<string | null>(null)
   const [confirmDialog, setConfirmDialog] = useState<ConfirmDialog | null>(null)
   const [actionLoading, setActionLoading] = useState<string | null>(null)
+  const [notifPermission, setNotifPermission] = useState<NotificationPermission | null>(null)
+  const [alertBanner, setAlertBanner] = useState<string | null>(null)
 
   const retryCountRef = useRef(0)
   const retryTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
@@ -59,6 +61,15 @@ function DashboardPage() {
   const fetchSummary = useCallback(async () => {
     const data = await getDailySummary()
     setSummary(data)
+  }, [])
+
+  useEffect(() => {
+    if (!('Notification' in window)) return
+    if (Notification.permission === 'default') {
+      Notification.requestPermission().then(setNotifPermission)
+    } else {
+      setNotifPermission(Notification.permission)
+    }
   }, [])
 
   useEffect(() => {
@@ -104,6 +115,12 @@ function DashboardPage() {
                 if (eventName === 'waiting-registered' || eventName === 'waiting-updated') {
                   fetchWaitingList()
                   fetchSummary()
+                } else if (eventName === 'alert-threshold-reached') {
+                  if (Notification.permission === 'granted') {
+                    new Notification('웨이팅 알림', {body: '대기자 수가 임계값을 초과했습니다.'})
+                  } else {
+                    setAlertBanner('대기자 수가 임계값을 초과했습니다.')
+                  }
                 }
                 eventName = ''
               }
@@ -183,6 +200,21 @@ function DashboardPage() {
             로그아웃
           </Button>
         </div>
+
+        {/* 알림 권한 거부 시 인앱 배너 */}
+        {alertBanner && (
+            <div style={styles.alertBanner}>
+              <span>{alertBanner}</span>
+              <button style={styles.alertClose} onClick={() => setAlertBanner(null)}>✕</button>
+            </div>
+        )}
+
+        {/* 알림 권한 거부 안내 */}
+        {notifPermission === 'denied' && (
+            <div style={styles.notifDeniedBanner}>
+              브라우저 알림이 차단되어 있습니다. 임계값 초과 시 화면 상단에 배너로 표시됩니다.
+            </div>
+        )}
 
         {loadError && <p style={styles.error}>{loadError}</p>}
 
@@ -490,6 +522,33 @@ const styles: Record<string, React.CSSProperties> = {
     fontSize: '0.875rem',
     color: '#dc2626',
     textAlign: 'center',
+  },
+  alertBanner: {
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    padding: '0.875rem 1rem',
+    borderRadius: '0.75rem',
+    backgroundColor: '#fef3c7',
+    border: '1px solid #fcd34d',
+    fontSize: '0.875rem',
+    fontWeight: 500,
+    color: '#92400e',
+  },
+  alertClose: {
+    background: 'none',
+    border: 'none',
+    cursor: 'pointer',
+    fontSize: '1rem',
+    color: '#92400e',
+    padding: '0 0.25rem',
+  },
+  notifDeniedBanner: {
+    padding: '0.75rem 1rem',
+    borderRadius: '0.75rem',
+    backgroundColor: '#f3f4f6',
+    fontSize: '0.8rem',
+    color: '#6b7280',
   },
 }
 
