@@ -406,32 +406,34 @@
     - 예상 대기시간 계산을 `StoreSettings.calculateEstimatedWait()` 메서드로 교체
     - `StoreSettingsRepository.findByStoreId()` 조회 추가
 
-### 3-10. UseCase 단위 테스트
+### 3-10. Service 단위 테스트
 
 > ⏱ 40m | 선행: 3-2 ~ 3-7
+> ※ 리팩토링으로 UseCase → Service 통합됨. 기존 UseCase 테스트가 아래 Service 테스트로 대체됨.
 
-- [ ] `SignUpOwnerUseCaseImplTest` — 정상 가입, 중복 이메일 예외
-- [ ] `LoginOwnerUseCaseImplTest` — 정상 로그인, 잘못된 비밀번호 예외
-- [ ] `UpdateStoreStatusUseCaseImplTest` — 상태 전이 성공, 소유권 검증 실패
-- [ ] `ProcessWaitingUseCaseTest` — 호출/입장/노쇼 각 케이스 + 소유권 검증 실패
+- [x] `OwnerServiceTest` — 정상 가입, 중복 이메일 예외, 정상 로그인, 잘못된 비밀번호 예외, 로그아웃, 토큰 갱신
+- [x] `StoreServiceTest` — 상태 전이 성공, 소유권 검증 실패 포함
+- [x] `WaitingManagementServiceTest` — 호출/입장/노쇼 각 케이스 + 소유권 검증 실패
 
 ### 3-11. OwnerController 통합 테스트
 
 > ⏱ 30m | 선행: 3-8
+> ※ 리팩토링으로 `OwnerController` → `OwnerStoreController` + `OwnerWaitingController`로 분리됨.
 
-- [ ] `OwnerControllerTest` 작성 (`@WebMvcTest`)
-    - JWT 없이 접근 → 401 검증
-    - 타 점주 매장 접근 → 403 검증
-    - 매장 상태 변경 성공 → 200 검증
+- [x] `OwnerStoreControllerTest` 작성 (`@WebMvcTest`) — 매장 조회/수정/상태 변경, JWT 없이 접근 → 403 검증
+- [x] `OwnerWaitingControllerTest` 작성 (`@WebMvcTest`)
+  - JWT 없이 접근 → 403 검증
     - 대기 목록 조회 성공 → 200 + 응답 바디 검증
+  - 일일 통계 조회 성공 → 200 + 응답 바디 검증
+  - 호출/입장/노쇼 성공 → 204 검증
 
 ### 3-12. 기존 시뮬레이션 엔드포인트 제거
 
 > ⏱ 10m | 선행: 3-7
 
-- [ ] `WaitingController`에서 `PUT /api/waitings/{waitingId}/enter` (시뮬레이션용) 제거
-- [ ] `EnterWaitingUseCaseImpl` (기존 시뮬레이션용) 제거
-- [ ] 관련 테스트 정리
+- [x] `WaitingController`에서 `PUT /api/waitings/{waitingId}/enter` (시뮬레이션용) 제거
+- [x] `EnterWaitingUseCaseImpl` (기존 시뮬레이션용) → `WaitingManagementService.enter()`로 대체됨
+- [x] 관련 테스트 정리
 
 ---
 
@@ -461,19 +463,21 @@
     - 손님 신규 등록 시 점주에게 `waiting-registered` 이벤트 발송
     - 대기자 수 임계값 초과 시 점주에게 `alert-threshold-reached` 이벤트 발송
 
-### 4-3. OwnerController에 SSE 엔드포인트 추가
+### 4-3. OwnerWaitingController에 SSE 엔드포인트 추가
 
 > ⏱ 15m | 선행: 4-2
+> ※ 리팩토링으로 `OwnerController` → `waiting/presentation/OwnerWaitingController.java`로 이동됨.
 
-- [ ] `GET /api/owner/stores/me/dashboard/stream` 엔드포인트 추가
+- [ ] `waiting/presentation/OwnerWaitingController.java`에 `GET /api/owner/stores/me/dashboard/stream` 엔드포인트 추가
     - `produces = MediaType.TEXT_EVENT_STREAM_VALUE`
     - JWT 검증 후 `subscribeOwner()` 호출
 
 ### 4-4. 매장 상태 변경 시 손님 SSE 연결
 
 > ⏱ 10m | 선행: 3-4, 4-2
+> ※ 리팩토링으로 `UpdateStoreStatusUseCaseImpl` → `store/application/StoreService.updateStoreStatus()`로 통합됨.
 
-- [ ] `UpdateStoreStatusUseCaseImpl`에서 `WaitingSseService.broadcastStoreStatus()` 호출 연결
+- [ ] `StoreService.updateStoreStatus()`에서 `WaitingSseService.broadcastStoreStatus()` 호출 연결
     - 손님 화면에 `store-status-changed` 이벤트 전송
 
 ---
