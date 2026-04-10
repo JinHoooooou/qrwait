@@ -1,6 +1,7 @@
 package com.qrwait.api.shared.sse;
 
 import com.qrwait.api.store.domain.StoreSettingsRepository;
+import com.qrwait.api.store.domain.StoreStatus;
 import com.qrwait.api.waiting.application.dto.WaitingStatusResponse;
 import com.qrwait.api.waiting.domain.WaitingRepository;
 import com.qrwait.api.waiting.domain.WaitingStatus;
@@ -96,6 +97,15 @@ public class WaitingSseService {
    */
   public void broadcastCalled(UUID storeId, UUID waitingId) {
     registry.broadcast(storeId, "waiting-called", Map.of("waitingId", waitingId));
+  }
+
+  /**
+   * 매장 영업 상태 변경 시 호출. 손님 전체 + 점주에게 변경된 상태를 브로드캐스트한다.
+   */
+  public void broadcastStoreStatus(UUID storeId, StoreStatus status) {
+    Map<String, String> data = Map.of("status", status.name());
+    registry.broadcast(storeId, "store-status-changed", data);
+    registry.broadcastToOwner(storeId, "store-status-changed", data);
   }
 
   private WaitingStatusResponse buildStoreStatus(UUID storeId) {

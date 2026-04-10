@@ -477,7 +477,7 @@
 > ⏱ 10m | 선행: 3-4, 4-2
 > ※ 리팩토링으로 `UpdateStoreStatusUseCaseImpl` → `store/application/StoreService.updateStoreStatus()`로 통합됨.
 
-- [ ] `StoreService.updateStoreStatus()`에서 `WaitingSseService.broadcastStoreStatus()` 호출 연결
+- [x] `StoreService.updateStoreStatus()`에서 `WaitingSseService.broadcastStoreStatus()` 호출 연결
     - 손님 화면에 `store-status-changed` 이벤트 전송
 
 ---

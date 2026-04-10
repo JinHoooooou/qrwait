@@ -5,6 +5,7 @@ import com.google.zxing.WriterException;
 import com.google.zxing.client.j2se.MatrixToImageWriter;
 import com.google.zxing.common.BitMatrix;
 import com.google.zxing.qrcode.QRCodeWriter;
+import com.qrwait.api.shared.sse.WaitingSseService;
 import com.qrwait.api.store.application.dto.StoreResponse;
 import com.qrwait.api.store.application.dto.UpdateStoreInfoRequest;
 import com.qrwait.api.store.application.dto.UpdateStoreStatusRequest;
@@ -24,6 +25,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class StoreService {
 
   private final StoreRepository storeRepository;
+  private final WaitingSseService waitingSseService;
 
   @Value("${app.base-url}")
   private String baseUrl;
@@ -48,6 +50,7 @@ public class StoreService {
     Store store = storeRepository.findByOwnerId(ownerId)
         .orElseThrow(() -> new StoreNotFoundException("ownerId=" + ownerId));
     Store updated = storeRepository.save(store.changeStatus(request.getStatus()));
+    waitingSseService.broadcastStoreStatus(updated.getId(), updated.getStatus());
     return toResponse(updated);
   }
 

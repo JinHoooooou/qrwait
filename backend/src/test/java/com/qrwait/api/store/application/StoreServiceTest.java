@@ -4,7 +4,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.verify;
 
+import com.qrwait.api.shared.sse.WaitingSseService;
 import com.qrwait.api.store.application.dto.StoreResponse;
 import com.qrwait.api.store.application.dto.UpdateStoreInfoRequest;
 import com.qrwait.api.store.application.dto.UpdateStoreStatusRequest;
@@ -30,12 +32,14 @@ class StoreServiceTest {
 
   @Mock
   StoreRepository storeRepository;
+  @Mock
+  WaitingSseService waitingSseService;
 
   StoreService storeService;
 
   @BeforeEach
   void setUp() {
-    storeService = new StoreService(storeRepository);
+    storeService = new StoreService(storeRepository, waitingSseService);
     ReflectionTestUtils.setField(storeService, "baseUrl", "http://localhost:5173");
   }
 
@@ -76,6 +80,7 @@ class StoreServiceTest {
     StoreResponse response = storeService.updateStoreStatus(ownerId, request);
 
     assertThat(response.status()).isEqualTo(StoreStatus.CLOSED);
+    verify(waitingSseService).broadcastStoreStatus(storeId, StoreStatus.CLOSED);
   }
 
   @Test
