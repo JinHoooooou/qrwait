@@ -7,6 +7,7 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.verify;
 
+import com.qrwait.api.shared.sse.WaitingSseService;
 import com.qrwait.api.store.application.StoreService;
 import com.qrwait.api.store.application.dto.StoreResponse;
 import com.qrwait.api.store.domain.StoreNotFoundException;
@@ -38,12 +39,14 @@ class WaitingManagementServiceTest {
   WaitingRepository waitingRepository;
   @Mock
   StoreService storeService;
+  @Mock
+  WaitingSseService waitingSseService;
 
   WaitingManagementService service;
 
   @BeforeEach
   void setUp() {
-    service = new WaitingManagementService(waitingRepository, storeService);
+    service = new WaitingManagementService(waitingRepository, storeService, waitingSseService);
   }
 
   // ===== getWaitingList =====
@@ -127,6 +130,7 @@ class WaitingManagementServiceTest {
     service.call(ownerId, waitingId);
 
     verify(waitingRepository).save(any());
+    verify(waitingSseService).broadcastCalled(storeId, waitingId);
   }
 
   @Test
@@ -162,6 +166,7 @@ class WaitingManagementServiceTest {
     service.enter(ownerId, waitingId);
 
     verify(waitingRepository).save(any());
+    verify(waitingSseService).broadcastUpdate(storeId);
   }
 
   @Test
@@ -197,6 +202,7 @@ class WaitingManagementServiceTest {
     service.noShow(ownerId, waitingId);
 
     verify(waitingRepository).save(any());
+    verify(waitingSseService).broadcastUpdate(storeId);
   }
 
   @Test

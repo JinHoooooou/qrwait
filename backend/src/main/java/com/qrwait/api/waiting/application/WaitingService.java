@@ -48,6 +48,8 @@ public class WaitingService {
 
     String waitingToken = UUID.randomUUID().toString();
 
+    waitingSseService.broadcastRegistered(storeId);
+
     return new RegisterWaitingResponse(
         saved.getId(),
         waitingNumber,

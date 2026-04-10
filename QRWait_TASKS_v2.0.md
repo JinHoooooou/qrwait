@@ -455,7 +455,7 @@
 
 > ⏱ 25m | 선행: 4-1
 
-- [ ] `WaitingSseService.java` 수정
+- [x] `WaitingSseService.java` 수정
     - `subscribeOwner(UUID storeId): SseEmitter` 메서드 추가
         - 기존 연결 있으면 교체
         - 초기 이벤트로 현재 대기 목록 전송

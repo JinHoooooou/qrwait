@@ -72,6 +72,7 @@ class WaitingServiceTest {
     assertThat(response.totalWaiting()).isEqualTo(2);
     assertThat(response.estimatedWaitMinutes()).isEqualTo(10);
     assertThat(response.waitingToken()).isNotBlank();
+    then(waitingSseService).should().broadcastRegistered(storeId);
   }
 
   @Test

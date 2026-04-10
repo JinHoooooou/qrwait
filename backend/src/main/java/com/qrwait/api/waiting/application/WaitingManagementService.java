@@ -1,5 +1,6 @@
 package com.qrwait.api.waiting.application;
 
+import com.qrwait.api.shared.sse.WaitingSseService;
 import com.qrwait.api.store.application.StoreService;
 import com.qrwait.api.store.domain.StoreNotFoundException;
 import com.qrwait.api.waiting.application.dto.DailySummaryResponse;
@@ -23,6 +24,7 @@ public class WaitingManagementService {
 
   private final WaitingRepository waitingRepository;
   private final StoreService storeService;
+  private final WaitingSseService waitingSseService;
 
   @Transactional(readOnly = true)
   public List<OwnerWaitingResponse> getWaitingList(UUID ownerId) {
@@ -65,7 +67,7 @@ public class WaitingManagementService {
     entry.call();
     waitingRepository.save(entry);
 
-    // TODO: Phase 4에서 SSE 추가 — 해당 손님 채널에 'called' 이벤트 발송
+    waitingSseService.broadcastCalled(entry.getStoreId(), waitingId);
   }
 
   @Transactional
@@ -81,7 +83,7 @@ public class WaitingManagementService {
     entry.enter();
     waitingRepository.save(entry);
 
-    // TODO: Phase 4에서 SSE 추가 — 매장 전체 브로드캐스트
+    waitingSseService.broadcastUpdate(entry.getStoreId());
   }
 
   @Transactional
@@ -97,7 +99,7 @@ public class WaitingManagementService {
     entry.noShow();
     waitingRepository.save(entry);
 
-    // TODO: Phase 4에서 SSE 추가 — 매장 전체 브로드캐스트
+    waitingSseService.broadcastUpdate(entry.getStoreId());
   }
 
   private UUID resolveStoreId(UUID ownerId) {
