@@ -32,7 +32,7 @@ import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 public class WaitingController {
 
   private final WaitingService waitingService;
-  private final WaitingSseService waitingSseService;
+  private final WaitingSseService waitingSseService;  // broadcast는 트랜잭션 커밋 후 호출
 
   @Operation(summary = "웨이팅 등록", description = "매장에 웨이팅을 등록합니다. 등록 성공 시 waitingId와 대기 순번을 반환합니다.")
   @ApiResponses({
@@ -45,6 +45,7 @@ public class WaitingController {
       @PathVariable UUID storeId,
       @Valid @RequestBody RegisterWaitingRequest request) {
     RegisterWaitingResponse response = waitingService.register(storeId, request);
+    waitingSseService.broadcastRegistered(storeId);  // 트랜잭션 커밋 후 broadcast
     URI location = URI.create("/api/waitings/" + response.waitingId());
     return ResponseEntity.created(location).body(response);
   }
@@ -67,7 +68,8 @@ public class WaitingController {
   })
   @DeleteMapping("/waitings/{waitingId}")
   public ResponseEntity<Void> cancel(@PathVariable UUID waitingId) {
-    waitingService.cancel(waitingId);
+    UUID storeId = waitingService.cancel(waitingId);
+    waitingSseService.broadcastUpdate(storeId);  // 트랜잭션 커밋 후 broadcast
     return ResponseEntity.noContent().build();
   }
 

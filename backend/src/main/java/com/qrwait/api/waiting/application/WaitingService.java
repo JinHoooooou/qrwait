@@ -1,6 +1,5 @@
 package com.qrwait.api.waiting.application;
 
-import com.qrwait.api.shared.sse.WaitingSseService;
 import com.qrwait.api.store.domain.Store;
 import com.qrwait.api.store.domain.StoreNotAvailableException;
 import com.qrwait.api.store.domain.StoreNotFoundException;
@@ -27,7 +26,6 @@ public class WaitingService {
   private final WaitingRepository waitingRepository;
   private final StoreRepository storeRepository;
   private final StoreSettingsRepository storeSettingsRepository;
-  private final WaitingSseService waitingSseService;
 
   @Transactional
   public RegisterWaitingResponse register(UUID storeId, RegisterWaitingRequest request) {
@@ -47,8 +45,6 @@ public class WaitingService {
     int estimatedWaitMinutes = totalWaiting * 5;
 
     String waitingToken = UUID.randomUUID().toString();
-
-    waitingSseService.broadcastRegistered(storeId);
 
     return new RegisterWaitingResponse(
         saved.getId(),
@@ -87,14 +83,14 @@ public class WaitingService {
   }
 
   @Transactional
-  public void cancel(UUID waitingId) {
+  public UUID cancel(UUID waitingId) {
     WaitingEntry entry = waitingRepository.findById(waitingId)
         .orElseThrow(() -> new WaitingNotFoundException(waitingId));
 
     entry.cancel();
     waitingRepository.save(entry);
 
-    waitingSseService.broadcastUpdate(entry.getStoreId());
+    return entry.getStoreId();
   }
 
   @Transactional(readOnly = true)

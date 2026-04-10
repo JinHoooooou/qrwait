@@ -83,14 +83,17 @@ function DashboardPage() {
   }, [])
 
   useEffect(() => {
+    console.log('[SSE] useEffect 실행 — accessToken:', accessToken ? '있음' : '없음(null)')
     if (!accessToken) return
     activeRef.current = true
 
     const connect = async () => {
       try {
+        console.log('[SSE] 연결 시도')
         const res = await fetch('/api/owner/stores/me/dashboard/stream', {
           headers: {Authorization: `Bearer ${accessToken}`},
         })
+        console.log('[SSE] 응답 상태:', res.status)
         if (!res.ok || !res.body) throw new Error('SSE 연결 실패')
 
         retryCountRef.current = 0
@@ -101,9 +104,13 @@ function DashboardPage() {
 
         while (activeRef.current) {
           const {done, value} = await reader.read()
-          if (done) break
+          if (done) {
+            console.log('[SSE] 스트림 종료');
+            break
+          }
 
           buffer += decoder.decode(value, {stream: true})
+          console.log('[SSE] 데이터 수신:', buffer)
           const blocks = buffer.split('\n\n')
           buffer = blocks.pop() ?? ''
 
@@ -112,7 +119,8 @@ function DashboardPage() {
               if (line.startsWith('event:')) {
                 eventName = line.slice(6).trim()
               } else if (line.startsWith('data:')) {
-                if (eventName === 'waiting-registered' || eventName === 'waiting-updated') {
+                console.log('[SSE] 이벤트 처리:', eventName)
+                if (eventName === 'waiting-registered' || eventName === 'waiting-update') {
                   fetchWaitingList()
                   fetchSummary()
                 } else if (eventName === 'alert-threshold-reached') {
@@ -127,7 +135,8 @@ function DashboardPage() {
             }
           }
         }
-      } catch {
+      } catch (e) {
+        console.log('[SSE] 연결 실패:', e)
         if (!activeRef.current) return
         if (retryCountRef.current < 3) {
           retryCountRef.current++

@@ -65,8 +65,9 @@ public class SseEmitterRegistry {
     log.debug("점주 SSE 등록 — storeId={}", storeId);
   }
 
-  public void removeOwner(UUID storeId) {
-    ownerEmitters.remove(storeId);
+  public void removeOwner(UUID storeId, SseEmitter emitter) {
+    // 현재 등록된 emitter가 자신과 동일할 때만 제거 (새 emitter가 등록됐으면 제거하지 않음)
+    ownerEmitters.remove(storeId, emitter);
     log.debug("점주 SSE 제거 — storeId={}", storeId);
   }
 
@@ -80,7 +81,7 @@ public class SseEmitterRegistry {
       emitter.send(SseEmitter.event().name(eventName).data(data));
     } catch (IOException e) {
       log.warn("점주 SSE 전송 실패 — emitter 제거: storeId={}", storeId);
-      removeOwner(storeId);
+      removeOwner(storeId, emitter);
     }
   }
 }

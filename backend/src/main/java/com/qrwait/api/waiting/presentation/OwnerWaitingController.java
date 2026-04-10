@@ -1,5 +1,6 @@
 package com.qrwait.api.waiting.presentation;
 
+import com.qrwait.api.shared.sse.WaitingSseService;
 import com.qrwait.api.waiting.application.WaitingManagementService;
 import com.qrwait.api.waiting.application.dto.DailySummaryResponse;
 import com.qrwait.api.waiting.application.dto.OwnerWaitingResponse;
@@ -25,6 +26,7 @@ import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 public class OwnerWaitingController {
 
   private final WaitingManagementService waitingManagementService;
+  private final WaitingSseService waitingSseService;  // broadcast는 트랜잭션 커밋 후 호출
 
   @Operation(summary = "점주 대시보드 SSE 구독")
   @GetMapping(value = "/stores/me/dashboard/stream", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
@@ -49,7 +51,8 @@ public class OwnerWaitingController {
   public ResponseEntity<Void> callWaiting(
       @AuthenticationPrincipal UUID ownerId,
       @PathVariable UUID waitingId) {
-    waitingManagementService.call(ownerId, waitingId);
+    UUID storeId = waitingManagementService.call(ownerId, waitingId);
+    waitingSseService.broadcastCalled(storeId, waitingId);  // 트랜잭션 커밋 후 broadcast
     return ResponseEntity.noContent().build();
   }
 
@@ -58,7 +61,8 @@ public class OwnerWaitingController {
   public ResponseEntity<Void> enterWaiting(
       @AuthenticationPrincipal UUID ownerId,
       @PathVariable UUID waitingId) {
-    waitingManagementService.enter(ownerId, waitingId);
+    UUID storeId = waitingManagementService.enter(ownerId, waitingId);
+    waitingSseService.broadcastUpdate(storeId);  // 트랜잭션 커밋 후 broadcast
     return ResponseEntity.noContent().build();
   }
 
@@ -67,7 +71,8 @@ public class OwnerWaitingController {
   public ResponseEntity<Void> noShowWaiting(
       @AuthenticationPrincipal UUID ownerId,
       @PathVariable UUID waitingId) {
-    waitingManagementService.noShow(ownerId, waitingId);
+    UUID storeId = waitingManagementService.noShow(ownerId, waitingId);
+    waitingSseService.broadcastUpdate(storeId);  // 트랜잭션 커밋 후 broadcast
     return ResponseEntity.noContent().build();
   }
 }

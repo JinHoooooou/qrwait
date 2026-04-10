@@ -10,7 +10,9 @@ import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
@@ -40,7 +42,11 @@ public class JwtAuthFilter extends OncePerRequestFilter {
           null,
           List.of(new SimpleGrantedAuthority("ROLE_OWNER"))
       );
-      SecurityContextHolder.getContext().setAuthentication(authentication);
+      SecurityContext context = SecurityContextHolder.createEmptyContext();
+      context.setAuthentication(authentication);
+      SecurityContextHolder.setContext(context);
+      // SSE async dispatch 시 Filter Chain이 재실행될 때 SecurityContext가 유지되도록 request attribute에 저장
+      request.setAttribute(HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY, context);
     }
 
     filterChain.doFilter(request, response);

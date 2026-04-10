@@ -55,9 +55,9 @@ public class WaitingSseService {
   public SseEmitter subscribeOwner(UUID storeId) {
     SseEmitter emitter = new SseEmitter(SSE_TIMEOUT_MS);
 
-    emitter.onCompletion(() -> registry.removeOwner(storeId));
-    emitter.onTimeout(() -> registry.removeOwner(storeId));
-    emitter.onError(e -> registry.removeOwner(storeId));
+    emitter.onCompletion(() -> registry.removeOwner(storeId, emitter));
+    emitter.onTimeout(() -> registry.removeOwner(storeId, emitter));
+    emitter.onError(e -> registry.removeOwner(storeId, emitter));
 
     registry.registerOwner(storeId, emitter);
 
@@ -67,7 +67,7 @@ public class WaitingSseService {
           .data(buildStoreStatus(storeId)));
     } catch (IOException e) {
       log.warn("점주 초기 SSE 이벤트 전송 실패 — storeId={}", storeId);
-      registry.removeOwner(storeId);
+      registry.removeOwner(storeId, emitter);
     }
 
     return emitter;
