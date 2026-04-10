@@ -3,8 +3,10 @@ package com.qrwait.api.waiting.infrastructure;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.qrwait.api.store.domain.Store;
+import com.qrwait.api.store.domain.StoreRepository;
 import com.qrwait.api.store.infrastructure.StoreRepositoryImpl;
 import com.qrwait.api.waiting.domain.WaitingEntry;
+import com.qrwait.api.waiting.domain.WaitingRepository;
 import com.qrwait.api.waiting.domain.WaitingStatus;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
@@ -21,10 +23,10 @@ import org.springframework.context.annotation.Import;
 class WaitingRepositoryImplTest {
 
   @Autowired
-  private StoreRepositoryImpl storeRepository;
+  private StoreRepository storeRepository;
 
   @Autowired
-  private WaitingRepositoryImpl waitingRepository;
+  private WaitingRepository waitingRepository;
 
   private Store savedStore;
 

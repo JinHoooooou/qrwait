@@ -3,6 +3,7 @@ package com.qrwait.api.owner.infrastructure;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.qrwait.api.owner.domain.Owner;
+import com.qrwait.api.owner.domain.OwnerRepository;
 import java.util.Optional;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,7 +18,7 @@ import org.springframework.context.annotation.Import;
 class OwnerRepositoryImplTest {
 
   @Autowired
-  private OwnerRepositoryImpl ownerRepository;
+  private OwnerRepository ownerRepository;
 
   @Test
   void findByEmail_존재하는_이메일_정상조회() {

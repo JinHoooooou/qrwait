@@ -3,6 +3,7 @@ package com.qrwait.api.store.infrastructure;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.qrwait.api.store.domain.Store;
+import com.qrwait.api.store.domain.StoreRepository;
 import java.util.Optional;
 import java.util.UUID;
 import org.junit.jupiter.api.Test;
@@ -18,7 +19,7 @@ import org.springframework.context.annotation.Import;
 class StoreRepositoryImplTest {
 
   @Autowired
-  private StoreRepositoryImpl storeRepository;
+  private StoreRepository storeRepository;
 
   @Test
   void findById_whenExists_returnsStore() {
