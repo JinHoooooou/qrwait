@@ -1,4 +1,4 @@
-import {useEffect, useState} from 'react'
+import {useEffect, useRef, useState} from 'react'
 import {useNavigate, useSearchParams} from 'react-router-dom'
 import type {StoreResponse} from '../api/waiting'
 import {getStore, registerWaiting} from '../api/waiting'
@@ -7,6 +7,12 @@ import {getWaitingSession, saveWaitingSession} from '../utils/session'
 import Button from '../components/Button'
 import LoadingSpinner from '../components/LoadingSpinner'
 import ErrorMessage from '../components/ErrorMessage'
+
+const STATUS_MESSAGES: Record<string, string> = {
+  BREAK: '현재 브레이크타임입니다.',
+  FULL: '현재 만석입니다.',
+  CLOSED: '오늘 영업이 종료되었습니다.',
+}
 
 function LandingPage() {
   const navigate = useNavigate()
@@ -22,6 +28,7 @@ function LandingPage() {
   const [submitting, setSubmitting] = useState(false)
 
   const setWaiting = useWaitingStore((s) => s.setWaiting)
+  const esRef = useRef<EventSource | null>(null)
 
   useEffect(() => {
     const session = getWaitingSession()
@@ -41,6 +48,27 @@ function LandingPage() {
         .catch(() => setError('매장 정보를 불러올 수 없습니다.'))
         .finally(() => setLoading(false))
   }, [storeId, navigate])
+
+  useEffect(() => {
+    if (!storeId) return
+
+    const es = new EventSource(`/api/stores/${storeId}/stream`)
+    esRef.current = es
+
+    es.addEventListener('store-status-changed', (e) => {
+      try {
+        const data = JSON.parse(e.data)
+        setStore((prev) => prev ? {...prev, status: data.status} : prev)
+      } catch {
+        // 파싱 실패 시 무시
+      }
+    })
+
+    return () => {
+      es.close()
+      esRef.current = null
+    }
+  }, [storeId])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -73,15 +101,24 @@ function LandingPage() {
   if (loading) return <LoadingSpinner/>
   if (error) return <div style={styles.container}><ErrorMessage message={error}/></div>
 
+  const statusMessage = store?.status ? STATUS_MESSAGES[store.status] : null
+
   return (
       <div style={styles.container}>
         <h1 style={styles.storeName}>{store?.name}</h1>
-        <p style={styles.subtitle}>웨이팅 등록</p>
 
-        <form onSubmit={handleSubmit} style={styles.form}>
-          <label style={styles.label}>
-            이름
-            <input
+        {statusMessage ? (
+            <div style={styles.statusBox}>
+              <p style={styles.statusMessage}>{statusMessage}</p>
+              <p style={styles.statusHint}>잠시 후 다시 확인해 주세요.</p>
+            </div>
+        ) : (
+            <>
+              <p style={styles.subtitle}>웨이팅 등록</p>
+              <form onSubmit={handleSubmit} style={styles.form}>
+                <label style={styles.label}>
+                  이름
+                  <input
                 style={styles.input}
                 type="text"
                 value={visitorName}
@@ -89,34 +126,36 @@ function LandingPage() {
                 maxLength={50}
                 placeholder="이름을 입력하세요"
                 required
-            />
-          </label>
+                  />
+                </label>
 
-          <label style={styles.label}>
-            인원수
-            <div style={styles.stepper}>
-              <button
+                <label style={styles.label}>
+                  인원수
+                  <div style={styles.stepper}>
+                    <button
                   type="button"
                   style={styles.stepBtn}
                   onClick={() => setPartySize((n) => Math.max(1, n - 1))}
-              >
-                −
-              </button>
-              <span style={styles.stepValue}>{partySize}명</span>
-              <button
+                    >
+                      −
+                    </button>
+                    <span style={styles.stepValue}>{partySize}명</span>
+                    <button
                   type="button"
                   style={styles.stepBtn}
                   onClick={() => setPartySize((n) => Math.min(10, n + 1))}
-              >
-                +
-              </button>
-            </div>
-          </label>
+                    >
+                      +
+                    </button>
+                  </div>
+                </label>
 
-          <Button type="submit" disabled={submitting}>
-            {submitting ? '등록 중...' : '웨이팅 등록'}
-          </Button>
-        </form>
+                <Button type="submit" disabled={submitting}>
+                  {submitting ? '등록 중...' : '웨이팅 등록'}
+                </Button>
+              </form>
+            </>
+        )}
       </div>
   )
 }
@@ -135,6 +174,26 @@ const styles: Record<string, React.CSSProperties> = {
   subtitle: {
     color: '#6b7280',
     marginBottom: '2rem',
+  },
+  statusBox: {
+    marginTop: '2rem',
+    padding: '2rem',
+    borderRadius: '1rem',
+    backgroundColor: '#f8fafc',
+    border: '1px solid #e2e8f0',
+    textAlign: 'center',
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '0.5rem',
+  },
+  statusMessage: {
+    fontSize: '1.125rem',
+    fontWeight: 600,
+    color: '#374151',
+  },
+  statusHint: {
+    fontSize: '0.875rem',
+    color: '#9ca3af',
   },
   form: {
     display: 'flex',

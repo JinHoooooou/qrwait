@@ -1,8 +1,11 @@
 import client from './client'
 
+export type StoreStatus = 'OPEN' | 'BREAK' | 'FULL' | 'CLOSED'
+
 export interface StoreResponse {
   storeId: string
   name: string
+  status: StoreStatus
 }
 
 export interface RegisterWaitingRequest {
