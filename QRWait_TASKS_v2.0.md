@@ -549,19 +549,18 @@
 
 > ⏱ 70m | 선행: 5-1, 5-2
 
-- [ ] 상단: 매장 상태 토글 버튼 (운영 중 / 브레이크타임 / 만석 / 영업 종료)
-- [ ] 오늘 통계 요약 카드 (등록 / 입장 / 노쇼 / 취소 건수)
-- [ ] 실시간 대기 목록 테이블
-    - 컬럼: 대기번호, 이름, 인원, 대기 경과시간
-    - 각 행에 호출 / 입장 처리 / 노쇼 버튼
+- [x] 상단: 매장 상태 토글 버튼 (운영 중 / 브레이크타임 / 만석 / 영업 종료) — 2×2 그리드
+- [x] 오늘 통계 요약 카드 (등록 / 입장 / 노쇼 / 취소 건수)
+- [x] 실시간 대기 목록 (카드 형태, 모바일 최적화)
+  - 대기번호, 이름, 인원, 대기 경과시간 표시
+  - WAITING → 호출 버튼 / CALLED → 입장·노쇼 버튼 (상태별 조건부 표시)
     - 처리 전 확인 다이얼로그 표시
-- [ ] SSE 연결 구현
+- [x] SSE 연결 구현 (fetch + ReadableStream, Authorization 헤더 지원)
     - `GET /api/owner/stores/me/dashboard/stream`
-    - `waiting-registered` 이벤트 → 목록 갱신
-    - `waiting-updated` 이벤트 → 목록 갱신
-    - `alert-threshold-reached` 이벤트 → 브라우저 알림 표시
+  - `waiting-registered` / `waiting-updated` 이벤트 → 목록 갱신
+  - `alert-threshold-reached` 이벤트 → 5-9에서 처리
     - 연결 끊김 시 자동 재연결 (최대 3회)
-- [ ] 로그아웃 버튼 → `POST /api/auth/logout` 호출 → `/owner/login` 이동
+- [x] 로그아웃 버튼 → `POST /api/auth/logout` 호출 → `/owner/login` 이동
 
 ### 5-7. StoreSettingsPage 구현
 
