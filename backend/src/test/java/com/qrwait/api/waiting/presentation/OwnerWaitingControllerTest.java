@@ -25,6 +25,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 @WebMvcTest(OwnerWaitingController.class)
 @Import({SecurityConfig.class, JwtAuthFilter.class})
@@ -39,6 +40,28 @@ class OwnerWaitingControllerTest {
   JwtTokenProvider jwtTokenProvider;
   @MockitoBean
   WaitingManagementService waitingManagementService;
+
+  // ===== streamDashboard =====
+
+  @Test
+  void streamDashboard_인증없음_403반환() throws Exception {
+    mockMvc.perform(get("/api/owner/stores/me/dashboard/stream"))
+        .andExpect(status().isForbidden());
+  }
+
+  @Test
+  void streamDashboard_인증된_점주_200반환() throws Exception {
+    UUID ownerId = UUID.randomUUID();
+
+    given(jwtTokenProvider.validateToken(any())).willReturn(true);
+    given(jwtTokenProvider.extractOwnerId(any())).willReturn(ownerId);
+    given(waitingManagementService.subscribeOwnerDashboard(eq(ownerId)))
+        .willReturn(new SseEmitter());
+
+    mockMvc.perform(get("/api/owner/stores/me/dashboard/stream")
+            .header("Authorization", "Bearer test-token"))
+        .andExpect(status().isOk());
+  }
 
   // ===== getWaitingList =====
 

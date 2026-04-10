@@ -468,7 +468,7 @@
 > ⏱ 15m | 선행: 4-2
 > ※ 리팩토링으로 `OwnerController` → `waiting/presentation/OwnerWaitingController.java`로 이동됨.
 
-- [ ] `waiting/presentation/OwnerWaitingController.java`에 `GET /api/owner/stores/me/dashboard/stream` 엔드포인트 추가
+- [x] `waiting/presentation/OwnerWaitingController.java`에 `GET /api/owner/stores/me/dashboard/stream` 엔드포인트 추가
     - `produces = MediaType.TEXT_EVENT_STREAM_VALUE`
     - JWT 검증 후 `subscribeOwner()` 호출
 

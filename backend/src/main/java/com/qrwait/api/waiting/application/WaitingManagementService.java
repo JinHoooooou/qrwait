@@ -17,6 +17,7 @@ import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 @Service
 @RequiredArgsConstructor
@@ -100,6 +101,11 @@ public class WaitingManagementService {
     waitingRepository.save(entry);
 
     waitingSseService.broadcastUpdate(entry.getStoreId());
+  }
+
+  public SseEmitter subscribeOwnerDashboard(UUID ownerId) {
+    UUID storeId = resolveStoreId(ownerId);
+    return waitingSseService.subscribeOwner(storeId);
   }
 
   private UUID resolveStoreId(UUID ownerId) {
