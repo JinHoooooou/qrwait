@@ -13,6 +13,10 @@ function OnboardingPage() {
   const [step, setStep] = useState(1)
   const [tableCount, setTableCount] = useState(5)
   const [avgTurnoverMinutes, setAvgTurnoverMinutes] = useState(30)
+  const [openTime, setOpenTime] = useState('09:00')
+  const [closeTime, setCloseTime] = useState('22:00')
+  const [alertThreshold, setAlertThreshold] = useState(10)
+  const [alertEnabled, setAlertEnabled] = useState(true)
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
@@ -34,7 +38,14 @@ function OnboardingPage() {
     setSaving(true)
     setError(null)
     try {
-      await updateStoreSettings({tableCount, avgTurnoverMinutes})
+      await updateStoreSettings({
+        tableCount,
+        avgTurnoverMinutes,
+        openTime,
+        closeTime,
+        alertThreshold,
+        alertEnabled,
+      })
       setStep(3)
     } catch (err) {
       setError(err instanceof Error ? err.message : '설정 저장에 실패했습니다.')
@@ -109,6 +120,49 @@ function OnboardingPage() {
                     max={300}
                     value={avgTurnoverMinutes}
                     onChange={(e) => setAvgTurnoverMinutes(Number(e.target.value))}
+                />
+              </label>
+
+              <div style={styles.timeRow}>
+                <label style={{...styles.label, flex: 1}}>
+                  영업 시작 시간
+                  <input
+                      style={styles.input}
+                      type="time"
+                      value={openTime}
+                      onChange={(e) => setOpenTime(e.target.value)}
+                  />
+                </label>
+                <label style={{...styles.label, flex: 1}}>
+                  영업 종료 시간
+                  <input
+                      style={styles.input}
+                      type="time"
+                      value={closeTime}
+                      onChange={(e) => setCloseTime(e.target.value)}
+                  />
+                </label>
+              </div>
+
+              <label style={styles.label}>
+                대기자 알림 임계값 (팀)
+                <input
+                    style={styles.input}
+                    type="number"
+                    min={1}
+                    max={50}
+                    value={alertThreshold}
+                    onChange={(e) => setAlertThreshold(Number(e.target.value))}
+                />
+              </label>
+
+              <label style={styles.toggleLabel}>
+                <span>대기자 수 초과 알림</span>
+                <input
+                    type="checkbox"
+                    checked={alertEnabled}
+                    onChange={(e) => setAlertEnabled(e.target.checked)}
+                    style={styles.checkbox}
                 />
               </label>
 
@@ -256,6 +310,25 @@ const styles: Record<string, React.CSSProperties> = {
   buttonRow: {
     display: 'flex',
     gap: '0.75rem',
+  },
+  timeRow: {
+    display: 'flex',
+    gap: '0.75rem',
+  },
+  toggleLabel: {
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    fontWeight: 600,
+    fontSize: '0.875rem',
+    padding: '0.75rem',
+    borderRadius: '0.5rem',
+    border: '1px solid #d1d5db',
+  },
+  checkbox: {
+    width: 20,
+    height: 20,
+    cursor: 'pointer',
   },
 }
 

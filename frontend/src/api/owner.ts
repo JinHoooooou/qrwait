@@ -43,6 +43,10 @@ export const refreshToken = (): Promise<{ accessToken: string; ownerId: string; 
 export interface UpdateStoreSettingsRequest {
   tableCount: number
   avgTurnoverMinutes: number
+  openTime: string | null
+  closeTime: string | null
+  alertThreshold: number
+  alertEnabled: boolean
 }
 
 export const updateStoreSettings = (body: UpdateStoreSettingsRequest): Promise<void> =>
