@@ -49,6 +49,19 @@ export interface UpdateStoreSettingsRequest {
   alertEnabled: boolean
 }
 
+export interface StoreSettingsResponse {
+  tableCount: number
+  avgTurnoverMinutes: number
+  openTime: string | null
+  closeTime: string | null
+  alertThreshold: number
+  alertEnabled: boolean
+  estimatedWaitFormulaExample: string
+}
+
+export const getStoreSettings = (): Promise<StoreSettingsResponse> =>
+    ownerClient.get('/owner/stores/me/settings').then((res) => res.data)
+
 export const updateStoreSettings = (body: UpdateStoreSettingsRequest): Promise<void> =>
     ownerClient.put('/owner/stores/me/settings', body).then((res) => res.data)
 

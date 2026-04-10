@@ -566,11 +566,11 @@
 
 > ⏱ 30m | 선행: 5-1
 
-- [ ] 현재 설정 조회 (`GET /api/owner/stores/me/settings`)
-- [ ] 테이블 수, 팀당 평균 이용시간, 영업 시작/종료 시간 수정 폼
-- [ ] 알림 설정 (임계값, ON/OFF 토글)
-- [ ] QR 코드 이미지 표시 + PNG 다운로드 버튼
-- [ ] 저장 (`PUT /api/owner/stores/me/settings`) 성공 시 토스트 알림
+- [x] 현재 설정 조회 (`GET /api/owner/stores/me/settings`)
+- [x] 테이블 수, 팀당 평균 이용시간, 영업 시작/종료 시간 수정 폼
+- [x] 알림 설정 (임계값, ON/OFF 토글)
+- [x] QR 코드 이미지 표시 + PNG 다운로드 버튼
+- [x] 저장 (`PUT /api/owner/stores/me/settings`) 성공 시 토스트 알림 (3초 후 자동 사라짐)
 
 ### 5-8. 손님 LandingPage 수정 — 매장 상태 반영
 
