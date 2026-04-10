@@ -445,7 +445,7 @@
 
 > ⏱ 20m | 선행: 0-2
 
-- [ ] `SseEmitterRegistry.java` 수정
+- [x] `SseEmitterRegistry.java` 수정
     - 점주용 `Map<UUID, SseEmitter> ownerEmitters` 추가 (storeId → 점주 Emitter)
     - `registerOwner(UUID storeId, SseEmitter emitter)` 메서드 추가
     - `removeOwner(UUID storeId)` 메서드 추가

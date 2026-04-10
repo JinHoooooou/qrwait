@@ -52,7 +52,9 @@
       "Bash(find /c/dev/study_study/qr-wait/backend/src/main/java/com/qrwait/api/application /c/dev/study_study/qr-wait/backend/src/main/java/com/qrwait/api/presentation/controller -name '*.java' -exec sed -i 's/com\\\\.qrwait\\\\.api\\\\.infrastructure\\\\.sse/com.qrwait.api.shared.sse/g' '{}' ';')",
       "Bash(find /c/dev/study_study/qr-wait/backend/src/test/java/com/qrwait/api -name '*.java' -exec sed -i 's/com\\\\.qrwait\\\\.api\\\\.infrastructure\\\\.sse/com.qrwait.api.shared.sse/g' '{}' ';')",
       "Bash(find /c/dev/study_study/qr-wait/backend/src/main/java/com/qrwait/api/application /c/dev/study_study/qr-wait/backend/src/main/java/com/qrwait/api/presentation/controller -name '*.java' -exec sed -i 's/com\\\\.qrwait\\\\.api\\\\.infrastructure\\\\.redis/com.qrwait.api.shared.redis/g' '{}' ';')",
-      "Bash(./gradlew compileJava compileTestJava)"
+      "Bash(./gradlew compileJava compileTestJava)",
+      "Bash(./gradlew build:*)",
+      "Bash(ls:*)"
     ]
   }
 }
