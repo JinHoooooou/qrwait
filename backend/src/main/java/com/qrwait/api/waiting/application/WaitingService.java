@@ -13,9 +13,12 @@ import com.qrwait.api.waiting.domain.WaitingEntry;
 import com.qrwait.api.waiting.domain.WaitingNotFoundException;
 import com.qrwait.api.waiting.domain.WaitingRepository;
 import com.qrwait.api.waiting.domain.WaitingStatus;
+import com.qrwait.api.waiting.domain.event.WaitingRegisteredEvent;
+import com.qrwait.api.waiting.domain.event.WaitingUpdatedEvent;
 import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -26,6 +29,7 @@ public class WaitingService {
   private final WaitingRepository waitingRepository;
   private final StoreRepository storeRepository;
   private final StoreSettingsRepository storeSettingsRepository;
+  private final ApplicationEventPublisher eventPublisher;
 
   @Transactional
   public RegisterWaitingResponse register(UUID storeId, RegisterWaitingRequest request) {
@@ -45,6 +49,8 @@ public class WaitingService {
     int estimatedWaitMinutes = totalWaiting * 5;
 
     String waitingToken = UUID.randomUUID().toString();
+
+    eventPublisher.publishEvent(new WaitingRegisteredEvent(storeId));
 
     return new RegisterWaitingResponse(
         saved.getId(),
@@ -83,14 +89,14 @@ public class WaitingService {
   }
 
   @Transactional
-  public UUID cancel(UUID waitingId) {
+  public void cancel(UUID waitingId) {
     WaitingEntry entry = waitingRepository.findById(waitingId)
         .orElseThrow(() -> new WaitingNotFoundException(waitingId));
 
     entry.cancel();
     waitingRepository.save(entry);
 
-    return entry.getStoreId();
+    eventPublisher.publishEvent(new WaitingUpdatedEvent(entry.getStoreId()));
   }
 
   @Transactional(readOnly = true)

@@ -5,9 +5,10 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.BDDMockito.then;
 import static org.mockito.Mockito.verify;
 
-import com.qrwait.api.shared.sse.WaitingSseService;
+import com.qrwait.api.shared.sse.SsePublisher;
 import com.qrwait.api.store.application.StoreService;
 import com.qrwait.api.store.application.dto.StoreResponse;
 import com.qrwait.api.store.domain.StoreNotFoundException;
@@ -18,6 +19,8 @@ import com.qrwait.api.waiting.domain.WaitingEntry;
 import com.qrwait.api.waiting.domain.WaitingNotFoundException;
 import com.qrwait.api.waiting.domain.WaitingRepository;
 import com.qrwait.api.waiting.domain.WaitingStatus;
+import com.qrwait.api.waiting.domain.event.WaitingCalledEvent;
+import com.qrwait.api.waiting.domain.event.WaitingUpdatedEvent;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -27,6 +30,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.context.ApplicationEventPublisher;
 
 @ExtendWith(MockitoExtension.class)
 class WaitingManagementServiceTest {
@@ -40,13 +44,15 @@ class WaitingManagementServiceTest {
   @Mock
   StoreService storeService;
   @Mock
-  WaitingSseService waitingSseService;
+  SsePublisher ssePublisher;
+  @Mock
+  ApplicationEventPublisher eventPublisher;
 
   WaitingManagementService service;
 
   @BeforeEach
   void setUp() {
-    service = new WaitingManagementService(waitingRepository, storeService, waitingSseService);
+    service = new WaitingManagementService(waitingRepository, storeService, ssePublisher, eventPublisher);
   }
 
   // ===== getWaitingList =====
@@ -127,10 +133,10 @@ class WaitingManagementServiceTest {
         .willReturn(new StoreResponse(storeId, "테스트 매장", "서울", StoreStatus.OPEN));
     given(waitingRepository.save(any())).willReturn(entry);
 
-    UUID result = service.call(ownerId, waitingId);
+    service.call(ownerId, waitingId);
 
-    assertThat(result).isEqualTo(storeId);
     verify(waitingRepository).save(any());
+    then(eventPublisher).should().publishEvent(any(WaitingCalledEvent.class));
   }
 
   @Test
@@ -163,10 +169,10 @@ class WaitingManagementServiceTest {
         .willReturn(new StoreResponse(storeId, "테스트 매장", "서울", StoreStatus.OPEN));
     given(waitingRepository.save(any())).willReturn(entry);
 
-    UUID result = service.enter(ownerId, waitingId);
+    service.enter(ownerId, waitingId);
 
-    assertThat(result).isEqualTo(storeId);
     verify(waitingRepository).save(any());
+    then(eventPublisher).should().publishEvent(any(WaitingUpdatedEvent.class));
   }
 
   @Test
@@ -199,10 +205,10 @@ class WaitingManagementServiceTest {
         .willReturn(new StoreResponse(storeId, "테스트 매장", "서울", StoreStatus.OPEN));
     given(waitingRepository.save(any())).willReturn(entry);
 
-    UUID result = service.noShow(ownerId, waitingId);
+    service.noShow(ownerId, waitingId);
 
-    assertThat(result).isEqualTo(storeId);
     verify(waitingRepository).save(any());
+    then(eventPublisher).should().publishEvent(any(WaitingUpdatedEvent.class));
   }
 
   @Test

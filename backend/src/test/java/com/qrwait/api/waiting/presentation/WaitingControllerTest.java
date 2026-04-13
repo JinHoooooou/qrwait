@@ -11,7 +11,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.qrwait.api.shared.security.JwtAuthFilter;
 import com.qrwait.api.shared.security.JwtTokenProvider;
 import com.qrwait.api.shared.security.SecurityConfig;
-import com.qrwait.api.shared.sse.WaitingSseService;
+import com.qrwait.api.shared.sse.SsePublisher;
 import com.qrwait.api.waiting.application.WaitingService;
 import com.qrwait.api.waiting.application.dto.RegisterWaitingRequest;
 import com.qrwait.api.waiting.application.dto.RegisterWaitingResponse;
@@ -37,7 +37,7 @@ class WaitingControllerTest {
   @MockitoBean
   WaitingService waitingService;
   @MockitoBean
-  WaitingSseService waitingSseService;
+  SsePublisher ssePublisher;
 
   @Test
   void register_성공_201반환_응답바디_검증() throws Exception {

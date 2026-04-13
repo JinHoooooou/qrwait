@@ -4,9 +4,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.verify;
+import static org.mockito.BDDMockito.then;
 
-import com.qrwait.api.shared.sse.WaitingSseService;
 import com.qrwait.api.store.application.dto.StoreResponse;
 import com.qrwait.api.store.application.dto.UpdateStoreInfoRequest;
 import com.qrwait.api.store.application.dto.UpdateStoreStatusRequest;
@@ -14,6 +13,7 @@ import com.qrwait.api.store.domain.Store;
 import com.qrwait.api.store.domain.StoreNotFoundException;
 import com.qrwait.api.store.domain.StoreRepository;
 import com.qrwait.api.store.domain.StoreStatus;
+import com.qrwait.api.store.domain.event.StoreStatusChangedEvent;
 import java.time.LocalDateTime;
 import java.util.Optional;
 import java.util.UUID;
@@ -22,6 +22,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.test.util.ReflectionTestUtils;
 
 @ExtendWith(MockitoExtension.class)
@@ -33,13 +34,13 @@ class StoreServiceTest {
   @Mock
   StoreRepository storeRepository;
   @Mock
-  WaitingSseService waitingSseService;
+  ApplicationEventPublisher eventPublisher;
 
   StoreService storeService;
 
   @BeforeEach
   void setUp() {
-    storeService = new StoreService(storeRepository, waitingSseService);
+    storeService = new StoreService(storeRepository, eventPublisher);
     ReflectionTestUtils.setField(storeService, "baseUrl", "http://localhost:5173");
   }
 
@@ -80,7 +81,7 @@ class StoreServiceTest {
     StoreResponse response = storeService.updateStoreStatus(ownerId, request);
 
     assertThat(response.status()).isEqualTo(StoreStatus.CLOSED);
-    verify(waitingSseService).broadcastStoreStatus(storeId, StoreStatus.CLOSED);
+    then(eventPublisher).should().publishEvent(any(StoreStatusChangedEvent.class));
   }
 
   @Test

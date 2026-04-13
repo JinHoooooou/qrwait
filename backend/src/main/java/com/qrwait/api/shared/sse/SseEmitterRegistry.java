@@ -18,7 +18,7 @@ public class SseEmitterRegistry {
   // 점주용: storeId → 단일 emitter (매장당 1개)
   private final ConcurrentHashMap<UUID, SseEmitter> ownerEmitters = new ConcurrentHashMap<>();
 
-  // ===== 손님용 =====
+  // ===== 손님용 ====-=
 
   public void register(UUID storeId, SseEmitter emitter) {
     emitters.computeIfAbsent(storeId, k -> new CopyOnWriteArrayList<>()).add(emitter);

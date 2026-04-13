@@ -1,6 +1,6 @@
 package com.qrwait.api.waiting.application;
 
-import com.qrwait.api.shared.sse.WaitingSseService;
+import com.qrwait.api.shared.sse.SsePublisher;
 import com.qrwait.api.store.application.StoreService;
 import com.qrwait.api.store.domain.StoreNotFoundException;
 import com.qrwait.api.waiting.application.dto.DailySummaryResponse;
@@ -9,12 +9,15 @@ import com.qrwait.api.waiting.domain.WaitingEntry;
 import com.qrwait.api.waiting.domain.WaitingNotFoundException;
 import com.qrwait.api.waiting.domain.WaitingRepository;
 import com.qrwait.api.waiting.domain.WaitingStatus;
+import com.qrwait.api.waiting.domain.event.WaitingCalledEvent;
+import com.qrwait.api.waiting.domain.event.WaitingUpdatedEvent;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
@@ -25,7 +28,8 @@ public class WaitingManagementService {
 
   private final WaitingRepository waitingRepository;
   private final StoreService storeService;
-  private final WaitingSseService waitingSseService;
+  private final SsePublisher ssePublisher;
+  private final ApplicationEventPublisher eventPublisher;
 
   @Transactional(readOnly = true)
   public List<OwnerWaitingResponse> getWaitingList(UUID ownerId) {
@@ -56,7 +60,7 @@ public class WaitingManagementService {
   }
 
   @Transactional
-  public UUID call(UUID ownerId, UUID waitingId) {
+  public void call(UUID ownerId, UUID waitingId) {
     WaitingEntry entry = waitingRepository.findById(waitingId)
         .orElseThrow(() -> new WaitingNotFoundException(waitingId));
 
@@ -68,11 +72,11 @@ public class WaitingManagementService {
     entry.call();
     waitingRepository.save(entry);
 
-    return entry.getStoreId();
+    eventPublisher.publishEvent(new WaitingCalledEvent(entry.getStoreId(), waitingId));
   }
 
   @Transactional
-  public UUID enter(UUID ownerId, UUID waitingId) {
+  public void enter(UUID ownerId, UUID waitingId) {
     WaitingEntry entry = waitingRepository.findById(waitingId)
         .orElseThrow(() -> new WaitingNotFoundException(waitingId));
 
@@ -84,11 +88,11 @@ public class WaitingManagementService {
     entry.enter();
     waitingRepository.save(entry);
 
-    return entry.getStoreId();
+    eventPublisher.publishEvent(new WaitingUpdatedEvent(entry.getStoreId()));
   }
 
   @Transactional
-  public UUID noShow(UUID ownerId, UUID waitingId) {
+  public void noShow(UUID ownerId, UUID waitingId) {
     WaitingEntry entry = waitingRepository.findById(waitingId)
         .orElseThrow(() -> new WaitingNotFoundException(waitingId));
 
@@ -100,12 +104,12 @@ public class WaitingManagementService {
     entry.noShow();
     waitingRepository.save(entry);
 
-    return entry.getStoreId();
+    eventPublisher.publishEvent(new WaitingUpdatedEvent(entry.getStoreId()));
   }
 
   public SseEmitter subscribeOwnerDashboard(UUID ownerId) {
     UUID storeId = resolveStoreId(ownerId);
-    return waitingSseService.subscribeOwner(storeId);
+    return ssePublisher.subscribeOwner(storeId);
   }
 
   private UUID resolveStoreId(UUID ownerId) {

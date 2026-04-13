@@ -19,6 +19,8 @@ import com.qrwait.api.waiting.domain.WaitingEntry;
 import com.qrwait.api.waiting.domain.WaitingNotFoundException;
 import com.qrwait.api.waiting.domain.WaitingRepository;
 import com.qrwait.api.waiting.domain.WaitingStatus;
+import com.qrwait.api.waiting.domain.event.WaitingRegisteredEvent;
+import com.qrwait.api.waiting.domain.event.WaitingUpdatedEvent;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -28,6 +30,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.context.ApplicationEventPublisher;
 
 @ExtendWith(MockitoExtension.class)
 class WaitingServiceTest {
@@ -38,12 +41,14 @@ class WaitingServiceTest {
   StoreRepository storeRepository;
   @Mock
   StoreSettingsRepository storeSettingsRepository;
+  @Mock
+  ApplicationEventPublisher eventPublisher;
 
   WaitingService waitingService;
 
   @BeforeEach
   void setUp() {
-    waitingService = new WaitingService(waitingRepository, storeRepository, storeSettingsRepository);
+    waitingService = new WaitingService(waitingRepository, storeRepository, storeSettingsRepository, eventPublisher);
   }
 
   // ===== register =====
@@ -69,6 +74,7 @@ class WaitingServiceTest {
     assertThat(response.totalWaiting()).isEqualTo(2);
     assertThat(response.estimatedWaitMinutes()).isEqualTo(10);
     assertThat(response.waitingToken()).isNotBlank();
+    then(eventPublisher).should().publishEvent(any(WaitingRegisteredEvent.class));
   }
 
   @Test
@@ -152,6 +158,7 @@ class WaitingServiceTest {
 
     assertThat(entry.getStatus()).isEqualTo(WaitingStatus.CANCELLED);
     then(waitingRepository).should().save(entry);
+    then(eventPublisher).should().publishEvent(any(WaitingUpdatedEvent.class));
   }
 
   @Test

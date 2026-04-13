@@ -55,7 +55,9 @@
       "Bash(./gradlew compileJava compileTestJava)",
       "Bash(./gradlew build:*)",
       "Bash(ls:*)",
-      "Bash(./gradlew compileTestJava)"
+      "Bash(./gradlew compileTestJava)",
+      "Bash(./gradlew clean:*)",
+      "Bash(find \"C:/dev/study_study/qr-wait/backend/build/test-results\" -name \"*.xml\" -exec grep -l \"testcase\" {} \\\\;)"
     ]
   }
 }

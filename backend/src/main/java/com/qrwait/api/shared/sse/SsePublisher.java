@@ -16,7 +16,7 @@ import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class WaitingSseService {
+public class SsePublisher {
 
   private static final long SSE_TIMEOUT_MS = 30 * 60 * 1000L; // 30분
   private static final int MINUTES_PER_TEAM = 5;
