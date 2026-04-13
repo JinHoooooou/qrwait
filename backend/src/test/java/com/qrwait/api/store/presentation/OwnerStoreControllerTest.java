@@ -58,9 +58,9 @@ class OwnerStoreControllerTest {
   }
 
   @Test
-  void getMyStore_인증없음_403반환() throws Exception {
+  void getMyStore_인증없음_401반환() throws Exception {
     mockMvc.perform(get("/api/owner/stores/me"))
-        .andExpect(status().isForbidden());
+        .andExpect(status().isUnauthorized());
   }
 
   @Test

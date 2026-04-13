@@ -28,3 +28,7 @@ jwt:
   secret: ${JWT_SECRET}
   access-expiry: 3600      # 1시간 (초)
   refresh-expiry: 604800   # 7일 (초)
+
+logging:
+  level:
+    org.apache.catalina.core.ContainerBase: WARN

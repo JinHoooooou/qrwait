@@ -44,9 +44,9 @@ class OwnerWaitingControllerTest {
   // ===== streamDashboard =====
 
   @Test
-  void streamDashboard_인증없음_403반환() throws Exception {
+  void streamDashboard_인증없음_401반환() throws Exception {
     mockMvc.perform(get("/api/owner/stores/me/dashboard/stream"))
-        .andExpect(status().isForbidden());
+        .andExpect(status().isUnauthorized());
   }
 
   @Test
@@ -66,9 +66,9 @@ class OwnerWaitingControllerTest {
   // ===== getWaitingList =====
 
   @Test
-  void getWaitingList_인증없음_403반환() throws Exception {
+  void getWaitingList_인증없음_401반환() throws Exception {
     mockMvc.perform(get("/api/owner/stores/me/waitings"))
-        .andExpect(status().isForbidden());
+        .andExpect(status().isUnauthorized());
   }
 
   @Test
@@ -94,9 +94,9 @@ class OwnerWaitingControllerTest {
   // ===== getDailySummary =====
 
   @Test
-  void getDailySummary_인증없음_403반환() throws Exception {
+  void getDailySummary_인증없음_401반환() throws Exception {
     mockMvc.perform(get("/api/owner/stores/me/waitings/summary"))
-        .andExpect(status().isForbidden());
+        .andExpect(status().isUnauthorized());
   }
 
   @Test
@@ -119,9 +119,9 @@ class OwnerWaitingControllerTest {
   // ===== call =====
 
   @Test
-  void callWaiting_인증없음_403반환() throws Exception {
+  void callWaiting_인증없음_401반환() throws Exception {
     mockMvc.perform(post("/api/owner/waitings/" + UUID.randomUUID() + "/call"))
-        .andExpect(status().isForbidden());
+        .andExpect(status().isUnauthorized());
   }
 
   @Test
@@ -141,9 +141,9 @@ class OwnerWaitingControllerTest {
   // ===== enter =====
 
   @Test
-  void enterWaiting_인증없음_403반환() throws Exception {
+  void enterWaiting_인증없음_401반환() throws Exception {
     mockMvc.perform(post("/api/owner/waitings/" + UUID.randomUUID() + "/enter"))
-        .andExpect(status().isForbidden());
+        .andExpect(status().isUnauthorized());
   }
 
   @Test
@@ -163,9 +163,9 @@ class OwnerWaitingControllerTest {
   // ===== noShow =====
 
   @Test
-  void noShowWaiting_인증없음_403반환() throws Exception {
+  void noShowWaiting_인증없음_401반환() throws Exception {
     mockMvc.perform(post("/api/owner/waitings/" + UUID.randomUUID() + "/noshow"))
-        .andExpect(status().isForbidden());
+        .andExpect(status().isUnauthorized());
   }
 
   @Test
