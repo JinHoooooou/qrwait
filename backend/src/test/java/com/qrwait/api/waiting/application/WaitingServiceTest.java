@@ -6,7 +6,6 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
 
-import com.qrwait.api.shared.sse.WaitingSseService;
 import com.qrwait.api.store.domain.Store;
 import com.qrwait.api.store.domain.StoreNotAvailableException;
 import com.qrwait.api.store.domain.StoreNotFoundException;
@@ -39,14 +38,12 @@ class WaitingServiceTest {
   StoreRepository storeRepository;
   @Mock
   StoreSettingsRepository storeSettingsRepository;
-  @Mock
-  WaitingSseService waitingSseService;
 
   WaitingService waitingService;
 
   @BeforeEach
   void setUp() {
-    waitingService = new WaitingService(waitingRepository, storeRepository, storeSettingsRepository, waitingSseService);
+    waitingService = new WaitingService(waitingRepository, storeRepository, storeSettingsRepository);
   }
 
   // ===== register =====
@@ -72,7 +69,6 @@ class WaitingServiceTest {
     assertThat(response.totalWaiting()).isEqualTo(2);
     assertThat(response.estimatedWaitMinutes()).isEqualTo(10);
     assertThat(response.waitingToken()).isNotBlank();
-    then(waitingSseService).should().broadcastRegistered(storeId);
   }
 
   @Test

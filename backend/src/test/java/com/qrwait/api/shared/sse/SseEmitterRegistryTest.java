@@ -123,7 +123,7 @@ class SseEmitterRegistryTest {
     SseEmitter ownerEmitter = mock(SseEmitter.class);
 
     registry.registerOwner(storeId, ownerEmitter);
-    registry.removeOwner(storeId);
+    registry.removeOwner(storeId, ownerEmitter);
 
     registry.broadcastToOwner(storeId, "event", "data");
 

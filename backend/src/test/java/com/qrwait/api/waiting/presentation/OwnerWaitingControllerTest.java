@@ -3,7 +3,6 @@ package com.qrwait.api.waiting.presentation;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.BDDMockito.willDoNothing;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -13,6 +12,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.qrwait.api.shared.security.JwtAuthFilter;
 import com.qrwait.api.shared.security.JwtTokenProvider;
 import com.qrwait.api.shared.security.SecurityConfig;
+import com.qrwait.api.shared.sse.WaitingSseService;
 import com.qrwait.api.waiting.application.WaitingManagementService;
 import com.qrwait.api.waiting.application.dto.DailySummaryResponse;
 import com.qrwait.api.waiting.application.dto.OwnerWaitingResponse;
@@ -40,6 +40,8 @@ class OwnerWaitingControllerTest {
   JwtTokenProvider jwtTokenProvider;
   @MockitoBean
   WaitingManagementService waitingManagementService;
+  @MockitoBean
+  WaitingSseService waitingSseService;
 
   // ===== streamDashboard =====
 
@@ -131,7 +133,7 @@ class OwnerWaitingControllerTest {
 
     given(jwtTokenProvider.validateToken(any())).willReturn(true);
     given(jwtTokenProvider.extractOwnerId(any())).willReturn(ownerId);
-    willDoNothing().given(waitingManagementService).call(eq(ownerId), eq(waitingId));
+    given(waitingManagementService.call(eq(ownerId), eq(waitingId))).willReturn(UUID.randomUUID());
 
     mockMvc.perform(post("/api/owner/waitings/" + waitingId + "/call")
             .header("Authorization", "Bearer test-token"))
@@ -153,7 +155,7 @@ class OwnerWaitingControllerTest {
 
     given(jwtTokenProvider.validateToken(any())).willReturn(true);
     given(jwtTokenProvider.extractOwnerId(any())).willReturn(ownerId);
-    willDoNothing().given(waitingManagementService).enter(eq(ownerId), eq(waitingId));
+    given(waitingManagementService.enter(eq(ownerId), eq(waitingId))).willReturn(UUID.randomUUID());
 
     mockMvc.perform(post("/api/owner/waitings/" + waitingId + "/enter")
             .header("Authorization", "Bearer test-token"))
@@ -175,7 +177,7 @@ class OwnerWaitingControllerTest {
 
     given(jwtTokenProvider.validateToken(any())).willReturn(true);
     given(jwtTokenProvider.extractOwnerId(any())).willReturn(ownerId);
-    willDoNothing().given(waitingManagementService).noShow(eq(ownerId), eq(waitingId));
+    given(waitingManagementService.noShow(eq(ownerId), eq(waitingId))).willReturn(UUID.randomUUID());
 
     mockMvc.perform(post("/api/owner/waitings/" + waitingId + "/noshow")
             .header("Authorization", "Bearer test-token"))

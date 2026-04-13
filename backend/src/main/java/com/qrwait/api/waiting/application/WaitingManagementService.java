@@ -56,7 +56,7 @@ public class WaitingManagementService {
   }
 
   @Transactional
-  public void call(UUID ownerId, UUID waitingId) {
+  public UUID call(UUID ownerId, UUID waitingId) {
     WaitingEntry entry = waitingRepository.findById(waitingId)
         .orElseThrow(() -> new WaitingNotFoundException(waitingId));
 
@@ -68,11 +68,11 @@ public class WaitingManagementService {
     entry.call();
     waitingRepository.save(entry);
 
-    waitingSseService.broadcastCalled(entry.getStoreId(), waitingId);
+    return entry.getStoreId();
   }
 
   @Transactional
-  public void enter(UUID ownerId, UUID waitingId) {
+  public UUID enter(UUID ownerId, UUID waitingId) {
     WaitingEntry entry = waitingRepository.findById(waitingId)
         .orElseThrow(() -> new WaitingNotFoundException(waitingId));
 
@@ -84,11 +84,11 @@ public class WaitingManagementService {
     entry.enter();
     waitingRepository.save(entry);
 
-    waitingSseService.broadcastUpdate(entry.getStoreId());
+    return entry.getStoreId();
   }
 
   @Transactional
-  public void noShow(UUID ownerId, UUID waitingId) {
+  public UUID noShow(UUID ownerId, UUID waitingId) {
     WaitingEntry entry = waitingRepository.findById(waitingId)
         .orElseThrow(() -> new WaitingNotFoundException(waitingId));
 
@@ -100,7 +100,7 @@ public class WaitingManagementService {
     entry.noShow();
     waitingRepository.save(entry);
 
-    waitingSseService.broadcastUpdate(entry.getStoreId());
+    return entry.getStoreId();
   }
 
   public SseEmitter subscribeOwnerDashboard(UUID ownerId) {

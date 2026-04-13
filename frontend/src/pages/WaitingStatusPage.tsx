@@ -91,7 +91,7 @@ function WaitingStatusPage() {
         }
       }
 
-      es.addEventListener('waiting-update', () => {
+      es.addEventListener('waiting-updated', () => {
         if (unmounted || !waitingId) return
         getWaiting(waitingId)
             .then((res) => {

@@ -14,9 +14,7 @@ import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 public class SseEmitterRegistry {
 
   // 손님용: storeId → 복수 emitter
-  private final ConcurrentHashMap<UUID, CopyOnWriteArrayList<SseEmitter>> emitters =
-      new ConcurrentHashMap<>();
-
+  private final ConcurrentHashMap<UUID, CopyOnWriteArrayList<SseEmitter>> emitters = new ConcurrentHashMap<>();
   // 점주용: storeId → 단일 emitter (매장당 1개)
   private final ConcurrentHashMap<UUID, SseEmitter> ownerEmitters = new ConcurrentHashMap<>();
 
@@ -65,8 +63,8 @@ public class SseEmitterRegistry {
     log.debug("점주 SSE 등록 — storeId={}", storeId);
   }
 
-  public void removeOwner(UUID storeId) {
-    ownerEmitters.remove(storeId);
+  public void removeOwner(UUID storeId, SseEmitter emitter) {
+    ownerEmitters.remove(storeId, emitter);
     log.debug("점주 SSE 제거 — storeId={}", storeId);
   }
 
@@ -80,7 +78,7 @@ public class SseEmitterRegistry {
       emitter.send(SseEmitter.event().name(eventName).data(data));
     } catch (IOException e) {
       log.warn("점주 SSE 전송 실패 — emitter 제거: storeId={}", storeId);
-      removeOwner(storeId);
+      removeOwner(storeId, emitter);
     }
   }
 }

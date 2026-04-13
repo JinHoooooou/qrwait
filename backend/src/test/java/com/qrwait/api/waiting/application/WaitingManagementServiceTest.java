@@ -127,10 +127,10 @@ class WaitingManagementServiceTest {
         .willReturn(new StoreResponse(storeId, "테스트 매장", "서울", StoreStatus.OPEN));
     given(waitingRepository.save(any())).willReturn(entry);
 
-    service.call(ownerId, waitingId);
+    UUID result = service.call(ownerId, waitingId);
 
+    assertThat(result).isEqualTo(storeId);
     verify(waitingRepository).save(any());
-    verify(waitingSseService).broadcastCalled(storeId, waitingId);
   }
 
   @Test
@@ -163,10 +163,10 @@ class WaitingManagementServiceTest {
         .willReturn(new StoreResponse(storeId, "테스트 매장", "서울", StoreStatus.OPEN));
     given(waitingRepository.save(any())).willReturn(entry);
 
-    service.enter(ownerId, waitingId);
+    UUID result = service.enter(ownerId, waitingId);
 
+    assertThat(result).isEqualTo(storeId);
     verify(waitingRepository).save(any());
-    verify(waitingSseService).broadcastUpdate(storeId);
   }
 
   @Test
@@ -199,10 +199,10 @@ class WaitingManagementServiceTest {
         .willReturn(new StoreResponse(storeId, "테스트 매장", "서울", StoreStatus.OPEN));
     given(waitingRepository.save(any())).willReturn(entry);
 
-    service.noShow(ownerId, waitingId);
+    UUID result = service.noShow(ownerId, waitingId);
 
+    assertThat(result).isEqualTo(storeId);
     verify(waitingRepository).save(any());
-    verify(waitingSseService).broadcastUpdate(storeId);
   }
 
   @Test

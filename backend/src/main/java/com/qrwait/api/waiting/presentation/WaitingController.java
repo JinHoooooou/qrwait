@@ -45,6 +45,7 @@ public class WaitingController {
       @PathVariable UUID storeId,
       @Valid @RequestBody RegisterWaitingRequest request) {
     RegisterWaitingResponse response = waitingService.register(storeId, request);
+    waitingSseService.broadcastRegistered(storeId);
     URI location = URI.create("/api/waitings/" + response.waitingId());
     return ResponseEntity.created(location).body(response);
   }
@@ -67,7 +68,8 @@ public class WaitingController {
   })
   @DeleteMapping("/waitings/{waitingId}")
   public ResponseEntity<Void> cancel(@PathVariable UUID waitingId) {
-    waitingService.cancel(waitingId);
+    UUID storeId = waitingService.cancel(waitingId);
+    waitingSseService.broadcastUpdate(storeId);
     return ResponseEntity.noContent().build();
   }
 
