@@ -2,6 +2,7 @@ package com.qrwait.api.shared.web;
 
 import com.qrwait.api.owner.domain.DuplicateEmailException;
 import com.qrwait.api.owner.domain.InvalidCredentialsException;
+import com.qrwait.api.shared.qr.QrCodeGenerationException;
 import com.qrwait.api.store.domain.StoreNotAvailableException;
 import com.qrwait.api.store.domain.StoreNotFoundException;
 import com.qrwait.api.waiting.domain.WaitingNotFoundException;
@@ -59,5 +60,11 @@ public class GlobalExceptionHandler {
   @ResponseStatus(HttpStatus.CONFLICT)
   public ErrorResponse handleIllegalState(IllegalStateException e) {
     return ErrorResponse.of("INVALID_STATUS_TRANSITION", e.getMessage());
+  }
+
+  @ExceptionHandler(QrCodeGenerationException.class)
+  @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+  public ErrorResponse handleQrCodeGeneration(QrCodeGenerationException e) {
+    return ErrorResponse.of("QR_GENERATION_FAILED", e.getMessage());
   }
 }

@@ -6,6 +6,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
 
+import com.qrwait.api.shared.qr.QrCodeGenerator;
 import com.qrwait.api.store.application.dto.StoreResponse;
 import com.qrwait.api.store.application.dto.UpdateStoreInfoRequest;
 import com.qrwait.api.store.application.dto.UpdateStoreStatusRequest;
@@ -35,12 +36,14 @@ class StoreServiceTest {
   StoreRepository storeRepository;
   @Mock
   ApplicationEventPublisher eventPublisher;
+  @Mock
+  QrCodeGenerator qrCodeGenerator;
 
   StoreService storeService;
 
   @BeforeEach
   void setUp() {
-    storeService = new StoreService(storeRepository, eventPublisher);
+    storeService = new StoreService(storeRepository, eventPublisher, qrCodeGenerator);
     ReflectionTestUtils.setField(storeService, "baseUrl", "http://localhost:5173");
   }
 

@@ -1,10 +1,6 @@
 package com.qrwait.api.store.application;
 
-import com.google.zxing.BarcodeFormat;
-import com.google.zxing.WriterException;
-import com.google.zxing.client.j2se.MatrixToImageWriter;
-import com.google.zxing.common.BitMatrix;
-import com.google.zxing.qrcode.QRCodeWriter;
+import com.qrwait.api.shared.qr.QrCodeGenerator;
 import com.qrwait.api.store.application.dto.StoreResponse;
 import com.qrwait.api.store.application.dto.UpdateStoreInfoRequest;
 import com.qrwait.api.store.application.dto.UpdateStoreStatusRequest;
@@ -12,8 +8,6 @@ import com.qrwait.api.store.domain.Store;
 import com.qrwait.api.store.domain.StoreNotFoundException;
 import com.qrwait.api.store.domain.StoreRepository;
 import com.qrwait.api.store.domain.event.StoreStatusChangedEvent;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -27,6 +21,7 @@ public class StoreService {
 
   private final StoreRepository storeRepository;
   private final ApplicationEventPublisher eventPublisher;
+  private final QrCodeGenerator qrCodeGenerator;
 
   @Value("${app.base-url}")
   private String baseUrl;
@@ -67,16 +62,7 @@ public class StoreService {
         .orElseThrow(() -> new StoreNotFoundException(storeId));
 
     String qrUrl = baseUrl + "/wait?storeId=" + storeId;
-
-    try {
-      QRCodeWriter writer = new QRCodeWriter();
-      BitMatrix bitMatrix = writer.encode(qrUrl, BarcodeFormat.QR_CODE, 300, 300);
-      ByteArrayOutputStream out = new ByteArrayOutputStream();
-      MatrixToImageWriter.writeToStream(bitMatrix, "PNG", out);
-      return out.toByteArray();
-    } catch (WriterException | IOException e) {
-      throw new RuntimeException("QR 코드 생성 실패", e);
-    }
+    return qrCodeGenerator.generate(qrUrl);
   }
 
   private StoreResponse toResponse(Store store) {

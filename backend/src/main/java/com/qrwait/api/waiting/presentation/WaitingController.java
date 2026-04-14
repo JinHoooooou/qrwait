@@ -41,9 +41,7 @@ public class WaitingController {
       @ApiResponse(responseCode = "404", description = "매장을 찾을 수 없음")
   })
   @PostMapping("/stores/{storeId}/waitings")
-  public ResponseEntity<RegisterWaitingResponse> register(
-      @PathVariable UUID storeId,
-      @Valid @RequestBody RegisterWaitingRequest request) {
+  public ResponseEntity<RegisterWaitingResponse> register(@PathVariable UUID storeId, @Valid @RequestBody RegisterWaitingRequest request) {
     RegisterWaitingResponse response = waitingService.register(storeId, request);
     URI location = URI.create("/api/waitings/" + response.waitingId());
     return ResponseEntity.created(location).body(response);
@@ -74,9 +72,7 @@ public class WaitingController {
   @Operation(summary = "웨이팅 실시간 구독 (SSE)", description = "Server-Sent Events로 대기 상태 변경을 실시간으로 수신합니다.")
   @ApiResponse(responseCode = "200", description = "SSE 스트림 연결 성공")
   @GetMapping(value = "/waitings/{waitingId}/stream", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
-  public SseEmitter stream(
-      @PathVariable UUID waitingId,
-      @RequestParam UUID storeId) {
+  public SseEmitter stream(@PathVariable UUID waitingId, @RequestParam UUID storeId) {
     return ssePublisher.subscribe(storeId, waitingId);
   }
 }
