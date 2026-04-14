@@ -46,7 +46,9 @@ public class WaitingService {
     WaitingEntry saved = waitingRepository.save(entry);
 
     int totalWaiting = waitingRepository.countByStoreIdAndStatus(storeId, WaitingStatus.WAITING);
-    int estimatedWaitMinutes = totalWaiting * 5;
+    int estimatedWaitMinutes = storeSettingsRepository.findByStoreId(storeId)
+        .map(settings -> settings.calculateEstimatedWait(totalWaiting))
+        .orElse(totalWaiting * 5);
 
     String waitingToken = UUID.randomUUID().toString();
 
@@ -102,7 +104,9 @@ public class WaitingService {
   @Transactional(readOnly = true)
   public WaitingStatusResponse getStoreWaitingStatus(UUID storeId) {
     int totalWaiting = waitingRepository.countByStoreIdAndStatus(storeId, WaitingStatus.WAITING);
-    int estimatedWaitMinutes = totalWaiting * 5;
+    int estimatedWaitMinutes = storeSettingsRepository.findByStoreId(storeId)
+        .map(settings -> settings.calculateEstimatedWait(totalWaiting))
+        .orElse(totalWaiting * 5);
     return new WaitingStatusResponse(totalWaiting, totalWaiting, estimatedWaitMinutes);
   }
 }

@@ -10,6 +10,7 @@ import com.qrwait.api.store.domain.Store;
 import com.qrwait.api.store.domain.StoreNotAvailableException;
 import com.qrwait.api.store.domain.StoreNotFoundException;
 import com.qrwait.api.store.domain.StoreRepository;
+import com.qrwait.api.store.domain.StoreSettings;
 import com.qrwait.api.store.domain.StoreSettingsRepository;
 import com.qrwait.api.store.domain.StoreStatus;
 import com.qrwait.api.waiting.application.dto.RegisterWaitingRequest;
@@ -78,6 +79,27 @@ class WaitingServiceTest {
   }
 
   @Test
+  void register_StoreSettings_기반_예상대기시간_계산() {
+    UUID storeId = UUID.randomUUID();
+    RegisterWaitingRequest request = new RegisterWaitingRequest();
+    request.setVisitorName("홍길동");
+    request.setPartySize(2);
+
+    given(storeRepository.findById(storeId))
+        .willReturn(Optional.of(Store.create(null, "테스트 식당", null)));
+    given(waitingRepository.findNextWaitingNumber(storeId)).willReturn(1);
+    given(waitingRepository.save(any(WaitingEntry.class)))
+        .willAnswer(inv -> inv.getArgument(0));
+    given(waitingRepository.countByStoreIdAndStatus(storeId, WaitingStatus.WAITING)).willReturn(3);
+    given(storeSettingsRepository.findByStoreId(storeId))
+        .willReturn(Optional.of(StoreSettings.createDefault(storeId))); // tableCount=5, avgTurnoverMinutes=30 → 30/5*3=18
+
+    RegisterWaitingResponse response = waitingService.register(storeId, request);
+
+    assertThat(response.estimatedWaitMinutes()).isEqualTo(18);
+  }
+
+  @Test
   void register_존재하지않는_storeId_예외발생() {
     UUID storeId = UUID.randomUUID();
     RegisterWaitingRequest request = new RegisterWaitingRequest();
@@ -103,6 +125,32 @@ class WaitingServiceTest {
 
     assertThatThrownBy(() -> waitingService.register(storeId, request))
         .isInstanceOf(StoreNotAvailableException.class);
+  }
+
+  // ===== getStoreWaitingStatus =====
+
+  @Test
+  void getStoreWaitingStatus_StoreSettings_기반_예상대기시간_계산() {
+    UUID storeId = UUID.randomUUID();
+    given(waitingRepository.countByStoreIdAndStatus(storeId, WaitingStatus.WAITING)).willReturn(4);
+    given(storeSettingsRepository.findByStoreId(storeId))
+        .willReturn(Optional.of(StoreSettings.createDefault(storeId))); // 30/5*4=24
+
+    WaitingStatusResponse response = waitingService.getStoreWaitingStatus(storeId);
+
+    assertThat(response.totalWaiting()).isEqualTo(4);
+    assertThat(response.estimatedWaitMinutes()).isEqualTo(24);
+  }
+
+  @Test
+  void getStoreWaitingStatus_StoreSettings_없을때_fallback_계산() {
+    UUID storeId = UUID.randomUUID();
+    given(waitingRepository.countByStoreIdAndStatus(storeId, WaitingStatus.WAITING)).willReturn(4);
+    given(storeSettingsRepository.findByStoreId(storeId)).willReturn(Optional.empty());
+
+    WaitingStatusResponse response = waitingService.getStoreWaitingStatus(storeId);
+
+    assertThat(response.estimatedWaitMinutes()).isEqualTo(20); // 4 * 5
   }
 
   // ===== getStatus =====

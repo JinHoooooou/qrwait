@@ -19,7 +19,6 @@ import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 public class SsePublisher {
 
   private static final long SSE_TIMEOUT_MS = 30 * 60 * 1000L; // 30분
-  private static final int MINUTES_PER_TEAM = 5;
 
   private final SseEmitterRegistry registry;
   private final WaitingRepository waitingRepository;
@@ -110,7 +109,9 @@ public class SsePublisher {
 
   private WaitingStatusResponse buildStoreStatus(UUID storeId) {
     int total = waitingRepository.countByStoreIdAndStatus(storeId, WaitingStatus.WAITING);
-    int estimated = total * MINUTES_PER_TEAM;
+    int estimated = storeSettingsRepository.findByStoreId(storeId)
+        .map(settings -> settings.calculateEstimatedWait(total))
+        .orElse(total * 5);
     return new WaitingStatusResponse(total, total, estimated);
   }
 
