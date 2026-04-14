@@ -1,8 +1,8 @@
 package com.qrwait.api.waiting.application;
 
 import com.qrwait.api.shared.sse.SsePublisher;
-import com.qrwait.api.store.application.StoreService;
 import com.qrwait.api.store.domain.StoreNotFoundException;
+import com.qrwait.api.store.domain.StoreRepository;
 import com.qrwait.api.waiting.application.dto.DailySummaryResponse;
 import com.qrwait.api.waiting.application.dto.OwnerWaitingResponse;
 import com.qrwait.api.waiting.domain.WaitingEntry;
@@ -27,7 +27,7 @@ import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 public class WaitingManagementService {
 
   private final WaitingRepository waitingRepository;
-  private final StoreService storeService;
+  private final StoreRepository storeRepository;
   private final SsePublisher ssePublisher;
   private final ApplicationEventPublisher eventPublisher;
 
@@ -113,7 +113,9 @@ public class WaitingManagementService {
   }
 
   private UUID resolveStoreId(UUID ownerId) {
-    return storeService.getMyStore(ownerId).storeId();
+    return storeRepository.findByOwnerId(ownerId)
+        .orElseThrow(() -> new StoreNotFoundException("ownerId=" + ownerId))
+        .getId();
   }
 
   private OwnerWaitingResponse toOwnerWaitingResponse(WaitingEntry entry) {
