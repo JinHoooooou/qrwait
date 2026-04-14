@@ -69,10 +69,10 @@ public class WaitingManagementService {
       throw new StoreNotFoundException("ownerId=" + ownerId);
     }
 
-    entry.call();
-    waitingRepository.save(entry);
+    WaitingEntry called = entry.call();
+    waitingRepository.save(called);
 
-    eventPublisher.publishEvent(new WaitingCalledEvent(entry.getStoreId(), waitingId));
+    eventPublisher.publishEvent(new WaitingCalledEvent(called.getStoreId(), waitingId));
   }
 
   @Transactional
@@ -85,10 +85,10 @@ public class WaitingManagementService {
       throw new StoreNotFoundException("ownerId=" + ownerId);
     }
 
-    entry.enter();
-    waitingRepository.save(entry);
+    WaitingEntry entered = entry.enter();
+    waitingRepository.save(entered);
 
-    eventPublisher.publishEvent(new WaitingUpdatedEvent(entry.getStoreId()));
+    eventPublisher.publishEvent(new WaitingUpdatedEvent(entered.getStoreId()));
   }
 
   @Transactional
@@ -101,10 +101,10 @@ public class WaitingManagementService {
       throw new StoreNotFoundException("ownerId=" + ownerId);
     }
 
-    entry.noShow();
-    waitingRepository.save(entry);
+    WaitingEntry noShowed = entry.noShow();
+    waitingRepository.save(noShowed);
 
-    eventPublisher.publishEvent(new WaitingUpdatedEvent(entry.getStoreId()));
+    eventPublisher.publishEvent(new WaitingUpdatedEvent(noShowed.getStoreId()));
   }
 
   public SseEmitter subscribeOwnerDashboard(UUID ownerId) {

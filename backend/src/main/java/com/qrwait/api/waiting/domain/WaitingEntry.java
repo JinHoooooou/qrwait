@@ -13,7 +13,7 @@ public class WaitingEntry {
   private final int partySize;
   private final int waitingNumber;
   private final LocalDateTime createdAt;
-  private WaitingStatus status;
+  private final WaitingStatus status;
 
   private WaitingEntry(UUID id, UUID storeId, String visitorName, int partySize,
       int waitingNumber, WaitingStatus status, LocalDateTime createdAt) {
@@ -54,44 +54,44 @@ public class WaitingEntry {
   /**
    * WAITING → CALLED
    */
-  public void call() {
+  public WaitingEntry call() {
     if (status != WaitingStatus.WAITING) {
       throw new IllegalStateException(
           "call() 은 WAITING 상태에서만 가능합니다. 현재 상태: " + status);
     }
-    this.status = WaitingStatus.CALLED;
+    return new WaitingEntry(id, storeId, visitorName, partySize, waitingNumber, WaitingStatus.CALLED, createdAt);
   }
 
   /**
    * CALLED → ENTERED
    */
-  public void enter() {
+  public WaitingEntry enter() {
     if (status != WaitingStatus.CALLED) {
       throw new IllegalStateException(
           "enter() 는 CALLED 상태에서만 가능합니다. 현재 상태: " + status);
     }
-    this.status = WaitingStatus.ENTERED;
+    return new WaitingEntry(id, storeId, visitorName, partySize, waitingNumber, WaitingStatus.ENTERED, createdAt);
   }
 
   /**
    * WAITING | CALLED → CANCELLED
    */
-  public void cancel() {
+  public WaitingEntry cancel() {
     if (status != WaitingStatus.WAITING && status != WaitingStatus.CALLED) {
       throw new IllegalStateException(
           "cancel() 은 WAITING 또는 CALLED 상태에서만 가능합니다. 현재 상태: " + status);
     }
-    this.status = WaitingStatus.CANCELLED;
+    return new WaitingEntry(id, storeId, visitorName, partySize, waitingNumber, WaitingStatus.CANCELLED, createdAt);
   }
 
   /**
    * CALLED → NO_SHOW
    */
-  public void noShow() {
+  public WaitingEntry noShow() {
     if (status != WaitingStatus.CALLED) {
       throw new IllegalStateException(
           "noShow() 는 CALLED 상태에서만 가능합니다. 현재 상태: " + status);
     }
-    this.status = WaitingStatus.NO_SHOW;
+    return new WaitingEntry(id, storeId, visitorName, partySize, waitingNumber, WaitingStatus.NO_SHOW, createdAt);
   }
 }

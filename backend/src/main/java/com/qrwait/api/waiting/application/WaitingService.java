@@ -95,10 +95,10 @@ public class WaitingService {
     WaitingEntry entry = waitingRepository.findById(waitingId)
         .orElseThrow(() -> new WaitingNotFoundException(waitingId));
 
-    entry.cancel();
-    waitingRepository.save(entry);
+    WaitingEntry cancelled = entry.cancel();
+    waitingRepository.save(cancelled);
 
-    eventPublisher.publishEvent(new WaitingUpdatedEvent(entry.getStoreId()));
+    eventPublisher.publishEvent(new WaitingUpdatedEvent(cancelled.getStoreId()));
   }
 
   @Transactional(readOnly = true)

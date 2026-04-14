@@ -5,6 +5,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
+import static org.mockito.Mockito.verify;
 
 import com.qrwait.api.store.domain.Store;
 import com.qrwait.api.store.domain.StoreNotAvailableException;
@@ -29,6 +30,7 @@ import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.context.ApplicationEventPublisher;
@@ -200,12 +202,13 @@ class WaitingServiceTest {
         waitingId, UUID.randomUUID(), "손님", 2, 1, WaitingStatus.WAITING, LocalDateTime.now());
 
     given(waitingRepository.findById(waitingId)).willReturn(Optional.of(entry));
-    given(waitingRepository.save(entry)).willReturn(entry);
+    given(waitingRepository.save(any(WaitingEntry.class))).willAnswer(inv -> inv.getArgument(0));
 
     waitingService.cancel(waitingId);
 
-    assertThat(entry.getStatus()).isEqualTo(WaitingStatus.CANCELLED);
-    then(waitingRepository).should().save(entry);
+    ArgumentCaptor<WaitingEntry> captor = ArgumentCaptor.forClass(WaitingEntry.class);
+    verify(waitingRepository).save(captor.capture());
+    assertThat(captor.getValue().getStatus()).isEqualTo(WaitingStatus.CANCELLED);
     then(eventPublisher).should().publishEvent(any(WaitingUpdatedEvent.class));
   }
 
