@@ -45,7 +45,7 @@ class WaitingControllerTest {
     UUID waitingId = UUID.randomUUID();
 
     given(waitingService.register(eq(storeId), any()))
-        .willReturn(new RegisterWaitingResponse(waitingId, 3, 3, 3, 15, "token-abc"));
+        .willReturn(new RegisterWaitingResponse(waitingId, 3, 3, 3, 15));
 
     RegisterWaitingRequest request = new RegisterWaitingRequest();
     request.setVisitorName("홍길동");
@@ -56,8 +56,7 @@ class WaitingControllerTest {
             .content(objectMapper.writeValueAsString(request)))
         .andExpect(status().isCreated())
         .andExpect(jsonPath("$.waitingNumber").value(3))
-        .andExpect(jsonPath("$.currentRank").value(3))
-        .andExpect(jsonPath("$.waitingToken").value("token-abc"));
+        .andExpect(jsonPath("$.currentRank").value(3));
   }
 
   @Test

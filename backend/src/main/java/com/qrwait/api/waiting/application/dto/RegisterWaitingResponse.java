@@ -7,8 +7,7 @@ public record RegisterWaitingResponse(
     int waitingNumber,
     int currentRank,
     int totalWaiting,
-    int estimatedWaitMinutes,
-    String waitingToken
+    int estimatedWaitMinutes
 ) {
 
 }

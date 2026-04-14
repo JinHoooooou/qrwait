@@ -83,13 +83,12 @@ function LandingPage() {
       setWaiting({
         waitingId: res.waitingId,
         waitingNumber: res.waitingNumber,
-        waitingToken: res.waitingToken,
         storeId,
         currentRank: res.currentRank,
         totalWaiting: res.totalWaiting,
         estimatedWaitMinutes: res.estimatedWaitMinutes,
       })
-      saveWaitingSession(res.waitingId, res.waitingToken, storeId, res.waitingNumber)
+      saveWaitingSession(res.waitingId, storeId, res.waitingNumber)
       navigate(`/waiting/${res.waitingId}`)
     } catch {
       setError('웨이팅 등록에 실패했습니다. 다시 시도해주세요.')

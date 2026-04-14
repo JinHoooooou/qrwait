@@ -3,7 +3,6 @@ import {create} from 'zustand'
 interface WaitingState {
   waitingId: string | null
   waitingNumber: number | null
-  waitingToken: string | null
   storeId: string | null
   currentRank: number | null
   totalWaiting: number | null
@@ -14,7 +13,6 @@ interface WaitingActions {
   setWaiting: (payload: {
     waitingId: string
     waitingNumber: number
-    waitingToken: string
     storeId: string
     currentRank: number
     totalWaiting: number
@@ -31,7 +29,6 @@ interface WaitingActions {
 const initialState: WaitingState = {
   waitingId: null,
   waitingNumber: null,
-  waitingToken: null,
   storeId: null,
   currentRank: null,
   totalWaiting: null,

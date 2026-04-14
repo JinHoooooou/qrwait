@@ -76,7 +76,6 @@ class WaitingServiceTest {
     assertThat(response.currentRank()).isEqualTo(2);
     assertThat(response.totalWaiting()).isEqualTo(2);
     assertThat(response.estimatedWaitMinutes()).isEqualTo(10);
-    assertThat(response.waitingToken()).isNotBlank();
     then(eventPublisher).should().publishEvent(any(WaitingRegisteredEvent.class));
   }
 

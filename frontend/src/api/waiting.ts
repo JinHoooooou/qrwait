@@ -19,7 +19,6 @@ export interface RegisterWaitingResponse {
   currentRank: number
   totalWaiting: number
   estimatedWaitMinutes: number
-  waitingToken: string
 }
 
 export interface WaitingStatusResponse {

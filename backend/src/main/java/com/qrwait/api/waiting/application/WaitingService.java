@@ -50,8 +50,6 @@ public class WaitingService {
         .map(settings -> settings.calculateEstimatedWait(totalWaiting))
         .orElse(totalWaiting * 5);
 
-    String waitingToken = UUID.randomUUID().toString();
-
     eventPublisher.publishEvent(new WaitingRegisteredEvent(storeId));
 
     return new RegisterWaitingResponse(
@@ -59,8 +57,7 @@ public class WaitingService {
         waitingNumber,
         totalWaiting,
         totalWaiting,
-        estimatedWaitMinutes,
-        waitingToken
+        estimatedWaitMinutes
     );
   }
 
