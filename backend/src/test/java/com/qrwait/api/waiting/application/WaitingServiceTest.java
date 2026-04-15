@@ -60,7 +60,7 @@ class WaitingServiceTest {
   void register_정상등록_waitingNumber와_currentRank_반환() {
     UUID storeId = UUID.randomUUID();
     RegisterWaitingRequest request = new RegisterWaitingRequest();
-    request.setVisitorName("홍길동");
+    request.setPhoneNumber("010-1234-5678");
     request.setPartySize(2);
 
     given(storeRepository.findById(storeId))
@@ -83,7 +83,7 @@ class WaitingServiceTest {
   void register_StoreSettings_기반_예상대기시간_계산() {
     UUID storeId = UUID.randomUUID();
     RegisterWaitingRequest request = new RegisterWaitingRequest();
-    request.setVisitorName("홍길동");
+    request.setPhoneNumber("010-1234-5678");
     request.setPartySize(2);
 
     given(storeRepository.findById(storeId))
@@ -104,7 +104,7 @@ class WaitingServiceTest {
   void register_존재하지않는_storeId_예외발생() {
     UUID storeId = UUID.randomUUID();
     RegisterWaitingRequest request = new RegisterWaitingRequest();
-    request.setVisitorName("홍길동");
+    request.setPhoneNumber("010-1234-5678");
     request.setPartySize(2);
 
     given(storeRepository.findById(storeId)).willReturn(Optional.empty());
@@ -117,7 +117,7 @@ class WaitingServiceTest {
   void register_매장_OPEN아닐때_예외발생() {
     UUID storeId = UUID.randomUUID();
     RegisterWaitingRequest request = new RegisterWaitingRequest();
-    request.setVisitorName("홍길동");
+    request.setPhoneNumber("010-1234-5678");
     request.setPartySize(2);
 
     Store closedStore = Store.restore(storeId, UUID.randomUUID(), "테스트 식당", "서울",
@@ -162,11 +162,11 @@ class WaitingServiceTest {
     UUID waitingId = UUID.randomUUID();
 
     WaitingEntry target = WaitingEntry.restore(
-        waitingId, storeId, "홍길동", 2, 3, WaitingStatus.WAITING, LocalDateTime.now());
+        waitingId, storeId, "010-1234-5678", 2, 3, WaitingStatus.WAITING, LocalDateTime.now());
 
     List<WaitingEntry> waitingList = List.of(
-        WaitingEntry.restore(UUID.randomUUID(), storeId, "손님A", 2, 1, WaitingStatus.WAITING, LocalDateTime.now()),
-        WaitingEntry.restore(UUID.randomUUID(), storeId, "손님B", 2, 2, WaitingStatus.WAITING, LocalDateTime.now()),
+        WaitingEntry.restore(UUID.randomUUID(), storeId, "010-1111-0001", 2, 1, WaitingStatus.WAITING, LocalDateTime.now()),
+        WaitingEntry.restore(UUID.randomUUID(), storeId, "010-1111-0002", 2, 2, WaitingStatus.WAITING, LocalDateTime.now()),
         target
     );
 
@@ -184,7 +184,7 @@ class WaitingServiceTest {
   void getStatus_취소된_웨이팅_조회시_예외발생() {
     UUID waitingId = UUID.randomUUID();
     WaitingEntry cancelled = WaitingEntry.restore(
-        waitingId, UUID.randomUUID(), "손님", 2, 1, WaitingStatus.CANCELLED, LocalDateTime.now());
+        waitingId, UUID.randomUUID(), "010-9999-9999", 2, 1, WaitingStatus.CANCELLED, LocalDateTime.now());
 
     given(waitingRepository.findById(waitingId)).willReturn(Optional.of(cancelled));
 
@@ -198,7 +198,7 @@ class WaitingServiceTest {
   void cancel_정상취소_상태가_CANCELLED로_변경됨() {
     UUID waitingId = UUID.randomUUID();
     WaitingEntry entry = WaitingEntry.restore(
-        waitingId, UUID.randomUUID(), "손님", 2, 1, WaitingStatus.WAITING, LocalDateTime.now());
+        waitingId, UUID.randomUUID(), "010-9999-9999", 2, 1, WaitingStatus.WAITING, LocalDateTime.now());
 
     given(waitingRepository.findById(waitingId)).willReturn(Optional.of(entry));
     given(waitingRepository.save(any(WaitingEntry.class))).willAnswer(inv -> inv.getArgument(0));
@@ -224,7 +224,7 @@ class WaitingServiceTest {
   void cancel_이미취소된_웨이팅_재취소시_예외발생() {
     UUID waitingId = UUID.randomUUID();
     WaitingEntry entry = WaitingEntry.restore(
-        waitingId, UUID.randomUUID(), "손님", 2, 1, WaitingStatus.CANCELLED, LocalDateTime.now());
+        waitingId, UUID.randomUUID(), "010-9999-9999", 2, 1, WaitingStatus.CANCELLED, LocalDateTime.now());
 
     given(waitingRepository.findById(waitingId)).willReturn(Optional.of(entry));
 

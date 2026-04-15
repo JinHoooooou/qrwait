@@ -123,7 +123,7 @@ public class WaitingManagementService {
     return new OwnerWaitingResponse(
         entry.getId(),
         entry.getWaitingNumber(),
-        entry.getVisitorName(),
+        entry.getPhoneNumber(),
         entry.getPartySize(),
         entry.getStatus(),
         elapsedMinutes

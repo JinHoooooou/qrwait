@@ -48,7 +48,7 @@ class WaitingControllerTest {
         .willReturn(new RegisterWaitingResponse(waitingId, 3, 3, 3, 15));
 
     RegisterWaitingRequest request = new RegisterWaitingRequest();
-    request.setVisitorName("홍길동");
+    request.setPhoneNumber("010-1234-5678");
     request.setPartySize(2);
 
     mockMvc.perform(post("/api/stores/{storeId}/waitings", storeId)
@@ -64,7 +64,7 @@ class WaitingControllerTest {
     UUID storeId = UUID.randomUUID();
 
     RegisterWaitingRequest request = new RegisterWaitingRequest();
-    request.setVisitorName("홍길동");
+    request.setPhoneNumber("010-1234-5678");
     request.setPartySize(0);
 
     mockMvc.perform(post("/api/stores/{storeId}/waitings", storeId)

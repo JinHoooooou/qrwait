@@ -80,14 +80,14 @@ class OwnerWaitingControllerTest {
     given(jwtTokenProvider.extractOwnerId(any())).willReturn(ownerId);
     given(waitingManagementService.getWaitingList(eq(ownerId)))
         .willReturn(List.of(
-            new OwnerWaitingResponse(waitingId, 1, "홍길동", 2, WaitingStatus.WAITING, 5L)
+            new OwnerWaitingResponse(waitingId, 1, "010-1234-5678", 2, WaitingStatus.WAITING, 5L)
         ));
 
     mockMvc.perform(get("/api/owner/stores/me/waitings")
             .header("Authorization", "Bearer test-token"))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$[0].waitingId").value(waitingId.toString()))
-        .andExpect(jsonPath("$[0].visitorName").value("홍길동"))
+        .andExpect(jsonPath("$[0].phoneNumber").value("010-1234-5678"))
         .andExpect(jsonPath("$[0].waitingNumber").value(1));
   }
 

@@ -6,7 +6,7 @@ import java.util.UUID;
 public record OwnerWaitingResponse(
     UUID waitingId,
     int waitingNumber,
-    String visitorName,
+    String phoneNumber,
     int partySize,
     WaitingStatus status,
     long elapsedMinutes

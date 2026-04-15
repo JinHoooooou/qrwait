@@ -42,7 +42,7 @@ public class WaitingService {
     int waitingNumber = waitingRepository.findNextWaitingNumber(storeId);
 
     WaitingEntry entry = WaitingEntry.create(
-        storeId, request.getVisitorName(), request.getPartySize(), waitingNumber);
+        storeId, request.getPhoneNumber(), request.getPartySize(), waitingNumber);
     WaitingEntry saved = waitingRepository.save(entry);
 
     int totalWaiting = waitingRepository.countByStoreIdAndStatus(storeId, WaitingStatus.WAITING);

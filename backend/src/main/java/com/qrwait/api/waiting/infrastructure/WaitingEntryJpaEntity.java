@@ -25,8 +25,8 @@ public class WaitingEntryJpaEntity {
   @Column(name = "store_id", nullable = false, columnDefinition = "uuid")
   private UUID storeId;
 
-  @Column(name = "visitor_name", nullable = false, length = 50)
-  private String visitorName;
+  @Column(name = "phone_number", nullable = false, length = 20)
+  private String phoneNumber;
 
   @Column(name = "party_size", nullable = false)
   private int partySize;
@@ -40,11 +40,11 @@ public class WaitingEntryJpaEntity {
   @Column(name = "created_at")
   private LocalDateTime createdAt;
 
-  private WaitingEntryJpaEntity(UUID id, UUID storeId, String visitorName, int partySize,
+  private WaitingEntryJpaEntity(UUID id, UUID storeId, String phoneNumber, int partySize,
       int waitingNumber, String status, LocalDateTime createdAt) {
     this.id = id;
     this.storeId = storeId;
-    this.visitorName = visitorName;
+    this.phoneNumber = phoneNumber;
     this.partySize = partySize;
     this.waitingNumber = waitingNumber;
     this.status = status;
@@ -55,7 +55,7 @@ public class WaitingEntryJpaEntity {
     return new WaitingEntryJpaEntity(
         entry.getId(),
         entry.getStoreId(),
-        entry.getVisitorName(),
+        entry.getPhoneNumber(),
         entry.getPartySize(),
         entry.getWaitingNumber(),
         entry.getStatus().name(),
@@ -67,7 +67,7 @@ public class WaitingEntryJpaEntity {
     return WaitingEntry.restore(
         id,
         storeId,
-        visitorName,
+        phoneNumber,
         partySize,
         waitingNumber,
         WaitingStatus.valueOf(status),

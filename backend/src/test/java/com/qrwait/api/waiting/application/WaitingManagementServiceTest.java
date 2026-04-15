@@ -59,9 +59,9 @@ class WaitingManagementServiceTest {
 
   @Test
   void getWaitingList_대기_목록_반환() {
-    WaitingEntry waiting = WaitingEntry.restore(UUID.randomUUID(), storeId, "김철수", 2, 1,
+    WaitingEntry waiting = WaitingEntry.restore(UUID.randomUUID(), storeId, "010-1111-0001", 2, 1,
         WaitingStatus.WAITING, LocalDateTime.now().minusMinutes(10));
-    WaitingEntry called = WaitingEntry.restore(UUID.randomUUID(), storeId, "이영희", 3, 2,
+    WaitingEntry called = WaitingEntry.restore(UUID.randomUUID(), storeId, "010-1111-0002", 3, 2,
         WaitingStatus.CALLED, LocalDateTime.now().minusMinutes(5));
 
     given(storeRepository.findByOwnerId(ownerId))
@@ -71,10 +71,10 @@ class WaitingManagementServiceTest {
     List<OwnerWaitingResponse> result = service.getWaitingList(ownerId);
 
     assertThat(result).hasSize(2);
-    assertThat(result.get(0).visitorName()).isEqualTo("김철수");
+    assertThat(result.get(0).phoneNumber()).isEqualTo("010-1111-0001");
     assertThat(result.get(0).status()).isEqualTo(WaitingStatus.WAITING);
     assertThat(result.get(0).elapsedMinutes()).isGreaterThanOrEqualTo(10);
-    assertThat(result.get(1).visitorName()).isEqualTo("이영희");
+    assertThat(result.get(1).phoneNumber()).isEqualTo("010-1111-0002");
     assertThat(result.get(1).status()).isEqualTo(WaitingStatus.CALLED);
   }
 
@@ -127,7 +127,7 @@ class WaitingManagementServiceTest {
 
   @Test
   void call_정상_호출처리() {
-    WaitingEntry entry = WaitingEntry.restore(waitingId, storeId, "김철수", 2, 1, WaitingStatus.WAITING, LocalDateTime.now());
+    WaitingEntry entry = WaitingEntry.restore(waitingId, storeId, "010-1111-0001", 2, 1, WaitingStatus.WAITING, LocalDateTime.now());
     given(waitingRepository.findById(waitingId)).willReturn(Optional.of(entry));
     given(storeRepository.findByOwnerId(ownerId))
         .willReturn(Optional.of(Store.restore(storeId, ownerId, "테스트 매장", "서울", StoreStatus.OPEN, LocalDateTime.now())));
@@ -142,7 +142,7 @@ class WaitingManagementServiceTest {
   @Test
   void call_소유권_불일치_예외발생() {
     UUID otherStoreId = UUID.randomUUID();
-    WaitingEntry entry = WaitingEntry.restore(waitingId, storeId, "김철수", 2, 1, WaitingStatus.WAITING, LocalDateTime.now());
+    WaitingEntry entry = WaitingEntry.restore(waitingId, storeId, "010-1111-0001", 2, 1, WaitingStatus.WAITING, LocalDateTime.now());
     given(waitingRepository.findById(waitingId)).willReturn(Optional.of(entry));
     given(storeRepository.findByOwnerId(ownerId))
         .willReturn(Optional.of(Store.restore(otherStoreId, ownerId, "내 매장", "서울", StoreStatus.OPEN, LocalDateTime.now())));
@@ -163,7 +163,7 @@ class WaitingManagementServiceTest {
 
   @Test
   void enter_정상_입장처리() {
-    WaitingEntry entry = WaitingEntry.restore(waitingId, storeId, "김철수", 2, 1, WaitingStatus.CALLED, LocalDateTime.now());
+    WaitingEntry entry = WaitingEntry.restore(waitingId, storeId, "010-1111-0001", 2, 1, WaitingStatus.CALLED, LocalDateTime.now());
     given(waitingRepository.findById(waitingId)).willReturn(Optional.of(entry));
     given(storeRepository.findByOwnerId(ownerId))
         .willReturn(Optional.of(Store.restore(storeId, ownerId, "테스트 매장", "서울", StoreStatus.OPEN, LocalDateTime.now())));
@@ -178,7 +178,7 @@ class WaitingManagementServiceTest {
   @Test
   void enter_소유권_불일치_예외발생() {
     UUID otherStoreId = UUID.randomUUID();
-    WaitingEntry entry = WaitingEntry.restore(waitingId, storeId, "김철수", 2, 1, WaitingStatus.CALLED, LocalDateTime.now());
+    WaitingEntry entry = WaitingEntry.restore(waitingId, storeId, "010-1111-0001", 2, 1, WaitingStatus.CALLED, LocalDateTime.now());
     given(waitingRepository.findById(waitingId)).willReturn(Optional.of(entry));
     given(storeRepository.findByOwnerId(ownerId))
         .willReturn(Optional.of(Store.restore(otherStoreId, ownerId, "내 매장", "서울", StoreStatus.OPEN, LocalDateTime.now())));
@@ -199,7 +199,7 @@ class WaitingManagementServiceTest {
 
   @Test
   void noShow_정상_노쇼처리() {
-    WaitingEntry entry = WaitingEntry.restore(waitingId, storeId, "김철수", 2, 1, WaitingStatus.CALLED, LocalDateTime.now());
+    WaitingEntry entry = WaitingEntry.restore(waitingId, storeId, "010-1111-0001", 2, 1, WaitingStatus.CALLED, LocalDateTime.now());
     given(waitingRepository.findById(waitingId)).willReturn(Optional.of(entry));
     given(storeRepository.findByOwnerId(ownerId))
         .willReturn(Optional.of(Store.restore(storeId, ownerId, "테스트 매장", "서울", StoreStatus.OPEN, LocalDateTime.now())));
@@ -214,7 +214,7 @@ class WaitingManagementServiceTest {
   @Test
   void noShow_소유권_불일치_예외발생() {
     UUID otherStoreId = UUID.randomUUID();
-    WaitingEntry entry = WaitingEntry.restore(waitingId, storeId, "김철수", 2, 1, WaitingStatus.CALLED, LocalDateTime.now());
+    WaitingEntry entry = WaitingEntry.restore(waitingId, storeId, "010-1111-0001", 2, 1, WaitingStatus.CALLED, LocalDateTime.now());
     given(waitingRepository.findById(waitingId)).willReturn(Optional.of(entry));
     given(storeRepository.findByOwnerId(ownerId))
         .willReturn(Optional.of(Store.restore(otherStoreId, ownerId, "내 매장", "서울", StoreStatus.OPEN, LocalDateTime.now())));
