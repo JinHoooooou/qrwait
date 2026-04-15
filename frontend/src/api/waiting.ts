@@ -9,7 +9,7 @@ export interface StoreResponse {
 }
 
 export interface RegisterWaitingRequest {
-  visitorName: string
+  phoneNumber: string
   partySize: number
 }
 
