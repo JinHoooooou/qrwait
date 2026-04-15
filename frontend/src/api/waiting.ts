@@ -13,6 +13,11 @@ export interface RegisterWaitingRequest {
   partySize: number
 }
 
+export interface StoreWaitingStatus {
+  totalWaiting: number
+  estimatedWaitMinutes: number
+}
+
 export interface RegisterWaitingResponse {
   waitingId: string
   waitingNumber: number
@@ -47,6 +52,9 @@ export const getStoreQrUrl = (storeId: string) => `/api/stores/${storeId}/qr`
 
 export const registerWaiting = (storeId: string, body: RegisterWaitingRequest) =>
   client.post<RegisterWaitingResponse>(`/stores/${storeId}/waitings`, body).then((res) => res.data)
+
+export const getStoreWaitingStatus = (storeId: string) =>
+    client.get<StoreWaitingStatus>(`/stores/${storeId}/waitings/status`).then((res) => res.data)
 
 export const getWaiting = (waitingId: string) =>
   client.get<WaitingStatusResponse>(`/waitings/${waitingId}`).then((res) => res.data)
