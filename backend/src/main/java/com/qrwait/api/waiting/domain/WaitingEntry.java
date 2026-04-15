@@ -9,17 +9,16 @@ public class WaitingEntry {
 
   private final UUID id;
   private final UUID storeId;
-  private final String visitorName;
+  private final String phoneNumber;
   private final int partySize;
   private final int waitingNumber;
   private final LocalDateTime createdAt;
   private final WaitingStatus status;
 
-  private WaitingEntry(UUID id, UUID storeId, String visitorName, int partySize,
-      int waitingNumber, WaitingStatus status, LocalDateTime createdAt) {
+  private WaitingEntry(UUID id, UUID storeId, String phoneNumber, int partySize, int waitingNumber, WaitingStatus status, LocalDateTime createdAt) {
     this.id = id;
     this.storeId = storeId;
-    this.visitorName = visitorName;
+    this.phoneNumber = phoneNumber;
     this.partySize = partySize;
     this.waitingNumber = waitingNumber;
     this.status = status;
@@ -29,11 +28,11 @@ public class WaitingEntry {
   /**
    * 신규 웨이팅 등록
    */
-  public static WaitingEntry create(UUID storeId, String visitorName, int partySize, int waitingNumber) {
+  public static WaitingEntry create(UUID storeId, String phoneNumber, int partySize, int waitingNumber) {
     return new WaitingEntry(
         UUID.randomUUID(),
         storeId,
-        visitorName,
+        phoneNumber,
         partySize,
         waitingNumber,
         WaitingStatus.WAITING,
@@ -44,9 +43,15 @@ public class WaitingEntry {
   /**
    * 영속 계층에서 복원
    */
-  public static WaitingEntry restore(UUID id, UUID storeId, String visitorName, int partySize,
-      int waitingNumber, WaitingStatus status, LocalDateTime createdAt) {
-    return new WaitingEntry(id, storeId, visitorName, partySize, waitingNumber, status, createdAt);
+  public static WaitingEntry restore(
+      UUID id, UUID storeId,
+      String phoneNumber,
+      int partySize,
+      int waitingNumber,
+      WaitingStatus status,
+      LocalDateTime createdAt
+  ) {
+    return new WaitingEntry(id, storeId, phoneNumber, partySize, waitingNumber, status, createdAt);
   }
 
   // ===== 도메인 상태 전이 =====
@@ -59,7 +64,7 @@ public class WaitingEntry {
       throw new IllegalStateException(
           "call() 은 WAITING 상태에서만 가능합니다. 현재 상태: " + status);
     }
-    return new WaitingEntry(id, storeId, visitorName, partySize, waitingNumber, WaitingStatus.CALLED, createdAt);
+    return new WaitingEntry(id, storeId, phoneNumber, partySize, waitingNumber, WaitingStatus.CALLED, createdAt);
   }
 
   /**
@@ -70,7 +75,7 @@ public class WaitingEntry {
       throw new IllegalStateException(
           "enter() 는 CALLED 상태에서만 가능합니다. 현재 상태: " + status);
     }
-    return new WaitingEntry(id, storeId, visitorName, partySize, waitingNumber, WaitingStatus.ENTERED, createdAt);
+    return new WaitingEntry(id, storeId, phoneNumber, partySize, waitingNumber, WaitingStatus.ENTERED, createdAt);
   }
 
   /**
@@ -81,7 +86,7 @@ public class WaitingEntry {
       throw new IllegalStateException(
           "cancel() 은 WAITING 또는 CALLED 상태에서만 가능합니다. 현재 상태: " + status);
     }
-    return new WaitingEntry(id, storeId, visitorName, partySize, waitingNumber, WaitingStatus.CANCELLED, createdAt);
+    return new WaitingEntry(id, storeId, phoneNumber, partySize, waitingNumber, WaitingStatus.CANCELLED, createdAt);
   }
 
   /**
@@ -92,6 +97,6 @@ public class WaitingEntry {
       throw new IllegalStateException(
           "noShow() 는 CALLED 상태에서만 가능합니다. 현재 상태: " + status);
     }
-    return new WaitingEntry(id, storeId, visitorName, partySize, waitingNumber, WaitingStatus.NO_SHOW, createdAt);
+    return new WaitingEntry(id, storeId, phoneNumber, partySize, waitingNumber, WaitingStatus.NO_SHOW, createdAt);
   }
 }

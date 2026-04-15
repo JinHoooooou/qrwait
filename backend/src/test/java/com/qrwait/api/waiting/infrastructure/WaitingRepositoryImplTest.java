@@ -37,8 +37,8 @@ class WaitingRepositoryImplTest {
 
   @Test
   void findByStoreIdAndStatus_returnsMatchingEntries() {
-    waitingRepository.save(WaitingEntry.create(savedStore.getId(), "손님A", 2, 1));
-    waitingRepository.save(WaitingEntry.create(savedStore.getId(), "손님B", 3, 2));
+    waitingRepository.save(WaitingEntry.create(savedStore.getId(), "010-1111-1111", 2, 1));
+    waitingRepository.save(WaitingEntry.create(savedStore.getId(), "010-2222-2222", 3, 2));
 
     List<WaitingEntry> result = waitingRepository.findByStoreIdAndStatus(savedStore.getId(), WaitingStatus.WAITING);
 
@@ -48,8 +48,8 @@ class WaitingRepositoryImplTest {
 
   @Test
   void countByStoreIdAndStatus_returnsCorrectCount() {
-    waitingRepository.save(WaitingEntry.create(savedStore.getId(), "손님A", 2, 1));
-    waitingRepository.save(WaitingEntry.create(savedStore.getId(), "손님B", 3, 2));
+    waitingRepository.save(WaitingEntry.create(savedStore.getId(), "010-1111-1111", 2, 1));
+    waitingRepository.save(WaitingEntry.create(savedStore.getId(), "010-2222-2222", 3, 2));
 
     int count = waitingRepository.countByStoreIdAndStatus(savedStore.getId(), WaitingStatus.WAITING);
 
