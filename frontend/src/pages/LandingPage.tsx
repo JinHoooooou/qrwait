@@ -1,12 +1,19 @@
 import {useEffect, useRef, useState} from 'react'
 import {useNavigate, useSearchParams} from 'react-router-dom'
-import type {StoreResponse} from '../api/waiting'
-import {getStore, registerWaiting} from '../api/waiting'
+import type {StoreResponse, StoreWaitingStatus} from '../api/waiting'
+import {getStore, getStoreWaitingStatus, registerWaiting} from '../api/waiting'
 import useWaitingStore from '../store/waitingStore'
 import {getWaitingSession, saveWaitingSession} from '../utils/session'
 import Button from '../components/Button'
 import LoadingSpinner from '../components/LoadingSpinner'
 import ErrorMessage from '../components/ErrorMessage'
+
+const formatPhoneNumber = (value: string): string => {
+  const digits = value.replace(/\D/g, '')
+  if (digits.length <= 3) return digits
+  if (digits.length <= 7) return `${digits.slice(0, 3)}-${digits.slice(3)}`
+  return `${digits.slice(0, 3)}-${digits.slice(3, 7)}-${digits.slice(7, 11)}`
+}
 
 const STATUS_MESSAGES: Record<string, string> = {
   BREAK: '현재 브레이크타임입니다.',
@@ -20,11 +27,13 @@ function LandingPage() {
   const storeId = searchParams.get('storeId')
 
   const [store, setStore] = useState<StoreResponse | null>(null)
+  const [waitingStatus, setWaitingStatus] = useState<StoreWaitingStatus | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
-  const [visitorName, setVisitorName] = useState('')
+  const [phoneNumber, setPhoneNumber] = useState('')
   const [partySize, setPartySize] = useState(1)
+  const [agreed, setAgreed] = useState(false)
   const [submitting, setSubmitting] = useState(false)
 
   const setWaiting = useWaitingStore((s) => s.setWaiting)
@@ -43,8 +52,11 @@ function LandingPage() {
       return
     }
 
-    getStore(storeId)
-        .then(setStore)
+    Promise.all([getStore(storeId), getStoreWaitingStatus(storeId)])
+        .then(([storeData, statusData]) => {
+          setStore(storeData)
+          setWaitingStatus(statusData)
+        })
         .catch(() => setError('매장 정보를 불러올 수 없습니다.'))
         .finally(() => setLoading(false))
   }, [storeId, navigate])
@@ -72,12 +84,12 @@ function LandingPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    if (!storeId || !visitorName.trim()) return
+    if (!storeId || !phoneNumber.trim() || !agreed) return
 
     setSubmitting(true)
     try {
       const res = await registerWaiting(storeId, {
-        visitorName: visitorName.trim(),
+        phoneNumber: phoneNumber.trim(),
         partySize,
       })
       setWaiting({
@@ -106,25 +118,33 @@ function LandingPage() {
       <div style={styles.container}>
         <h1 style={styles.storeName}>{store?.name}</h1>
 
-        {statusMessage ? (
+        {waitingStatus && (
             <div style={styles.statusBox}>
-              <p style={styles.statusMessage}>{statusMessage}</p>
-              <p style={styles.statusHint}>잠시 후 다시 확인해 주세요.</p>
+              <span style={styles.statusTeam}>현재 대기 {waitingStatus.totalWaiting}팀</span>
+              <span style={styles.statusDot}>·</span>
+              <span style={styles.statusTime}>예상 {waitingStatus.estimatedWaitMinutes}분</span>
+            </div>
+        )}
+
+        {statusMessage ? (
+            <div style={styles.unavailableBox}>
+              <p style={styles.unavailableMessage}>{statusMessage}</p>
+              <p style={styles.unavailableHint}>잠시 후 다시 확인해 주세요.</p>
             </div>
         ) : (
             <>
               <p style={styles.subtitle}>웨이팅 등록</p>
               <form onSubmit={handleSubmit} style={styles.form}>
                 <label style={styles.label}>
-                  이름
+                  전화번호
                   <input
-                style={styles.input}
-                type="text"
-                value={visitorName}
-                onChange={(e) => setVisitorName(e.target.value)}
-                maxLength={50}
-                placeholder="이름을 입력하세요"
-                required
+                      style={styles.input}
+                      type="tel"
+                      value={phoneNumber}
+                      onChange={(e) => setPhoneNumber(formatPhoneNumber(e.target.value))}
+                      maxLength={13}
+                      placeholder="010-XXXX-XXXX"
+                      required
                   />
                 </label>
 
@@ -132,24 +152,36 @@ function LandingPage() {
                   인원수
                   <div style={styles.stepper}>
                     <button
-                  type="button"
-                  style={styles.stepBtn}
-                  onClick={() => setPartySize((n) => Math.max(1, n - 1))}
+                        type="button"
+                        style={styles.stepBtn}
+                        onClick={() => setPartySize((n) => Math.max(1, n - 1))}
                     >
                       −
                     </button>
                     <span style={styles.stepValue}>{partySize}명</span>
                     <button
-                  type="button"
-                  style={styles.stepBtn}
-                  onClick={() => setPartySize((n) => Math.min(10, n + 1))}
+                        type="button"
+                        style={styles.stepBtn}
+                        onClick={() => setPartySize((n) => Math.min(10, n + 1))}
                     >
                       +
                     </button>
                   </div>
                 </label>
 
-                <Button type="submit" disabled={submitting}>
+                <label style={styles.consentLabel}>
+                  <input
+                      type="checkbox"
+                      checked={agreed}
+                      onChange={(e) => setAgreed(e.target.checked)}
+                      style={styles.checkbox}
+                  />
+                  <span style={styles.consentText}>
+                    전화번호는 웨이팅 호출 알림 목적으로만 사용됩니다.
+                  </span>
+                </label>
+
+                <Button type="submit" disabled={submitting || !agreed}>
                   {submitting ? '등록 중...' : '웨이팅 등록'}
                 </Button>
               </form>
@@ -168,13 +200,27 @@ const styles: Record<string, React.CSSProperties> = {
   storeName: {
     fontSize: '1.5rem',
     fontWeight: 700,
-    marginBottom: '0.25rem',
-  },
-  subtitle: {
-    color: '#6b7280',
-    marginBottom: '2rem',
+    marginBottom: '0.75rem',
   },
   statusBox: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '0.5rem',
+    padding: '0.75rem 1rem',
+    borderRadius: '0.75rem',
+    backgroundColor: '#eff6ff',
+    border: '1px solid #bfdbfe',
+    marginBottom: '1.5rem',
+    fontSize: '0.9375rem',
+    fontWeight: 600,
+    color: '#1d4ed8',
+  },
+  statusDot: {
+    color: '#93c5fd',
+  },
+  statusTeam: {},
+  statusTime: {},
+  unavailableBox: {
     marginTop: '2rem',
     padding: '2rem',
     borderRadius: '1rem',
@@ -185,14 +231,18 @@ const styles: Record<string, React.CSSProperties> = {
     flexDirection: 'column',
     gap: '0.5rem',
   },
-  statusMessage: {
+  unavailableMessage: {
     fontSize: '1.125rem',
     fontWeight: 600,
     color: '#374151',
   },
-  statusHint: {
+  unavailableHint: {
     fontSize: '0.875rem',
     color: '#9ca3af',
+  },
+  subtitle: {
+    color: '#6b7280',
+    marginBottom: '1.5rem',
   },
   form: {
     display: 'flex',
@@ -232,6 +282,24 @@ const styles: Record<string, React.CSSProperties> = {
     fontWeight: 600,
     minWidth: '3rem',
     textAlign: 'center',
+  },
+  consentLabel: {
+    display: 'flex',
+    alignItems: 'flex-start',
+    gap: '0.5rem',
+    cursor: 'pointer',
+  },
+  checkbox: {
+    marginTop: '0.125rem',
+    width: 16,
+    height: 16,
+    flexShrink: 0,
+    cursor: 'pointer',
+  },
+  consentText: {
+    fontSize: '0.8125rem',
+    color: '#6b7280',
+    lineHeight: 1.5,
   },
 }
 
