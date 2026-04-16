@@ -111,3 +111,15 @@ export const enterWaiting = (waitingId: string): Promise<void> =>
 
 export const noShowWaiting = (waitingId: string): Promise<void> =>
     ownerClient.post(`/owner/waitings/${waitingId}/noshow`).then((res) => res.data)
+
+export interface TodayWaiting {
+  waitingId: string
+  waitingNumber: number
+  phoneNumber: string
+  partySize: number
+  status: 'WAITING' | 'CALLED' | 'ENTERED' | 'NO_SHOW' | 'CANCELLED'
+  createdAt: string
+}
+
+export const getTodayWaitings = (): Promise<TodayWaiting[]> =>
+    ownerClient.get('/owner/stores/me/waitings/today').then((res) => res.data)
