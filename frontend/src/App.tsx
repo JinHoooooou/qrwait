@@ -10,6 +10,7 @@ import OwnerSignupPage from './pages/OwnerSignupPage'
 import OnboardingPage from './pages/OnboardingPage'
 import DashboardPage from './pages/DashboardPage'
 import StoreSettingsPage from './pages/StoreSettingsPage'
+import QrPrintPage from './pages/QrPrintPage'
 import PrivateRoute from './components/PrivateRoute'
 import useOwnerStore from './store/ownerStore'
 import {refreshToken} from './api/owner'
@@ -54,6 +55,7 @@ function App() {
         <Route path="/owner/onboarding" element={<PrivateRoute><OnboardingPage/></PrivateRoute>}/>
         <Route path="/owner/dashboard" element={<PrivateRoute><DashboardPage/></PrivateRoute>}/>
         <Route path="/owner/settings" element={<PrivateRoute><StoreSettingsPage/></PrivateRoute>}/>
+        <Route path="/owner/qr-print" element={<PrivateRoute><QrPrintPage/></PrivateRoute>}/>
 
         <Route path="*" element={<NotFoundPage />} />
       </Routes>
