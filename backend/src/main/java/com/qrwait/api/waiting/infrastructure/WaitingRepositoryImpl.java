@@ -61,4 +61,14 @@ public class WaitingRepositoryImpl implements WaitingRepository {
   public int findNextWaitingNumber(UUID storeId) {
     return waitingEntryJpaRepository.findMaxWaitingNumberByStoreId(storeId) + 1;
   }
+
+  @Override
+  public List<WaitingEntry> findAllByStoreIdAndDate(UUID storeId, LocalDate date) {
+    LocalDateTime startOfDay = date.atStartOfDay();
+    LocalDateTime endOfDay = date.plusDays(1).atStartOfDay();
+    return waitingEntryJpaRepository.findAllByStoreIdBetween(storeId, startOfDay, endOfDay)
+        .stream()
+        .map(WaitingEntryJpaEntity::toDomain)
+        .toList();
+  }
 }

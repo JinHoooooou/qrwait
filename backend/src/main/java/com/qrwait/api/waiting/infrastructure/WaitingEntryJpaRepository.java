@@ -21,4 +21,11 @@ public interface WaitingEntryJpaRepository extends JpaRepository<WaitingEntryJpa
 
   @Query("SELECT COALESCE(MAX(w.waitingNumber), 0) FROM WaitingEntryJpaEntity w WHERE w.storeId = :storeId")
   int findMaxWaitingNumberByStoreId(@Param("storeId") UUID storeId);
+
+  @Query("SELECT w FROM WaitingEntryJpaEntity w WHERE w.storeId = :storeId AND w.createdAt >= :startOfDay AND w.createdAt < :endOfDay ORDER BY w.waitingNumber DESC")
+  List<WaitingEntryJpaEntity> findAllByStoreIdBetween(
+      @Param("storeId") UUID storeId,
+      @Param("startOfDay") LocalDateTime startOfDay,
+      @Param("endOfDay") LocalDateTime endOfDay
+  );
 }

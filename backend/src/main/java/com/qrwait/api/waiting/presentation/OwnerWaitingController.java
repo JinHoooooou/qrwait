@@ -3,6 +3,7 @@ package com.qrwait.api.waiting.presentation;
 import com.qrwait.api.waiting.application.WaitingManagementService;
 import com.qrwait.api.waiting.application.dto.DailySummaryResponse;
 import com.qrwait.api.waiting.application.dto.OwnerWaitingResponse;
+import com.qrwait.api.waiting.application.dto.TodayWaitingResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.List;
@@ -42,6 +43,12 @@ public class OwnerWaitingController {
   @GetMapping("/stores/me/waitings/summary")
   public ResponseEntity<DailySummaryResponse> getDailySummary(@AuthenticationPrincipal UUID ownerId) {
     return ResponseEntity.ok(waitingManagementService.getDailySummary(ownerId));
+  }
+
+  @Operation(summary = "오늘의 웨이팅 이력 전체 조회")
+  @GetMapping("/stores/me/waitings/today")
+  public ResponseEntity<List<TodayWaitingResponse>> getTodayWaitings(@AuthenticationPrincipal UUID ownerId) {
+    return ResponseEntity.ok(waitingManagementService.getTodayWaitings(ownerId));
   }
 
   @Operation(summary = "손님 호출")

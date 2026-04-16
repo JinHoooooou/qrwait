@@ -16,6 +16,7 @@ import com.qrwait.api.shared.security.SecurityConfig;
 import com.qrwait.api.waiting.application.WaitingManagementService;
 import com.qrwait.api.waiting.application.dto.DailySummaryResponse;
 import com.qrwait.api.waiting.application.dto.OwnerWaitingResponse;
+import com.qrwait.api.waiting.application.dto.TodayWaitingResponse;
 import com.qrwait.api.waiting.domain.WaitingStatus;
 import java.util.List;
 import java.util.UUID;
@@ -180,5 +181,33 @@ class OwnerWaitingControllerTest {
     mockMvc.perform(post("/api/owner/waitings/" + waitingId + "/noshow")
             .header("Authorization", "Bearer test-token"))
         .andExpect(status().isNoContent());
+  }
+
+  // ===== getTodayWaitings =====
+
+  @Test
+  void getTodayWaitings_인증없음_401반환() throws Exception {
+    mockMvc.perform(get("/api/owner/stores/me/waitings/today"))
+        .andExpect(status().isUnauthorized());
+  }
+
+  @Test
+  void getTodayWaitings_인증된_점주_200반환() throws Exception {
+    UUID ownerId = UUID.randomUUID();
+    UUID waitingId = UUID.randomUUID();
+
+    given(jwtTokenProvider.validateToken(any())).willReturn(true);
+    given(jwtTokenProvider.extractOwnerId(any())).willReturn(ownerId);
+    given(waitingManagementService.getTodayWaitings(eq(ownerId)))
+        .willReturn(List.of(new TodayWaitingResponse(
+            waitingId, 1, "010-1234-5678", 2, WaitingStatus.ENTERED, java.time.LocalDateTime.now()
+        )));
+
+    mockMvc.perform(get("/api/owner/stores/me/waitings/today")
+            .header("Authorization", "Bearer test-token"))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$[0].phoneNumber").value("010-1234-5678"))
+        .andExpect(jsonPath("$[0].waitingNumber").value(1))
+        .andExpect(jsonPath("$[0].status").value("ENTERED"));
   }
 }

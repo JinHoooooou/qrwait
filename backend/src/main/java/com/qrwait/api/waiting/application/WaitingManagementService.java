@@ -5,6 +5,7 @@ import com.qrwait.api.store.domain.StoreNotFoundException;
 import com.qrwait.api.store.domain.StoreRepository;
 import com.qrwait.api.waiting.application.dto.DailySummaryResponse;
 import com.qrwait.api.waiting.application.dto.OwnerWaitingResponse;
+import com.qrwait.api.waiting.application.dto.TodayWaitingResponse;
 import com.qrwait.api.waiting.domain.WaitingEntry;
 import com.qrwait.api.waiting.domain.WaitingNotFoundException;
 import com.qrwait.api.waiting.domain.WaitingRepository;
@@ -105,6 +106,22 @@ public class WaitingManagementService {
     waitingRepository.save(noShowed);
 
     eventPublisher.publishEvent(new WaitingUpdatedEvent(noShowed.getStoreId()));
+  }
+
+  @Transactional(readOnly = true)
+  public List<TodayWaitingResponse> getTodayWaitings(UUID ownerId) {
+    UUID storeId = resolveStoreId(ownerId);
+    return waitingRepository.findAllByStoreIdAndDate(storeId, LocalDate.now())
+        .stream()
+        .map(entry -> new TodayWaitingResponse(
+            entry.getId(),
+            entry.getWaitingNumber(),
+            entry.getPhoneNumber(),
+            entry.getPartySize(),
+            entry.getStatus(),
+            entry.getCreatedAt()
+        ))
+        .toList();
   }
 
   public SseEmitter subscribeOwnerDashboard(UUID ownerId) {

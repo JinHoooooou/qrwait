@@ -15,12 +15,14 @@ import com.qrwait.api.store.domain.StoreRepository;
 import com.qrwait.api.store.domain.StoreStatus;
 import com.qrwait.api.waiting.application.dto.DailySummaryResponse;
 import com.qrwait.api.waiting.application.dto.OwnerWaitingResponse;
+import com.qrwait.api.waiting.application.dto.TodayWaitingResponse;
 import com.qrwait.api.waiting.domain.WaitingEntry;
 import com.qrwait.api.waiting.domain.WaitingNotFoundException;
 import com.qrwait.api.waiting.domain.WaitingRepository;
 import com.qrwait.api.waiting.domain.WaitingStatus;
 import com.qrwait.api.waiting.domain.event.WaitingCalledEvent;
 import com.qrwait.api.waiting.domain.event.WaitingUpdatedEvent;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -229,5 +231,50 @@ class WaitingManagementServiceTest {
 
     assertThatThrownBy(() -> service.noShow(ownerId, waitingId))
         .isInstanceOf(WaitingNotFoundException.class);
+  }
+
+  // ===== getTodayWaitings =====
+
+  @Test
+  void getTodayWaitings_오늘_전체_목록_반환() {
+    WaitingEntry waiting = WaitingEntry.restore(
+        UUID.randomUUID(),
+        storeId,
+        "010-1111-0001",
+        2,
+        1,
+        WaitingStatus.WAITING,
+        LocalDateTime.now()
+    );
+    WaitingEntry entered = WaitingEntry.restore(
+        UUID.randomUUID(),
+        storeId,
+        "010-1111-0002",
+        1,
+        2,
+        WaitingStatus.ENTERED,
+        LocalDateTime.now().minusMinutes(30)
+    );
+
+    given(storeRepository.findByOwnerId(ownerId))
+        .willReturn(Optional.of(Store.restore(storeId, ownerId, "테스트 매장", "서울", StoreStatus.OPEN, LocalDateTime.now())));
+    given(waitingRepository.findAllByStoreIdAndDate(eq(storeId), any(LocalDate.class)))
+        .willReturn(List.of(waiting, entered));
+
+    List<TodayWaitingResponse> result = service.getTodayWaitings(ownerId);
+
+    assertThat(result).hasSize(2);
+    assertThat(result.get(0).phoneNumber()).isEqualTo("010-1111-0001");
+    assertThat(result.get(0).status()).isEqualTo(WaitingStatus.WAITING);
+    assertThat(result.get(1).phoneNumber()).isEqualTo("010-1111-0002");
+    assertThat(result.get(1).status()).isEqualTo(WaitingStatus.ENTERED);
+  }
+
+  @Test
+  void getTodayWaitings_매장_없음_예외발생() {
+    given(storeRepository.findByOwnerId(ownerId)).willReturn(Optional.empty());
+
+    assertThatThrownBy(() -> service.getTodayWaitings(ownerId))
+        .isInstanceOf(StoreNotFoundException.class);
   }
 }
