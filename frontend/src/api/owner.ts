@@ -77,7 +77,7 @@ export interface MyStoreResponse {
 export interface OwnerWaitingItem {
   waitingId: string
   waitingNumber: number
-  visitorName: string
+  phoneNumber: string
   partySize: number
   status: 'WAITING' | 'CALLED'
   elapsedMinutes: number

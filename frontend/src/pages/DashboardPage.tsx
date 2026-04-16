@@ -274,7 +274,7 @@ function DashboardPage() {
                     <div key={item.waitingId} style={styles.waitingCard}>
                       <div style={styles.waitingInfo}>
                         <span style={styles.waitingNumber}>#{item.waitingNumber}</span>
-                        <span style={styles.waitingName}>{item.visitorName}</span>
+                        <span style={styles.waitingName}>{item.phoneNumber}</span>
                         <span style={styles.waitingMeta}>{item.partySize}명 · {item.elapsedMinutes}분 경과</span>
                         {item.status === 'CALLED' && (
                             <span style={styles.calledBadge}>호출됨</span>
@@ -286,7 +286,7 @@ function DashboardPage() {
                                 style={{...styles.actionBtn, ...styles.callBtn}}
                                 disabled={actionLoading === item.waitingId}
                                 onClick={() => handleAction(
-                                    `#${item.waitingNumber} ${item.visitorName} 손님을 호출할까요?`,
+                                    `#${item.waitingNumber} ${item.phoneNumber} 손님을 호출할까요?`,
                                     item.waitingId,
                                     callWaiting,
                                 )}
@@ -300,7 +300,7 @@ function DashboardPage() {
                                   style={{...styles.actionBtn, ...styles.enterBtn}}
                                   disabled={actionLoading === item.waitingId}
                                   onClick={() => handleAction(
-                                      `#${item.waitingNumber} ${item.visitorName} 손님 입장 처리할까요?`,
+                                      `#${item.waitingNumber} ${item.phoneNumber} 손님 입장 처리할까요?`,
                                       item.waitingId,
                                       enterWaiting,
                                   )}
@@ -311,7 +311,7 @@ function DashboardPage() {
                                   style={{...styles.actionBtn, ...styles.noshowBtn}}
                                   disabled={actionLoading === item.waitingId}
                                   onClick={() => handleAction(
-                                      `#${item.waitingNumber} ${item.visitorName} 손님을 노쇼 처리할까요?`,
+                                      `#${item.waitingNumber} ${item.phoneNumber} 손님을 노쇼 처리할까요?`,
                                       item.waitingId,
                                       noShowWaiting,
                                   )}
