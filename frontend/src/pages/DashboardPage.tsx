@@ -196,9 +196,14 @@ function DashboardPage() {
             </span>
             )}
           </div>
-          <Button variant="secondary" onClick={handleLogout} style={styles.logoutBtn}>
-            로그아웃
-          </Button>
+          <div style={styles.headerActions}>
+            <Button variant="secondary" onClick={() => navigate('/owner/qr-print')} style={styles.headerBtn}>
+              QR 인쇄
+            </Button>
+            <Button variant="secondary" onClick={handleLogout} style={styles.headerBtn}>
+              로그아웃
+            </Button>
+          </div>
         </div>
 
         {/* 알림 권한 거부 시 인앱 배너 */}
@@ -243,19 +248,19 @@ function DashboardPage() {
             <section>
               <p style={styles.sectionTitle}>오늘의 통계</p>
               <div style={styles.summaryGrid}>
-                <div style={styles.summaryCard}>
+                <div style={{...styles.summaryCard, cursor: 'pointer'}} onClick={() => navigate('/owner/history')}>
                   <p style={styles.summaryValue}>{summary.totalRegistered}</p>
-                  <p style={styles.summaryLabel}>등록</p>
+                  <p style={styles.summaryLabel}>전체</p>
                 </div>
-                <div style={styles.summaryCard}>
+                <div style={{...styles.summaryCard, cursor: 'pointer'}} onClick={() => navigate('/owner/history?status=ENTERED')}>
                   <p style={styles.summaryValue}>{summary.totalEntered}</p>
                   <p style={styles.summaryLabel}>입장</p>
                 </div>
-                <div style={styles.summaryCard}>
+                <div style={{...styles.summaryCard, cursor: 'pointer'}} onClick={() => navigate('/owner/history?status=NO_SHOW')}>
                   <p style={styles.summaryValue}>{summary.totalNoShow}</p>
                   <p style={styles.summaryLabel}>노쇼</p>
                 </div>
-                <div style={styles.summaryCard}>
+                <div style={{...styles.summaryCard, cursor: 'pointer'}} onClick={() => navigate('/owner/history?status=CANCELLED')}>
                   <p style={styles.summaryValue}>{summary.totalCancelled}</p>
                   <p style={styles.summaryLabel}>취소</p>
                 </div>
@@ -370,7 +375,12 @@ const styles: Record<string, React.CSSProperties> = {
     padding: '0.25rem 0.625rem',
     borderRadius: '999px',
   },
-  logoutBtn: {
+  headerActions: {
+    display: 'flex',
+    gap: '0.5rem',
+    alignItems: 'center',
+  },
+  headerBtn: {
     width: 'auto',
     minHeight: 'auto',
     padding: '0.5rem 1rem',
