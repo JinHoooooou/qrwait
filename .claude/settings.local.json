@@ -59,7 +59,9 @@
       "Bash(./gradlew clean:*)",
       "Bash(find \"C:/dev/study_study/qr-wait/backend/build/test-results\" -name \"*.xml\" -exec grep -l \"testcase\" {} \\\\;)",
       "Bash(git add:*)",
-      "Bash(git commit:*)"
+      "Bash(git commit:*)",
+      "Bash(bash *)",
+      "Bash(xargs cat *)"
     ]
   }
 }
