@@ -132,13 +132,15 @@ class WaitingManagementServiceTest {
     WaitingEntry entry = WaitingEntry.restore(waitingId, storeId, "010-1111-0001", 2, 1, WaitingStatus.WAITING, LocalDateTime.now());
     given(waitingRepository.findById(waitingId)).willReturn(Optional.of(entry));
     given(storeRepository.findByOwnerId(ownerId))
-        .willReturn(Optional.of(Store.restore(storeId, ownerId, "테스트 매장", "서울", StoreStatus.OPEN, LocalDateTime.now())));
+        .willReturn(Optional.of(Store.restore(storeId, ownerId, "홍콩반점", "서울", StoreStatus.OPEN, LocalDateTime.now())));
     given(waitingRepository.save(any())).willReturn(entry);
 
     service.call(ownerId, waitingId);
 
     verify(waitingRepository).save(any());
-    then(eventPublisher).should().publishEvent(any(WaitingCalledEvent.class));
+    then(eventPublisher).should().publishEvent(
+        new WaitingCalledEvent(storeId, waitingId, "010-1111-0001", 1, "홍콩반점")
+    );
   }
 
   @Test

@@ -2,6 +2,12 @@ package com.qrwait.api.waiting.domain.event;
 
 import java.util.UUID;
 
-public record WaitingCalledEvent(UUID storeId, UUID waitingId) {
+public record WaitingCalledEvent(
+    UUID storeId,
+    UUID waitingId,
+    String phoneNumber,
+    int waitingNumber,
+    String storeName
+) {
 
 }

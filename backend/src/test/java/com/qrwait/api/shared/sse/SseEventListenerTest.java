@@ -65,7 +65,7 @@ class SseEventListenerTest {
     UUID storeId = UUID.randomUUID();
     UUID waitingId = UUID.randomUUID();
 
-    listener.onWaitingCalled(new WaitingCalledEvent(storeId, waitingId));
+    listener.onWaitingCalled(new WaitingCalledEvent(storeId, waitingId, "010-1234-5678", 1, "테스트 매장"));
 
     verify(registry).broadcast(eq(storeId), eq("waiting-called"), any());
   }

@@ -65,15 +65,23 @@ public class WaitingManagementService {
     WaitingEntry entry = waitingRepository.findById(waitingId)
         .orElseThrow(() -> new WaitingNotFoundException(waitingId));
 
-    UUID ownerStoreId = resolveStoreId(ownerId);
-    if (!ownerStoreId.equals(entry.getStoreId())) {
+    com.qrwait.api.store.domain.Store store = storeRepository.findByOwnerId(ownerId)
+        .orElseThrow(() -> new StoreNotFoundException("ownerId=" + ownerId));
+
+    if (!store.getId().equals(entry.getStoreId())) {
       throw new StoreNotFoundException("ownerId=" + ownerId);
     }
 
     WaitingEntry called = entry.call();
     waitingRepository.save(called);
 
-    eventPublisher.publishEvent(new WaitingCalledEvent(called.getStoreId(), waitingId));
+    eventPublisher.publishEvent(new WaitingCalledEvent(
+        called.getStoreId(),
+        waitingId,
+        called.getPhoneNumber(),
+        called.getWaitingNumber(),
+        store.getName()
+    ));
   }
 
   @Transactional
