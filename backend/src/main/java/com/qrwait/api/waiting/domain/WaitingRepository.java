@@ -18,8 +18,6 @@ public interface WaitingRepository {
 
   int countByStoreIdAndStatus(UUID storeId, WaitingStatus status);
 
-  long countByStoreIdAndStatusAndDate(UUID storeId, WaitingStatus status, LocalDate date);
-
   int findNextWaitingNumber(UUID storeId);
 
   List<WaitingEntry> findAllByStoreIdAndDate(UUID storeId, LocalDate date);

@@ -25,6 +25,7 @@ import com.qrwait.api.waiting.domain.event.WaitingUpdatedEvent;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
@@ -66,8 +67,8 @@ class WaitingManagementServiceTest {
     WaitingEntry called = WaitingEntry.restore(UUID.randomUUID(), storeId, "010-1111-0002", 3, 2,
         WaitingStatus.CALLED, LocalDateTime.now().minusMinutes(5));
 
-    given(storeRepository.findByOwnerId(ownerId))
-        .willReturn(Optional.of(Store.restore(storeId, ownerId, "테스트 매장", "서울", StoreStatus.OPEN, LocalDateTime.now())));
+    given(storeRepository.getByOwnerId(ownerId))
+        .willReturn(Store.restore(storeId, ownerId, "테스트 매장", "서울", StoreStatus.OPEN, LocalDateTime.now()));
     given(waitingRepository.findActiveByStoreId(storeId)).willReturn(List.of(waiting, called));
 
     List<OwnerWaitingResponse> result = service.getWaitingList(ownerId);
@@ -82,8 +83,8 @@ class WaitingManagementServiceTest {
 
   @Test
   void getWaitingList_활성_대기_없음_빈_목록_반환() {
-    given(storeRepository.findByOwnerId(ownerId))
-        .willReturn(Optional.of(Store.restore(storeId, ownerId, "테스트 매장", "서울", StoreStatus.OPEN, LocalDateTime.now())));
+    given(storeRepository.getByOwnerId(ownerId))
+        .willReturn(Store.restore(storeId, ownerId, "테스트 매장", "서울", StoreStatus.OPEN, LocalDateTime.now()));
     given(waitingRepository.findActiveByStoreId(storeId)).willReturn(List.of());
 
     List<OwnerWaitingResponse> result = service.getWaitingList(ownerId);
@@ -95,14 +96,16 @@ class WaitingManagementServiceTest {
 
   @Test
   void getDailySummary_일별_통계_집계() {
-    given(storeRepository.findByOwnerId(ownerId))
-        .willReturn(Optional.of(Store.restore(storeId, ownerId, "테스트 매장", "서울", StoreStatus.OPEN, LocalDateTime.now())));
+    given(storeRepository.getByOwnerId(ownerId))
+        .willReturn(Store.restore(storeId, ownerId, "테스트 매장", "서울", StoreStatus.OPEN, LocalDateTime.now()));
 
-    given(waitingRepository.countByStoreIdAndStatusAndDate(eq(storeId), eq(WaitingStatus.WAITING), any())).willReturn(3L);
-    given(waitingRepository.countByStoreIdAndStatusAndDate(eq(storeId), eq(WaitingStatus.CALLED), any())).willReturn(1L);
-    given(waitingRepository.countByStoreIdAndStatusAndDate(eq(storeId), eq(WaitingStatus.ENTERED), any())).willReturn(5L);
-    given(waitingRepository.countByStoreIdAndStatusAndDate(eq(storeId), eq(WaitingStatus.NO_SHOW), any())).willReturn(2L);
-    given(waitingRepository.countByStoreIdAndStatusAndDate(eq(storeId), eq(WaitingStatus.CANCELLED), any())).willReturn(1L);
+    given(waitingRepository.countByStatusForStoreAndDate(eq(storeId), any()))
+        .willReturn(Map.of(
+            WaitingStatus.WAITING, 3L,
+            WaitingStatus.CALLED, 1L,
+            WaitingStatus.ENTERED, 5L,
+            WaitingStatus.NO_SHOW, 2L,
+            WaitingStatus.CANCELLED, 1L));
 
     DailySummaryResponse response = service.getDailySummary(ownerId);
 
@@ -115,9 +118,10 @@ class WaitingManagementServiceTest {
 
   @Test
   void getDailySummary_데이터_없을_때_모두_0() {
-    given(storeRepository.findByOwnerId(ownerId))
-        .willReturn(Optional.of(Store.restore(storeId, ownerId, "테스트 매장", "서울", StoreStatus.OPEN, LocalDateTime.now())));
-    given(waitingRepository.countByStoreIdAndStatusAndDate(eq(storeId), any(), any())).willReturn(0L);
+    given(storeRepository.getByOwnerId(ownerId))
+        .willReturn(Store.restore(storeId, ownerId, "테스트 매장", "서울", StoreStatus.OPEN, LocalDateTime.now()));
+    given(waitingRepository.countByStatusForStoreAndDate(eq(storeId), any()))
+        .willReturn(Map.of());
 
     DailySummaryResponse response = service.getDailySummary(ownerId);
 
@@ -131,8 +135,8 @@ class WaitingManagementServiceTest {
   void call_정상_호출처리() {
     WaitingEntry entry = WaitingEntry.restore(waitingId, storeId, "010-1111-0001", 2, 1, WaitingStatus.WAITING, LocalDateTime.now());
     given(waitingRepository.findById(waitingId)).willReturn(Optional.of(entry));
-    given(storeRepository.findByOwnerId(ownerId))
-        .willReturn(Optional.of(Store.restore(storeId, ownerId, "홍콩반점", "서울", StoreStatus.OPEN, LocalDateTime.now())));
+    given(storeRepository.getByOwnerId(ownerId))
+        .willReturn(Store.restore(storeId, ownerId, "홍콩반점", "서울", StoreStatus.OPEN, LocalDateTime.now()));
     given(waitingRepository.save(any())).willReturn(entry);
 
     service.call(ownerId, waitingId);
@@ -148,8 +152,8 @@ class WaitingManagementServiceTest {
     UUID otherStoreId = UUID.randomUUID();
     WaitingEntry entry = WaitingEntry.restore(waitingId, storeId, "010-1111-0001", 2, 1, WaitingStatus.WAITING, LocalDateTime.now());
     given(waitingRepository.findById(waitingId)).willReturn(Optional.of(entry));
-    given(storeRepository.findByOwnerId(ownerId))
-        .willReturn(Optional.of(Store.restore(otherStoreId, ownerId, "내 매장", "서울", StoreStatus.OPEN, LocalDateTime.now())));
+    given(storeRepository.getByOwnerId(ownerId))
+        .willReturn(Store.restore(otherStoreId, ownerId, "내 매장", "서울", StoreStatus.OPEN, LocalDateTime.now()));
 
     assertThatThrownBy(() -> service.call(ownerId, waitingId))
         .isInstanceOf(StoreNotFoundException.class);
@@ -169,8 +173,8 @@ class WaitingManagementServiceTest {
   void enter_정상_입장처리() {
     WaitingEntry entry = WaitingEntry.restore(waitingId, storeId, "010-1111-0001", 2, 1, WaitingStatus.CALLED, LocalDateTime.now());
     given(waitingRepository.findById(waitingId)).willReturn(Optional.of(entry));
-    given(storeRepository.findByOwnerId(ownerId))
-        .willReturn(Optional.of(Store.restore(storeId, ownerId, "테스트 매장", "서울", StoreStatus.OPEN, LocalDateTime.now())));
+    given(storeRepository.getByOwnerId(ownerId))
+        .willReturn(Store.restore(storeId, ownerId, "테스트 매장", "서울", StoreStatus.OPEN, LocalDateTime.now()));
     given(waitingRepository.save(any())).willReturn(entry);
 
     service.enter(ownerId, waitingId);
@@ -184,8 +188,8 @@ class WaitingManagementServiceTest {
     UUID otherStoreId = UUID.randomUUID();
     WaitingEntry entry = WaitingEntry.restore(waitingId, storeId, "010-1111-0001", 2, 1, WaitingStatus.CALLED, LocalDateTime.now());
     given(waitingRepository.findById(waitingId)).willReturn(Optional.of(entry));
-    given(storeRepository.findByOwnerId(ownerId))
-        .willReturn(Optional.of(Store.restore(otherStoreId, ownerId, "내 매장", "서울", StoreStatus.OPEN, LocalDateTime.now())));
+    given(storeRepository.getByOwnerId(ownerId))
+        .willReturn(Store.restore(otherStoreId, ownerId, "내 매장", "서울", StoreStatus.OPEN, LocalDateTime.now()));
 
     assertThatThrownBy(() -> service.enter(ownerId, waitingId))
         .isInstanceOf(StoreNotFoundException.class);
@@ -205,8 +209,8 @@ class WaitingManagementServiceTest {
   void noShow_정상_노쇼처리() {
     WaitingEntry entry = WaitingEntry.restore(waitingId, storeId, "010-1111-0001", 2, 1, WaitingStatus.CALLED, LocalDateTime.now());
     given(waitingRepository.findById(waitingId)).willReturn(Optional.of(entry));
-    given(storeRepository.findByOwnerId(ownerId))
-        .willReturn(Optional.of(Store.restore(storeId, ownerId, "테스트 매장", "서울", StoreStatus.OPEN, LocalDateTime.now())));
+    given(storeRepository.getByOwnerId(ownerId))
+        .willReturn(Store.restore(storeId, ownerId, "테스트 매장", "서울", StoreStatus.OPEN, LocalDateTime.now()));
     given(waitingRepository.save(any())).willReturn(entry);
 
     service.noShow(ownerId, waitingId);
@@ -220,8 +224,8 @@ class WaitingManagementServiceTest {
     UUID otherStoreId = UUID.randomUUID();
     WaitingEntry entry = WaitingEntry.restore(waitingId, storeId, "010-1111-0001", 2, 1, WaitingStatus.CALLED, LocalDateTime.now());
     given(waitingRepository.findById(waitingId)).willReturn(Optional.of(entry));
-    given(storeRepository.findByOwnerId(ownerId))
-        .willReturn(Optional.of(Store.restore(otherStoreId, ownerId, "내 매장", "서울", StoreStatus.OPEN, LocalDateTime.now())));
+    given(storeRepository.getByOwnerId(ownerId))
+        .willReturn(Store.restore(otherStoreId, ownerId, "내 매장", "서울", StoreStatus.OPEN, LocalDateTime.now()));
 
     assertThatThrownBy(() -> service.noShow(ownerId, waitingId))
         .isInstanceOf(StoreNotFoundException.class);
@@ -258,8 +262,8 @@ class WaitingManagementServiceTest {
         LocalDateTime.now().minusMinutes(30)
     );
 
-    given(storeRepository.findByOwnerId(ownerId))
-        .willReturn(Optional.of(Store.restore(storeId, ownerId, "테스트 매장", "서울", StoreStatus.OPEN, LocalDateTime.now())));
+    given(storeRepository.getByOwnerId(ownerId))
+        .willReturn(Store.restore(storeId, ownerId, "테스트 매장", "서울", StoreStatus.OPEN, LocalDateTime.now()));
     given(waitingRepository.findAllByStoreIdAndDate(eq(storeId), any(LocalDate.class)))
         .willReturn(List.of(waiting, entered));
 
@@ -274,7 +278,8 @@ class WaitingManagementServiceTest {
 
   @Test
   void getTodayWaitings_매장_없음_예외발생() {
-    given(storeRepository.findByOwnerId(ownerId)).willReturn(Optional.empty());
+    given(storeRepository.getByOwnerId(ownerId))
+        .willThrow(new StoreNotFoundException("ownerId=" + ownerId));
 
     assertThatThrownBy(() -> service.getTodayWaitings(ownerId))
         .isInstanceOf(StoreNotFoundException.class);

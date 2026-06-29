@@ -1,15 +1,16 @@
 package com.qrwait.api.waiting.application;
 
 import com.qrwait.api.shared.sse.SsePublisher;
+import com.qrwait.api.store.domain.Store;
 import com.qrwait.api.store.domain.StoreNotFoundException;
 import com.qrwait.api.store.domain.StoreRepository;
 import com.qrwait.api.waiting.application.dto.DailySummaryResponse;
 import com.qrwait.api.waiting.application.dto.OwnerWaitingResponse;
 import com.qrwait.api.waiting.application.dto.TodayWaitingResponse;
+import com.qrwait.api.waiting.domain.DailySummary;
 import com.qrwait.api.waiting.domain.WaitingEntry;
 import com.qrwait.api.waiting.domain.WaitingNotFoundException;
 import com.qrwait.api.waiting.domain.WaitingRepository;
-import com.qrwait.api.waiting.domain.WaitingStatus;
 import com.qrwait.api.waiting.domain.event.WaitingCalledEvent;
 import com.qrwait.api.waiting.domain.event.WaitingUpdatedEvent;
 import java.time.LocalDate;
@@ -34,7 +35,7 @@ public class WaitingManagementService {
 
   @Transactional(readOnly = true)
   public List<OwnerWaitingResponse> getWaitingList(UUID ownerId) {
-    UUID storeId = resolveStoreId(ownerId);
+    UUID storeId = storeRepository.getByOwnerId(ownerId).getId();
     return waitingRepository.findActiveByStoreId(storeId).stream()
         .map(this::toOwnerWaitingResponse)
         .toList();
@@ -42,83 +43,44 @@ public class WaitingManagementService {
 
   @Transactional(readOnly = true)
   public DailySummaryResponse getDailySummary(UUID ownerId) {
-    UUID storeId = resolveStoreId(ownerId);
-    LocalDate today = LocalDate.now();
-
-    long totalRegistered = waitingRepository.countByStoreIdAndStatusAndDate(storeId, WaitingStatus.WAITING, today)
-        + waitingRepository.countByStoreIdAndStatusAndDate(storeId, WaitingStatus.CALLED, today)
-        + waitingRepository.countByStoreIdAndStatusAndDate(storeId, WaitingStatus.ENTERED, today)
-        + waitingRepository.countByStoreIdAndStatusAndDate(storeId, WaitingStatus.NO_SHOW, today)
-        + waitingRepository.countByStoreIdAndStatusAndDate(storeId, WaitingStatus.CANCELLED, today);
-
-    long totalEntered = waitingRepository.countByStoreIdAndStatusAndDate(storeId, WaitingStatus.ENTERED, today);
-    long totalNoShow = waitingRepository.countByStoreIdAndStatusAndDate(storeId, WaitingStatus.NO_SHOW, today);
-    long totalCancelled = waitingRepository.countByStoreIdAndStatusAndDate(storeId, WaitingStatus.CANCELLED, today);
-    long currentWaiting = waitingRepository.countByStoreIdAndStatusAndDate(storeId, WaitingStatus.WAITING, today)
-        + waitingRepository.countByStoreIdAndStatusAndDate(storeId, WaitingStatus.CALLED, today);
-
-    return new DailySummaryResponse(totalRegistered, totalEntered, totalNoShow, totalCancelled, currentWaiting);
+    UUID storeId = storeRepository.getByOwnerId(ownerId).getId();
+    DailySummary summary = DailySummary.from(
+        waitingRepository.countByStatusForStoreAndDate(storeId, LocalDate.now())
+    );
+    return DailySummaryResponse.from(summary);
   }
 
   @Transactional
   public void call(UUID ownerId, UUID waitingId) {
-    WaitingEntry entry = waitingRepository.findById(waitingId)
-        .orElseThrow(() -> new WaitingNotFoundException(waitingId));
-
-    com.qrwait.api.store.domain.Store store = storeRepository.findByOwnerId(ownerId)
-        .orElseThrow(() -> new StoreNotFoundException("ownerId=" + ownerId));
-
-    if (!store.getId().equals(entry.getStoreId())) {
-      throw new StoreNotFoundException("ownerId=" + ownerId);
-    }
-
-    WaitingEntry called = entry.call();
+    OwnedEntry owned = loadOwnedEntry(ownerId, waitingId);
+    WaitingEntry called = owned.entry().call();
     waitingRepository.save(called);
-
     eventPublisher.publishEvent(new WaitingCalledEvent(
         called.getStoreId(),
         waitingId,
         called.getPhoneNumber(),
         called.getWaitingNumber(),
-        store.getName()
+        owned.store().getName()
     ));
   }
 
   @Transactional
   public void enter(UUID ownerId, UUID waitingId) {
-    WaitingEntry entry = waitingRepository.findById(waitingId)
-        .orElseThrow(() -> new WaitingNotFoundException(waitingId));
-
-    UUID ownerStoreId = resolveStoreId(ownerId);
-    if (!ownerStoreId.equals(entry.getStoreId())) {
-      throw new StoreNotFoundException("ownerId=" + ownerId);
-    }
-
-    WaitingEntry entered = entry.enter();
+    WaitingEntry entered = loadOwnedEntry(ownerId, waitingId).entry().enter();
     waitingRepository.save(entered);
-
     eventPublisher.publishEvent(new WaitingUpdatedEvent(entered.getStoreId()));
   }
 
   @Transactional
   public void noShow(UUID ownerId, UUID waitingId) {
-    WaitingEntry entry = waitingRepository.findById(waitingId)
-        .orElseThrow(() -> new WaitingNotFoundException(waitingId));
-
-    UUID ownerStoreId = resolveStoreId(ownerId);
-    if (!ownerStoreId.equals(entry.getStoreId())) {
-      throw new StoreNotFoundException("ownerId=" + ownerId);
-    }
-
-    WaitingEntry noShowed = entry.noShow();
+    WaitingEntry noShowed = loadOwnedEntry(ownerId, waitingId).entry().noShow();
     waitingRepository.save(noShowed);
-
     eventPublisher.publishEvent(new WaitingUpdatedEvent(noShowed.getStoreId()));
   }
 
   @Transactional(readOnly = true)
   public List<TodayWaitingResponse> getTodayWaitings(UUID ownerId) {
-    UUID storeId = resolveStoreId(ownerId);
+    UUID storeId = storeRepository.getByOwnerId(ownerId).getId();
     return waitingRepository.findAllByStoreIdAndDate(storeId, LocalDate.now())
         .stream()
         .map(entry -> new TodayWaitingResponse(
@@ -133,14 +95,8 @@ public class WaitingManagementService {
   }
 
   public SseEmitter subscribeOwnerDashboard(UUID ownerId) {
-    UUID storeId = resolveStoreId(ownerId);
+    UUID storeId = storeRepository.getByOwnerId(ownerId).getId();
     return ssePublisher.subscribeOwner(storeId);
-  }
-
-  private UUID resolveStoreId(UUID ownerId) {
-    return storeRepository.findByOwnerId(ownerId)
-        .orElseThrow(() -> new StoreNotFoundException("ownerId=" + ownerId))
-        .getId();
   }
 
   private OwnerWaitingResponse toOwnerWaitingResponse(WaitingEntry entry) {
@@ -153,5 +109,19 @@ public class WaitingManagementService {
         entry.getStatus(),
         elapsedMinutes
     );
+  }
+
+  private OwnedEntry loadOwnedEntry(UUID ownerId, UUID waitingId) {
+    WaitingEntry entry = waitingRepository.findById(waitingId)
+        .orElseThrow(() -> new WaitingNotFoundException(waitingId));
+    Store store = storeRepository.getByOwnerId(ownerId);
+    if (!entry.belongsTo(store.getId())) {
+      throw new StoreNotFoundException("ownerId=" + ownerId);
+    }
+    return new OwnedEntry(store, entry);
+  }
+
+  private record OwnedEntry(Store store, WaitingEntry entry) {
+
   }
 }

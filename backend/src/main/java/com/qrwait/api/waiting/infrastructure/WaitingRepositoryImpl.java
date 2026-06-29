@@ -53,13 +53,6 @@ public class WaitingRepositoryImpl implements WaitingRepository {
   }
 
   @Override
-  public long countByStoreIdAndStatusAndDate(UUID storeId, WaitingStatus status, LocalDate date) {
-    LocalDateTime startOfDay = date.atStartOfDay();
-    LocalDateTime endOfDay = date.plusDays(1).atStartOfDay();
-    return waitingEntryJpaRepository.countByStoreIdAndStatusAndDate(storeId, status.name(), startOfDay, endOfDay);
-  }
-
-  @Override
   public int findNextWaitingNumber(UUID storeId) {
     return waitingEntryJpaRepository.findMaxWaitingNumberByStoreId(storeId) + 1;
   }
