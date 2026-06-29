@@ -99,4 +99,8 @@ public class WaitingEntry {
     }
     return new WaitingEntry(id, storeId, phoneNumber, partySize, waitingNumber, WaitingStatus.NO_SHOW, createdAt);
   }
+
+  public boolean belongsTo(UUID storeId) {
+    return this.storeId.equals(storeId);
+  }
 }
