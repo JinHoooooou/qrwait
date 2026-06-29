@@ -26,6 +26,8 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class WaitingService {
 
+  private static final int DEFAULT_MINUTES_PER_PERSON = 5;
+
   private final WaitingRepository waitingRepository;
   private final StoreRepository storeRepository;
   private final StoreSettingsRepository storeSettingsRepository;
@@ -46,12 +48,11 @@ public class WaitingService {
     WaitingEntry saved = waitingRepository.save(entry);
 
     int totalWaiting = waitingRepository.countByStoreIdAndStatus(storeId, WaitingStatus.WAITING);
-    int estimatedWaitMinutes = storeSettingsRepository.findByStoreId(storeId)
-        .map(settings -> settings.calculateEstimatedWait(totalWaiting))
-        .orElse(totalWaiting * 5);
+    int estimatedWaitMinutes = estimatedWaitMinutes(storeId, totalWaiting);
 
     eventPublisher.publishEvent(new WaitingRegisteredEvent(storeId));
 
+    // 신규 등록자는 대기열 맨 뒤이므로 currentRank == totalWaiting (의도된 동일 값)
     return new RegisterWaitingResponse(
         saved.getId(),
         waitingNumber,
@@ -80,9 +81,7 @@ public class WaitingService {
     int currentRank = (int) ahead + 1;
     int totalWaiting = waitingList.size();
 
-    int estimatedWaitMinutes = storeSettingsRepository.findByStoreId(entry.getStoreId())
-        .map(settings -> settings.calculateEstimatedWait((int) ahead))
-        .orElse((int) ahead * 5);
+    int estimatedWaitMinutes = estimatedWaitMinutes(entry.getStoreId(), (int) ahead);
 
     return new WaitingStatusResponse(currentRank, totalWaiting, estimatedWaitMinutes);
   }
@@ -101,9 +100,14 @@ public class WaitingService {
   @Transactional(readOnly = true)
   public WaitingStatusResponse getStoreWaitingStatus(UUID storeId) {
     int totalWaiting = waitingRepository.countByStoreIdAndStatus(storeId, WaitingStatus.WAITING);
-    int estimatedWaitMinutes = storeSettingsRepository.findByStoreId(storeId)
-        .map(settings -> settings.calculateEstimatedWait(totalWaiting))
-        .orElse(totalWaiting * 5);
+    int estimatedWaitMinutes = estimatedWaitMinutes(storeId, totalWaiting);
+    // 매장 전체 상태 조회는 특정 손님이 없으므로 currentRank 자리에 totalWaiting을 그대로 둔다 (의도)
     return new WaitingStatusResponse(totalWaiting, totalWaiting, estimatedWaitMinutes);
+  }
+
+  private int estimatedWaitMinutes(UUID storeId, int ahead) {
+    return storeSettingsRepository.findByStoreId(storeId)
+        .map(settings -> settings.calculateEstimatedWait(ahead))
+        .orElse(ahead * DEFAULT_MINUTES_PER_PERSON);
   }
 }
