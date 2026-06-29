@@ -1,8 +1,10 @@
 package com.qrwait.api.store.infrastructure;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import com.qrwait.api.store.domain.Store;
+import com.qrwait.api.store.domain.StoreNotFoundException;
 import com.qrwait.api.store.domain.StoreRepository;
 import java.util.Optional;
 import java.util.UUID;
@@ -38,5 +40,26 @@ class StoreRepositoryImplTest {
     Optional<Store> result = storeRepository.findById(UUID.randomUUID());
 
     assertThat(result).isEmpty();
+  }
+
+  @Test
+  void getByOwnerId_매장_있으면_반환() {
+    Store saved = storeRepository.save(Store.create(UUID.randomUUID(), "가게", "주소"));
+
+    Store found = storeRepository.getByOwnerId(saved.getOwnerId());
+
+    assertThat(found.getId()).isEqualTo(saved.getId());
+  }
+
+  @Test
+  void getByOwnerId_매장_없으면_예외() {
+    assertThatThrownBy(() -> storeRepository.getByOwnerId(UUID.randomUUID()))
+        .isInstanceOf(StoreNotFoundException.class);
+  }
+
+  @Test
+  void getById_매장_없으면_예외() {
+    assertThatThrownBy(() -> storeRepository.getById(UUID.randomUUID()))
+        .isInstanceOf(StoreNotFoundException.class);
   }
 }

@@ -10,4 +10,14 @@ public interface StoreRepository {
   Optional<Store> findByOwnerId(UUID ownerId);
 
   Store save(Store store);
+
+  default Store getByOwnerId(UUID ownerId) {
+    return findByOwnerId(ownerId)
+        .orElseThrow(() -> new StoreNotFoundException("ownerId=" + ownerId));
+  }
+
+  default Store getById(UUID storeId) {
+    return findById(storeId)
+        .orElseThrow(() -> new StoreNotFoundException(storeId));
+  }
 }
