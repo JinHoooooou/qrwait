@@ -20,7 +20,7 @@ public class StoreSettingsService {
 
   @Transactional(readOnly = true)
   public StoreSettingsResponse getSettings(UUID ownerId) {
-    UUID storeId = resolveStoreId(ownerId);
+    UUID storeId = storeRepository.getByOwnerId(ownerId).getId();
     return storeSettingsRepository.findByStoreId(storeId)
         .map(StoreSettingsResponse::from)
         .orElseThrow(() -> new StoreNotFoundException(storeId));
@@ -28,7 +28,7 @@ public class StoreSettingsService {
 
   @Transactional
   public StoreSettingsResponse updateSettings(UUID ownerId, UpdateStoreSettingsRequest request) {
-    UUID storeId = resolveStoreId(ownerId);
+    UUID storeId = storeRepository.getByOwnerId(ownerId).getId();
     StoreSettings settings = storeSettingsRepository.findByStoreId(storeId)
         .orElseThrow(() -> new StoreNotFoundException(storeId));
 
@@ -42,11 +42,5 @@ public class StoreSettingsService {
     );
 
     return StoreSettingsResponse.from(storeSettingsRepository.save(updated));
-  }
-
-  private UUID resolveStoreId(UUID ownerId) {
-    return storeRepository.findByOwnerId(ownerId)
-        .orElseThrow(() -> new StoreNotFoundException("ownerId=" + ownerId))
-        .getId();
   }
 }

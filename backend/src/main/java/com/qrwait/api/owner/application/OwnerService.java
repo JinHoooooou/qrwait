@@ -63,8 +63,7 @@ public class OwnerService {
       throw new InvalidCredentialsException();
     }
 
-    Store store = storeRepository.findByOwnerId(owner.getId())
-        .orElseThrow(() -> new StoreNotFoundException("ownerId=" + owner.getId()));
+    Store store = storeRepository.getByOwnerId(owner.getId());
 
     String accessToken = jwtTokenProvider.generateAccessToken(owner.getId());
     String refreshToken = jwtTokenProvider.generateRefreshToken(owner.getId());

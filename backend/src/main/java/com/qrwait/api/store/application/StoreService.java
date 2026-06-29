@@ -28,23 +28,20 @@ public class StoreService {
 
   @Transactional(readOnly = true)
   public StoreResponse getMyStore(UUID ownerId) {
-    Store store = storeRepository.findByOwnerId(ownerId)
-        .orElseThrow(() -> new StoreNotFoundException("ownerId=" + ownerId));
+    Store store = storeRepository.getByOwnerId(ownerId);
     return toResponse(store);
   }
 
   @Transactional
   public StoreResponse updateStoreInfo(UUID ownerId, UpdateStoreInfoRequest request) {
-    Store store = storeRepository.findByOwnerId(ownerId)
-        .orElseThrow(() -> new StoreNotFoundException("ownerId=" + ownerId));
+    Store store = storeRepository.getByOwnerId(ownerId);
     Store updated = storeRepository.save(store.updateInfo(request.getName(), request.getAddress()));
     return toResponse(updated);
   }
 
   @Transactional
   public StoreResponse updateStoreStatus(UUID ownerId, UpdateStoreStatusRequest request) {
-    Store store = storeRepository.findByOwnerId(ownerId)
-        .orElseThrow(() -> new StoreNotFoundException("ownerId=" + ownerId));
+    Store store = storeRepository.getByOwnerId(ownerId);
     Store updated = storeRepository.save(store.changeStatus(request.getStatus()));
     eventPublisher.publishEvent(new StoreStatusChangedEvent(updated.getId(), updated.getStatus()));
     return toResponse(updated);
@@ -52,14 +49,12 @@ public class StoreService {
 
   @Transactional(readOnly = true)
   public StoreResponse getStoreById(UUID storeId) {
-    Store store = storeRepository.findById(storeId)
-        .orElseThrow(() -> new StoreNotFoundException(storeId));
+    Store store = storeRepository.getById(storeId);
     return toResponse(store);
   }
 
   public byte[] generateQrImage(UUID storeId) {
-    storeRepository.findById(storeId)
-        .orElseThrow(() -> new StoreNotFoundException(storeId));
+    storeRepository.getById(storeId);
 
     String qrUrl = baseUrl + "/wait?storeId=" + storeId;
     return qrCodeGenerator.generate(qrUrl);

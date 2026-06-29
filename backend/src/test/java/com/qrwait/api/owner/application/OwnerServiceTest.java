@@ -108,7 +108,7 @@ class OwnerServiceTest {
     Store store = Store.restore(storeId, ownerId, "테스트 매장", "서울", null, LocalDateTime.now());
 
     given(ownerRepository.findByEmail("owner@test.com")).willReturn(Optional.of(owner));
-    given(storeRepository.findByOwnerId(ownerId)).willReturn(Optional.of(store));
+    given(storeRepository.getByOwnerId(ownerId)).willReturn(store);
     given(jwtTokenProvider.generateAccessToken(ownerId)).willReturn("access-token");
     given(jwtTokenProvider.generateRefreshToken(ownerId)).willReturn("refresh-token");
 

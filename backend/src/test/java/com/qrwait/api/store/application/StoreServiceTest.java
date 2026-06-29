@@ -16,7 +16,6 @@ import com.qrwait.api.store.domain.StoreRepository;
 import com.qrwait.api.store.domain.StoreStatus;
 import com.qrwait.api.store.domain.event.StoreStatusChangedEvent;
 import java.time.LocalDateTime;
-import java.util.Optional;
 import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -52,7 +51,7 @@ class StoreServiceTest {
   @Test
   void getMyStore_정상_조회() {
     Store store = Store.restore(storeId, ownerId, "테스트 매장", "서울시 강남구", StoreStatus.OPEN, LocalDateTime.now());
-    given(storeRepository.findByOwnerId(ownerId)).willReturn(Optional.of(store));
+    given(storeRepository.getByOwnerId(ownerId)).willReturn(store);
 
     StoreResponse response = storeService.getMyStore(ownerId);
 
@@ -63,7 +62,7 @@ class StoreServiceTest {
 
   @Test
   void getMyStore_매장_없음_예외발생() {
-    given(storeRepository.findByOwnerId(ownerId)).willReturn(Optional.empty());
+    given(storeRepository.getByOwnerId(ownerId)).willThrow(new StoreNotFoundException("ownerId=" + ownerId));
 
     assertThatThrownBy(() -> storeService.getMyStore(ownerId))
         .isInstanceOf(StoreNotFoundException.class);
@@ -75,7 +74,7 @@ class StoreServiceTest {
   void updateStoreStatus_정상_상태_변경() {
     Store store = Store.restore(storeId, ownerId, "테스트 매장", "서울", StoreStatus.OPEN, LocalDateTime.now());
     Store updated = store.changeStatus(StoreStatus.CLOSED);
-    given(storeRepository.findByOwnerId(ownerId)).willReturn(Optional.of(store));
+    given(storeRepository.getByOwnerId(ownerId)).willReturn(store);
     given(storeRepository.save(any())).willReturn(updated);
 
     UpdateStoreStatusRequest request = new UpdateStoreStatusRequest();
@@ -89,7 +88,7 @@ class StoreServiceTest {
 
   @Test
   void updateStoreStatus_매장_없음_예외발생() {
-    given(storeRepository.findByOwnerId(ownerId)).willReturn(Optional.empty());
+    given(storeRepository.getByOwnerId(ownerId)).willThrow(new StoreNotFoundException("ownerId=" + ownerId));
 
     UpdateStoreStatusRequest request = new UpdateStoreStatusRequest();
     ReflectionTestUtils.setField(request, "status", StoreStatus.CLOSED);
@@ -104,7 +103,7 @@ class StoreServiceTest {
   void updateStoreInfo_정상_수정() {
     Store store = Store.restore(storeId, ownerId, "기존 매장", "서울", StoreStatus.OPEN, LocalDateTime.now());
     Store updated = store.updateInfo("수정 매장", "부산");
-    given(storeRepository.findByOwnerId(ownerId)).willReturn(Optional.of(store));
+    given(storeRepository.getByOwnerId(ownerId)).willReturn(store);
     given(storeRepository.save(any())).willReturn(updated);
 
     UpdateStoreInfoRequest request = new UpdateStoreInfoRequest();
@@ -122,7 +121,7 @@ class StoreServiceTest {
   @Test
   void getStoreById_정상_조회() {
     Store store = Store.restore(storeId, ownerId, "테스트 매장", "서울", StoreStatus.OPEN, LocalDateTime.now());
-    given(storeRepository.findById(storeId)).willReturn(Optional.of(store));
+    given(storeRepository.getById(storeId)).willReturn(store);
 
     StoreResponse response = storeService.getStoreById(storeId);
 
@@ -131,7 +130,7 @@ class StoreServiceTest {
 
   @Test
   void getStoreById_존재하지않는_매장_예외발생() {
-    given(storeRepository.findById(storeId)).willReturn(Optional.empty());
+    given(storeRepository.getById(storeId)).willThrow(new StoreNotFoundException(storeId));
 
     assertThatThrownBy(() -> storeService.getStoreById(storeId))
         .isInstanceOf(StoreNotFoundException.class);

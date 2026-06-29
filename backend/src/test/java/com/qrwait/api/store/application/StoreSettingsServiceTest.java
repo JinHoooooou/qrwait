@@ -47,7 +47,7 @@ class StoreSettingsServiceTest {
     Store store = Store.restore(storeId, ownerId, "테스트 매장", "서울", StoreStatus.OPEN, LocalDateTime.now());
     StoreSettings settings = StoreSettings.createDefault(storeId);
 
-    given(storeRepository.findByOwnerId(ownerId)).willReturn(Optional.of(store));
+    given(storeRepository.getByOwnerId(ownerId)).willReturn(store);
     given(storeSettingsRepository.findByStoreId(storeId)).willReturn(Optional.of(settings));
 
     StoreSettingsResponse response = storeSettingsService.getSettings(ownerId);
@@ -59,7 +59,7 @@ class StoreSettingsServiceTest {
 
   @Test
   void getSettings_매장_없음_예외발생() {
-    given(storeRepository.findByOwnerId(ownerId)).willReturn(Optional.empty());
+    given(storeRepository.getByOwnerId(ownerId)).willThrow(new StoreNotFoundException("ownerId=" + ownerId));
 
     assertThatThrownBy(() -> storeSettingsService.getSettings(ownerId))
         .isInstanceOf(StoreNotFoundException.class);
@@ -71,7 +71,7 @@ class StoreSettingsServiceTest {
     StoreSettings settings = StoreSettings.createDefault(storeId);
     StoreSettings updated = settings.update(10, 20, LocalTime.of(9, 0), LocalTime.of(22, 0), 5, false);
 
-    given(storeRepository.findByOwnerId(ownerId)).willReturn(Optional.of(store));
+    given(storeRepository.getByOwnerId(ownerId)).willReturn(store);
     given(storeSettingsRepository.findByStoreId(storeId)).willReturn(Optional.of(settings));
     given(storeSettingsRepository.save(any())).willReturn(updated);
 
