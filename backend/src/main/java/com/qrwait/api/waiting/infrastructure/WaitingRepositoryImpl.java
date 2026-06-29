@@ -5,7 +5,9 @@ import com.qrwait.api.waiting.domain.WaitingRepository;
 import com.qrwait.api.waiting.domain.WaitingStatus;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.EnumMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
@@ -70,5 +72,17 @@ public class WaitingRepositoryImpl implements WaitingRepository {
         .stream()
         .map(WaitingEntryJpaEntity::toDomain)
         .toList();
+  }
+
+  @Override
+  public Map<WaitingStatus, Long> countByStatusForStoreAndDate(UUID storeId, LocalDate date) {
+    LocalDateTime startOfDay = date.atStartOfDay();
+    LocalDateTime endOfDay = date.plusDays(1).atStartOfDay();
+    Map<WaitingStatus, Long> result = new EnumMap<>(WaitingStatus.class);
+    for (WaitingEntryJpaRepository.StatusCount row :
+        waitingEntryJpaRepository.countByStatusGrouped(storeId, startOfDay, endOfDay)) {
+      result.put(WaitingStatus.valueOf(row.getStatus()), row.getCount());
+    }
+    return result;
   }
 }

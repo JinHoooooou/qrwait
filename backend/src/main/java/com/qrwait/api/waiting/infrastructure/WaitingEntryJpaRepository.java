@@ -15,17 +15,42 @@ public interface WaitingEntryJpaRepository extends JpaRepository<WaitingEntryJpa
 
   int countByStoreIdAndStatus(UUID storeId, String status);
 
-  @Query("SELECT COUNT(w) FROM WaitingEntryJpaEntity w WHERE w.storeId = :storeId AND w.status = :status AND w.createdAt >= :startOfDay AND w.createdAt < :endOfDay")
-  long countByStoreIdAndStatusAndDate(@Param("storeId") UUID storeId, @Param("status") String status,
-      @Param("startOfDay") LocalDateTime startOfDay, @Param("endOfDay") LocalDateTime endOfDay);
-
-  @Query("SELECT COALESCE(MAX(w.waitingNumber), 0) FROM WaitingEntryJpaEntity w WHERE w.storeId = :storeId")
+  @Query("""
+      SELECT COALESCE(MAX(w.waitingNumber), 0)
+        FROM WaitingEntryJpaEntity w
+       WHERE w.storeId = :storeId
+      """)
   int findMaxWaitingNumberByStoreId(@Param("storeId") UUID storeId);
 
-  @Query("SELECT w FROM WaitingEntryJpaEntity w WHERE w.storeId = :storeId AND w.createdAt >= :startOfDay AND w.createdAt < :endOfDay ORDER BY w.waitingNumber DESC")
+  @Query("""
+        SELECT w
+          FROM WaitingEntryJpaEntity w
+         WHERE w.storeId = :storeId
+           AND w.createdAt >= :startOfDay
+           AND w.createdAt < :endOfDay
+      ORDER BY w.waitingNumber DESC
+      """)
   List<WaitingEntryJpaEntity> findAllByStoreIdBetween(
       @Param("storeId") UUID storeId,
       @Param("startOfDay") LocalDateTime startOfDay,
       @Param("endOfDay") LocalDateTime endOfDay
   );
+
+  @Query("""
+        SELECT w.status AS status, COUNT(w) AS count
+          FROM WaitingEntryJpaEntity w
+         WHERE w.storeId = :storeId
+           AND w.createdAt >= :startOfDay
+           AND w.createdAt < :endOfDay
+      GROUP BY w.status
+      """)
+  List<StatusCount> countByStatusGrouped(@Param("storeId") UUID storeId,
+      @Param("startOfDay") LocalDateTime startOfDay, @Param("endOfDay") LocalDateTime endOfDay);
+
+  interface StatusCount {
+
+    String getStatus();
+
+    long getCount();
+  }
 }

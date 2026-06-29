@@ -5,9 +5,11 @@ import static org.assertj.core.api.Assertions.assertThat;
 import com.qrwait.api.store.domain.Store;
 import com.qrwait.api.store.domain.StoreRepository;
 import com.qrwait.api.store.infrastructure.StoreRepositoryImpl;
+import com.qrwait.api.waiting.domain.DailySummary;
 import com.qrwait.api.waiting.domain.WaitingEntry;
 import com.qrwait.api.waiting.domain.WaitingRepository;
 import com.qrwait.api.waiting.domain.WaitingStatus;
+import java.time.LocalDate;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -54,5 +56,16 @@ class WaitingRepositoryImplTest {
     int count = waitingRepository.countByStoreIdAndStatus(savedStore.getId(), WaitingStatus.WAITING);
 
     assertThat(count).isEqualTo(2);
+  }
+
+  @Test
+  void countByStatusForStoreAndDate_상태별_집계() {
+    waitingRepository.save(WaitingEntry.create(savedStore.getId(), "010-0000-0001", 2, 1));
+    waitingRepository.save(WaitingEntry.create(savedStore.getId(), "010-0000-0002", 2, 2));
+
+    var counts = waitingRepository.countByStatusForStoreAndDate(savedStore.getId(), LocalDate.now());
+
+    assertThat(counts.get(WaitingStatus.WAITING)).isEqualTo(2L);
+    assertThat(DailySummary.from(counts).getTotalRegistered()).isEqualTo(2L);
   }
 }
