@@ -28,8 +28,14 @@ public class StoreSettings {
     this.alertEnabled = alertEnabled;
   }
 
+  private static final int DEFAULT_TABLE_COUNT = 5;
+  private static final int DEFAULT_AVG_TURNOVER_MINUTES = 30;
+  private static final int DEFAULT_ALERT_THRESHOLD = 10;
+  private static final boolean DEFAULT_ALERT_ENABLED = true;
+
   public static StoreSettings createDefault(UUID storeId) {
-    return new StoreSettings(UUID.randomUUID(), storeId, 5, 30, null, null, 10, true);
+    return new StoreSettings(UUID.randomUUID(), storeId, DEFAULT_TABLE_COUNT,
+        DEFAULT_AVG_TURNOVER_MINUTES, null, null, DEFAULT_ALERT_THRESHOLD, DEFAULT_ALERT_ENABLED);
   }
 
   public static StoreSettings restore(UUID id, UUID storeId, int tableCount,
