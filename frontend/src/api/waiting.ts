@@ -30,6 +30,7 @@ export interface WaitingStatusResponse {
   currentRank: number
   totalWaiting: number
   estimatedWaitMinutes: number
+  status: 'WAITING' | 'CALLED'
 }
 
 export interface CreateStoreRequest {
