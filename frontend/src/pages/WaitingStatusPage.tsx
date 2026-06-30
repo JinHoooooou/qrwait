@@ -1,13 +1,10 @@
-import {useEffect, useState} from 'react'
+import {useCallback, useEffect, useState} from 'react'
 import {useNavigate, useParams} from 'react-router-dom'
 import useWaitingStore from '../store/waitingStore'
 import {getWaiting} from '../api/waiting'
 import {clearWaitingSession, getWaitingSession} from '../utils/session'
+import {useWaitingSse, type SseConnectionStatus} from '../hooks/useWaitingSse'
 import Button from '../components/Button'
-
-type ConnectionStatus = 'connecting' | 'connected' | 'error'
-
-const MAX_RETRIES = 3
 
 function WaitingStatusPage() {
   const navigate = useNavigate()
@@ -20,24 +17,27 @@ function WaitingStatusPage() {
   const resolvedStoreId = storeId ?? session?.storeId ?? null
   const resolvedWaitingNumber = waitingNumber ?? session?.waitingNumber ?? null
 
-  const [connectionStatus, setConnectionStatus] = useState<ConnectionStatus>('connecting')
-  const [showCalledModal, setShowCalledModal] = useState(false)
+  const [connectionStatus, setConnectionStatus] = useState<SseConnectionStatus>('connecting')
   const [expired, setExpired] = useState(false)
   const [initialized, setInitialized] = useState(false)
   const [loadError, setLoadError] = useState<string | null>(null)
 
-  // API 응답 이후에만 리다이렉트 평가 (Bug A 수정)
+  // API 응답 이후에만 리다이렉트 평가
   useEffect(() => {
     if (!resolvedStoreId && initialized && !expired) {
       navigate('/', {replace: true})
     }
   }, [resolvedStoreId, initialized, expired, navigate])
 
-  // 초기 상태 로드
-  useEffect(() => {
+  // 상태 로드/갱신: CALLED면 호출됨 페이지로, 종료면 expired
+  const loadStatus = useCallback((isInitial: boolean) => {
     if (!waitingId) return
     getWaiting(waitingId)
         .then((res) => {
+          if (res.status === 'CALLED') {
+            navigate(`/waiting/${waitingId}/called`, {replace: true})
+            return
+          }
           updateStatus({
             currentRank: res.currentRank,
             totalWaiting: res.totalWaiting,
@@ -47,90 +47,28 @@ function WaitingStatusPage() {
         .catch((err: unknown) => {
           const status = (err as { status?: number }).status
           if (status === 404) {
-            // 정상 종료 (취소/입장 완료) → 세션 삭제 + expired 화면
             clearWaitingSession()
             clearWaiting()
             setExpired(true)
-          } else {
-            // 일시적 오류 (네트워크 에러, 5xx) → 세션 유지 + 에러 메시지
+          } else if (isInitial) {
             setLoadError('서버에 연결할 수 없습니다. 잠시 후 새로고침해 주세요.')
           }
         })
-        .finally(() => setInitialized(true))
-  }, [waitingId, updateStatus, clearWaiting])
+        .finally(() => {
+          if (isInitial) setInitialized(true)
+        })
+  }, [waitingId, navigate, updateStatus, clearWaiting])
 
-  // SSE 연결 (재연결 최대 3회)
   useEffect(() => {
-    if (!waitingId || !resolvedStoreId || expired) return
+    loadStatus(true)
+  }, [loadStatus])
 
-    let unmounted = false
-    let retryCount = 0
-    let retryTimer: ReturnType<typeof setTimeout> | null = null
-    let es: EventSource | null = null
-
-    const connect = () => {
-      if (unmounted) return
-
-      es = new EventSource(`/api/waitings/${waitingId}/stream?storeId=${resolvedStoreId}`)
-
-      es.onopen = () => {
-        if (unmounted) return
-        setConnectionStatus('connected')
-        retryCount = 0
-      }
-
-      es.onerror = () => {
-        if (unmounted) return
-        es?.close()
-        if (retryCount < MAX_RETRIES) {
-          retryCount++
-          setConnectionStatus('connecting')
-          retryTimer = setTimeout(connect, 3000)
-        } else {
-          setConnectionStatus('error')
-        }
-      }
-
-      es.addEventListener('waiting-updated', () => {
-        if (unmounted || !waitingId) return
-        getWaiting(waitingId)
-            .then((res) => {
-              if (!unmounted) {
-                updateStatus({
-                  currentRank: res.currentRank,
-                  totalWaiting: res.totalWaiting,
-                  estimatedWaitMinutes: res.estimatedWaitMinutes,
-                })
-              }
-            })
-            .catch(() => {
-              if (!unmounted) {
-                clearWaitingSession()
-                clearWaiting()
-                setExpired(true)
-              }
-            })
-      })
-
-      es.addEventListener('waiting-called', (e) => {
-        if (unmounted) return
-        try {
-          const data = JSON.parse((e as MessageEvent).data)
-          if (data.waitingId === waitingId) setShowCalledModal(true)
-        } catch {
-          // payload 파싱 실패 시 무시
-        }
-      })
-    }
-
-    connect()
-
-    return () => {
-      unmounted = true
-      if (retryTimer) clearTimeout(retryTimer)
-      es?.close()
-    }
-  }, [waitingId, resolvedStoreId, expired, updateStatus, clearWaiting])
+  useWaitingSse(waitingId, resolvedStoreId, {
+    enabled: !!waitingId && !!resolvedStoreId && !expired,
+    onUpdated: () => loadStatus(false),
+    onCalled: () => navigate(`/waiting/${waitingId}/called`),
+    onConnectionChange: setConnectionStatus,
+  })
 
   if (!initialized) return null
 
@@ -157,16 +95,6 @@ function WaitingStatusPage() {
 
   return (
       <div style={styles.container}>
-        {showCalledModal && (
-            <div style={styles.overlay}>
-              <div style={styles.modal}>
-                <p style={styles.modalTitle}>입장해 주세요!</p>
-                <p style={styles.modalDesc}>순서가 되었습니다. 지금 입장해 주세요.</p>
-                <Button onClick={() => setShowCalledModal(false)}>확인</Button>
-              </div>
-            </div>
-        )}
-
         <div style={{...styles.statusBadge, ...statusBadgeVariant[connectionStatus]}}>
           {connectionStatus === 'connected'
               ? '● 실시간 업데이트 중'
@@ -275,35 +203,6 @@ const styles: Record<string, React.CSSProperties> = {
   },
   buttons: {
     width: '100%',
-  },
-  overlay: {
-    position: 'fixed',
-    inset: 0,
-    backgroundColor: 'rgba(0,0,0,0.5)',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    zIndex: 100,
-  },
-  modal: {
-    backgroundColor: '#fff',
-    borderRadius: '1rem',
-    padding: '2rem',
-    maxWidth: 320,
-    width: '90%',
-    display: 'flex',
-    flexDirection: 'column',
-    gap: '1rem',
-    textAlign: 'center',
-  },
-  modalTitle: {
-    fontSize: '1.5rem',
-    fontWeight: 700,
-    color: '#1d4ed8',
-  },
-  modalDesc: {
-    fontSize: '0.875rem',
-    color: '#6b7280',
   },
   expiredIcon: {
     width: 64,
