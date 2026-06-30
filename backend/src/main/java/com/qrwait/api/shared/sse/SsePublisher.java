@@ -2,7 +2,7 @@ package com.qrwait.api.shared.sse;
 
 import com.qrwait.api.store.domain.StoreSettingsRepository;
 import com.qrwait.api.store.domain.StoreStatus;
-import com.qrwait.api.waiting.application.dto.WaitingStatusResponse;
+import com.qrwait.api.waiting.customer.dto.WaitingStatusResponse;
 import com.qrwait.api.waiting.domain.WaitingRepository;
 import com.qrwait.api.waiting.domain.WaitingStatus;
 import java.io.IOException;

@@ -1,4 +1,4 @@
-package com.qrwait.api.waiting.application;
+package com.qrwait.api.waiting.customer.application;
 
 import com.qrwait.api.store.domain.Store;
 import com.qrwait.api.store.domain.StoreNotAvailableException;
@@ -6,10 +6,10 @@ import com.qrwait.api.store.domain.StoreNotFoundException;
 import com.qrwait.api.store.domain.StoreRepository;
 import com.qrwait.api.store.domain.StoreSettingsRepository;
 import com.qrwait.api.store.domain.StoreStatus;
-import com.qrwait.api.waiting.application.dto.MyWaitingStatusResponse;
-import com.qrwait.api.waiting.application.dto.RegisterWaitingRequest;
-import com.qrwait.api.waiting.application.dto.RegisterWaitingResponse;
-import com.qrwait.api.waiting.application.dto.WaitingStatusResponse;
+import com.qrwait.api.waiting.customer.dto.MyWaitingStatusResponse;
+import com.qrwait.api.waiting.customer.dto.RegisterWaitingRequest;
+import com.qrwait.api.waiting.customer.dto.RegisterWaitingResponse;
+import com.qrwait.api.waiting.customer.dto.WaitingStatusResponse;
 import com.qrwait.api.waiting.domain.WaitingEntry;
 import com.qrwait.api.waiting.domain.WaitingNotFoundException;
 import com.qrwait.api.waiting.domain.WaitingRepository;

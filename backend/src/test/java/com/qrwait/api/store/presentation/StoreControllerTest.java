@@ -13,7 +13,7 @@ import com.qrwait.api.store.application.StoreService;
 import com.qrwait.api.store.application.dto.StoreResponse;
 import com.qrwait.api.store.domain.StoreNotFoundException;
 import com.qrwait.api.store.domain.StoreStatus;
-import com.qrwait.api.waiting.application.WaitingService;
+import com.qrwait.api.waiting.customer.application.WaitingService;
 import java.util.UUID;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

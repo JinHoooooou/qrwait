@@ -1,4 +1,4 @@
-package com.qrwait.api.waiting.presentation;
+package com.qrwait.api.waiting.customer.presentation;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
@@ -12,9 +12,9 @@ import com.qrwait.api.shared.security.JwtAuthFilter;
 import com.qrwait.api.shared.security.JwtTokenProvider;
 import com.qrwait.api.shared.security.SecurityConfig;
 import com.qrwait.api.shared.sse.SsePublisher;
-import com.qrwait.api.waiting.application.WaitingService;
-import com.qrwait.api.waiting.application.dto.RegisterWaitingRequest;
-import com.qrwait.api.waiting.application.dto.RegisterWaitingResponse;
+import com.qrwait.api.waiting.customer.application.WaitingService;
+import com.qrwait.api.waiting.customer.dto.RegisterWaitingRequest;
+import com.qrwait.api.waiting.customer.dto.RegisterWaitingResponse;
 import java.util.UUID;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

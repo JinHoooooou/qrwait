@@ -1,10 +1,10 @@
-package com.qrwait.api.waiting.presentation;
+package com.qrwait.api.waiting.customer.presentation;
 
 import com.qrwait.api.shared.sse.SsePublisher;
-import com.qrwait.api.waiting.application.WaitingService;
-import com.qrwait.api.waiting.application.dto.MyWaitingStatusResponse;
-import com.qrwait.api.waiting.application.dto.RegisterWaitingRequest;
-import com.qrwait.api.waiting.application.dto.RegisterWaitingResponse;
+import com.qrwait.api.waiting.customer.application.WaitingService;
+import com.qrwait.api.waiting.customer.dto.MyWaitingStatusResponse;
+import com.qrwait.api.waiting.customer.dto.RegisterWaitingRequest;
+import com.qrwait.api.waiting.customer.dto.RegisterWaitingResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;

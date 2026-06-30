@@ -1,4 +1,4 @@
-package com.qrwait.api.waiting.application.dto;
+package com.qrwait.api.waiting.customer.dto;
 
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;

@@ -2,8 +2,8 @@ package com.qrwait.api.store.presentation;
 
 import com.qrwait.api.store.application.StoreService;
 import com.qrwait.api.store.application.dto.StoreResponse;
-import com.qrwait.api.waiting.application.WaitingService;
-import com.qrwait.api.waiting.application.dto.WaitingStatusResponse;
+import com.qrwait.api.waiting.customer.application.WaitingService;
+import com.qrwait.api.waiting.customer.dto.WaitingStatusResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
