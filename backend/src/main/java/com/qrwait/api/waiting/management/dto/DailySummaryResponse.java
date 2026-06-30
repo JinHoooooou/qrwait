@@ -1,4 +1,4 @@
-package com.qrwait.api.waiting.application.dto;
+package com.qrwait.api.waiting.management.dto;
 
 import com.qrwait.api.waiting.domain.DailySummary;
 

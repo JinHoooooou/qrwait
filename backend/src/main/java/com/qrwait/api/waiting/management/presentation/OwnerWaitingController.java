@@ -1,9 +1,9 @@
-package com.qrwait.api.waiting.presentation;
+package com.qrwait.api.waiting.management.presentation;
 
-import com.qrwait.api.waiting.application.WaitingManagementService;
-import com.qrwait.api.waiting.application.dto.DailySummaryResponse;
-import com.qrwait.api.waiting.application.dto.OwnerWaitingResponse;
-import com.qrwait.api.waiting.application.dto.TodayWaitingResponse;
+import com.qrwait.api.waiting.management.application.WaitingManagementService;
+import com.qrwait.api.waiting.management.dto.DailySummaryResponse;
+import com.qrwait.api.waiting.management.dto.OwnerWaitingResponse;
+import com.qrwait.api.waiting.management.dto.TodayWaitingResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.List;

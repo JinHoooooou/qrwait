@@ -1,12 +1,12 @@
-package com.qrwait.api.waiting.application;
+package com.qrwait.api.waiting.management.application;
 
 import com.qrwait.api.shared.sse.SsePublisher;
 import com.qrwait.api.store.domain.Store;
 import com.qrwait.api.store.domain.StoreNotFoundException;
 import com.qrwait.api.store.domain.StoreRepository;
-import com.qrwait.api.waiting.application.dto.DailySummaryResponse;
-import com.qrwait.api.waiting.application.dto.OwnerWaitingResponse;
-import com.qrwait.api.waiting.application.dto.TodayWaitingResponse;
+import com.qrwait.api.waiting.management.dto.DailySummaryResponse;
+import com.qrwait.api.waiting.management.dto.OwnerWaitingResponse;
+import com.qrwait.api.waiting.management.dto.TodayWaitingResponse;
 import com.qrwait.api.waiting.domain.DailySummary;
 import com.qrwait.api.waiting.domain.WaitingEntry;
 import com.qrwait.api.waiting.domain.WaitingNotFoundException;

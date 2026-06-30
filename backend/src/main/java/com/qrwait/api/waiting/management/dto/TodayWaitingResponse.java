@@ -1,15 +1,16 @@
-package com.qrwait.api.waiting.application.dto;
+package com.qrwait.api.waiting.management.dto;
 
 import com.qrwait.api.waiting.domain.WaitingStatus;
+import java.time.LocalDateTime;
 import java.util.UUID;
 
-public record OwnerWaitingResponse(
+public record TodayWaitingResponse(
     UUID waitingId,
     int waitingNumber,
     String phoneNumber,
     int partySize,
     WaitingStatus status,
-    long elapsedMinutes
+    LocalDateTime createdAt
 ) {
 
 }

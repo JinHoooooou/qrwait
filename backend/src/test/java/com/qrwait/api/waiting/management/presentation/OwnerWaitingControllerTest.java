@@ -1,4 +1,4 @@
-package com.qrwait.api.waiting.presentation;
+package com.qrwait.api.waiting.management.presentation;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
@@ -13,10 +13,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.qrwait.api.shared.security.JwtAuthFilter;
 import com.qrwait.api.shared.security.JwtTokenProvider;
 import com.qrwait.api.shared.security.SecurityConfig;
-import com.qrwait.api.waiting.application.WaitingManagementService;
-import com.qrwait.api.waiting.application.dto.DailySummaryResponse;
-import com.qrwait.api.waiting.application.dto.OwnerWaitingResponse;
-import com.qrwait.api.waiting.application.dto.TodayWaitingResponse;
+import com.qrwait.api.waiting.management.application.WaitingManagementService;
+import com.qrwait.api.waiting.management.dto.DailySummaryResponse;
+import com.qrwait.api.waiting.management.dto.OwnerWaitingResponse;
+import com.qrwait.api.waiting.management.dto.TodayWaitingResponse;
 import com.qrwait.api.waiting.domain.WaitingStatus;
 import java.util.List;
 import java.util.UUID;
