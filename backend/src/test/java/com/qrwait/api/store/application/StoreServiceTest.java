@@ -6,7 +6,6 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
 
-import com.qrwait.api.shared.qr.QrCodeGenerator;
 import com.qrwait.api.store.application.dto.StoreResponse;
 import com.qrwait.api.store.application.dto.UpdateStoreInfoRequest;
 import com.qrwait.api.store.application.dto.UpdateStoreStatusRequest;
@@ -35,15 +34,12 @@ class StoreServiceTest {
   StoreRepository storeRepository;
   @Mock
   ApplicationEventPublisher eventPublisher;
-  @Mock
-  QrCodeGenerator qrCodeGenerator;
 
   StoreService storeService;
 
   @BeforeEach
   void setUp() {
-    storeService = new StoreService(storeRepository, eventPublisher, qrCodeGenerator);
-    ReflectionTestUtils.setField(storeService, "baseUrl", "http://localhost:5173");
+    storeService = new StoreService(storeRepository, eventPublisher);
   }
 
   // ===== getMyStore =====
@@ -114,25 +110,5 @@ class StoreServiceTest {
 
     assertThat(response.name()).isEqualTo("수정 매장");
     assertThat(response.address()).isEqualTo("부산");
-  }
-
-  // ===== getStoreById =====
-
-  @Test
-  void getStoreById_정상_조회() {
-    Store store = Store.restore(storeId, ownerId, "테스트 매장", "서울", StoreStatus.OPEN, LocalDateTime.now());
-    given(storeRepository.getById(storeId)).willReturn(store);
-
-    StoreResponse response = storeService.getStoreById(storeId);
-
-    assertThat(response.storeId()).isEqualTo(storeId);
-  }
-
-  @Test
-  void getStoreById_존재하지않는_매장_예외발생() {
-    given(storeRepository.getById(storeId)).willThrow(new StoreNotFoundException(storeId));
-
-    assertThatThrownBy(() -> storeService.getStoreById(storeId))
-        .isInstanceOf(StoreNotFoundException.class);
   }
 }

@@ -1,4 +1,4 @@
-package com.qrwait.api.store.presentation;
+package com.qrwait.api.store.customer.presentation;
 
 import static org.mockito.BDDMockito.given;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -9,8 +9,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.qrwait.api.shared.security.JwtAuthFilter;
 import com.qrwait.api.shared.security.JwtTokenProvider;
 import com.qrwait.api.shared.security.SecurityConfig;
-import com.qrwait.api.store.application.StoreService;
 import com.qrwait.api.store.application.dto.StoreResponse;
+import com.qrwait.api.store.customer.application.StoreViewService;
 import com.qrwait.api.store.domain.StoreNotFoundException;
 import com.qrwait.api.store.domain.StoreStatus;
 import com.qrwait.api.waiting.customer.application.WaitingService;
@@ -35,14 +35,14 @@ class StoreControllerTest {
   @MockitoBean
   JwtTokenProvider jwtTokenProvider;
   @MockitoBean
-  StoreService storeService;
+  StoreViewService storeViewService;
   @MockitoBean
   WaitingService waitingService;
 
   @Test
   void getStore_존재하는_storeId_200반환() throws Exception {
     UUID storeId = UUID.randomUUID();
-    given(storeService.getStoreById(storeId))
+    given(storeViewService.getStoreById(storeId))
         .willReturn(new StoreResponse(storeId, "테스트 식당", "서울시 강남구", StoreStatus.OPEN));
 
     mockMvc.perform(get("/api/stores/" + storeId))
@@ -54,7 +54,7 @@ class StoreControllerTest {
   @Test
   void getStore_존재하지않는_storeId_404반환() throws Exception {
     UUID unknownId = UUID.randomUUID();
-    given(storeService.getStoreById(unknownId))
+    given(storeViewService.getStoreById(unknownId))
         .willThrow(new StoreNotFoundException(unknownId));
 
     mockMvc.perform(get("/api/stores/" + unknownId))

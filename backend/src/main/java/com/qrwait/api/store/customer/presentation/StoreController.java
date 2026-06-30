@@ -1,7 +1,7 @@
-package com.qrwait.api.store.presentation;
+package com.qrwait.api.store.customer.presentation;
 
-import com.qrwait.api.store.application.StoreService;
 import com.qrwait.api.store.application.dto.StoreResponse;
+import com.qrwait.api.store.customer.application.StoreViewService;
 import com.qrwait.api.waiting.customer.application.WaitingService;
 import com.qrwait.api.waiting.customer.dto.WaitingStatusResponse;
 import io.swagger.v3.oas.annotations.Operation;
@@ -23,7 +23,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 public class StoreController {
 
-  private final StoreService storeService;
+  private final StoreViewService storeViewService;
   private final WaitingService waitingService;
 
   @Operation(summary = "매장 조회", description = "storeId로 매장 정보를 조회합니다.")
@@ -33,7 +33,7 @@ public class StoreController {
   })
   @GetMapping("/{storeId}")
   public ResponseEntity<StoreResponse> getStoreById(@PathVariable UUID storeId) {
-    return ResponseEntity.ok(storeService.getStoreById(storeId));
+    return ResponseEntity.ok(storeViewService.getStoreById(storeId));
   }
 
   @Operation(summary = "QR 코드 이미지 조회", description = "매장의 QR 코드 PNG 이미지를 반환합니다.")
@@ -45,7 +45,7 @@ public class StoreController {
   public ResponseEntity<byte[]> getStoreQrImage(@PathVariable UUID storeId) {
     return ResponseEntity.ok()
         .contentType(MediaType.IMAGE_PNG)
-        .body(storeService.generateQrImage(storeId));
+        .body(storeViewService.generateQrImage(storeId));
   }
 
   @Operation(summary = "매장 대기 현황 조회", description = "해당 매장의 현재 대기 중인 팀 수를 조회합니다.")
