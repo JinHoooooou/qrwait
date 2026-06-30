@@ -98,11 +98,6 @@ public class SsePublisher {
     registry.broadcast(storeId, "waiting-called", Map.of("waitingId", waitingId));
   }
 
-  public void notifyOwnerSmsFailed(UUID storeId, int waitingNumber, String phoneNumber) {
-    registry.broadcastToOwner(storeId, "sms-send-failed",
-        Map.of("waitingNumber", waitingNumber, "phoneNumber", phoneNumber));
-  }
-
   /**
    * 매장 영업 상태 변경 시 호출. 손님 전체 + 점주에게 변경된 상태를 브로드캐스트한다.
    */
