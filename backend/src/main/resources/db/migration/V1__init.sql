@@ -15,7 +15,7 @@ CREATE TABLE owners
 CREATE TABLE stores
 (
   id         UUID PRIMARY KEY     DEFAULT gen_random_uuid(),
-  owner_id   UUID REFERENCES owners (id),
+  owner_id   UUID REFERENCES owners (id) ON DELETE CASCADE,
   name       VARCHAR(100) NOT NULL,
   address    VARCHAR(255),
   status     VARCHAR(20) NOT NULL DEFAULT 'OPEN',
@@ -30,7 +30,7 @@ CREATE INDEX idx_stores_owner ON stores (owner_id);
 CREATE TABLE waiting_entries
 (
   id             UUID PRIMARY KEY     DEFAULT gen_random_uuid(),
-  store_id       UUID        NOT NULL REFERENCES stores (id),
+  store_id       UUID        NOT NULL REFERENCES stores (id) ON DELETE CASCADE,
   phone_number VARCHAR(20) NOT NULL,
   party_size     INT         NOT NULL CHECK (party_size BETWEEN 1 AND 10),
   waiting_number INT         NOT NULL,
@@ -46,7 +46,7 @@ CREATE INDEX idx_waiting_store_status ON waiting_entries (store_id, status);
 CREATE TABLE store_settings
 (
   id                   UUID PRIMARY KEY     DEFAULT gen_random_uuid(),
-  store_id             UUID UNIQUE NOT NULL REFERENCES stores (id),
+  store_id             UUID UNIQUE NOT NULL REFERENCES stores (id) ON DELETE CASCADE,
   table_count          INT         NOT NULL DEFAULT 5,
   avg_turnover_minutes INT         NOT NULL DEFAULT 30,
   open_time            TIME,
