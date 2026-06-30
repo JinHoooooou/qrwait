@@ -6,6 +6,7 @@ import com.qrwait.api.store.domain.StoreNotFoundException;
 import com.qrwait.api.store.domain.StoreRepository;
 import com.qrwait.api.store.domain.StoreSettingsRepository;
 import com.qrwait.api.store.domain.StoreStatus;
+import com.qrwait.api.waiting.application.dto.MyWaitingStatusResponse;
 import com.qrwait.api.waiting.application.dto.RegisterWaitingRequest;
 import com.qrwait.api.waiting.application.dto.RegisterWaitingResponse;
 import com.qrwait.api.waiting.application.dto.WaitingStatusResponse;
@@ -63,7 +64,7 @@ public class WaitingService {
   }
 
   @Transactional(readOnly = true)
-  public WaitingStatusResponse getStatus(UUID waitingId) {
+  public MyWaitingStatusResponse getStatus(UUID waitingId) {
     WaitingEntry entry = waitingRepository.findById(waitingId)
         .orElseThrow(() -> new WaitingNotFoundException(waitingId));
 
@@ -83,7 +84,7 @@ public class WaitingService {
 
     int estimatedWaitMinutes = estimatedWaitMinutes(entry.getStoreId(), (int) ahead);
 
-    return new WaitingStatusResponse(currentRank, totalWaiting, estimatedWaitMinutes);
+    return new MyWaitingStatusResponse(currentRank, totalWaiting, estimatedWaitMinutes, entry.getStatus());
   }
 
   @Transactional

@@ -14,6 +14,7 @@ import com.qrwait.api.store.domain.StoreRepository;
 import com.qrwait.api.store.domain.StoreSettings;
 import com.qrwait.api.store.domain.StoreSettingsRepository;
 import com.qrwait.api.store.domain.StoreStatus;
+import com.qrwait.api.waiting.application.dto.MyWaitingStatusResponse;
 import com.qrwait.api.waiting.application.dto.RegisterWaitingRequest;
 import com.qrwait.api.waiting.application.dto.RegisterWaitingResponse;
 import com.qrwait.api.waiting.application.dto.WaitingStatusResponse;
@@ -173,11 +174,28 @@ class WaitingServiceTest {
     given(waitingRepository.findById(waitingId)).willReturn(Optional.of(target));
     given(waitingRepository.findByStoreIdAndStatus(storeId, WaitingStatus.WAITING)).willReturn(waitingList);
 
-    WaitingStatusResponse response = waitingService.getStatus(waitingId);
+    MyWaitingStatusResponse response = waitingService.getStatus(waitingId);
 
     assertThat(response.currentRank()).isEqualTo(3);
     assertThat(response.totalWaiting()).isEqualTo(3);
     assertThat(response.estimatedWaitMinutes()).isEqualTo(10); // 앞 2팀 × 5분 (fallback)
+    assertThat(response.status()).isEqualTo(WaitingStatus.WAITING);
+  }
+
+  @Test
+  void getStatus_호출된_웨이팅은_CALLED_상태를_반환() {
+    UUID storeId = UUID.randomUUID();
+    UUID waitingId = UUID.randomUUID();
+
+    WaitingEntry called = WaitingEntry.restore(
+        waitingId, storeId, "010-1234-5678", 2, 1, WaitingStatus.CALLED, LocalDateTime.now());
+
+    given(waitingRepository.findById(waitingId)).willReturn(Optional.of(called));
+    given(waitingRepository.findByStoreIdAndStatus(storeId, WaitingStatus.WAITING)).willReturn(List.of());
+
+    MyWaitingStatusResponse response = waitingService.getStatus(waitingId);
+
+    assertThat(response.status()).isEqualTo(WaitingStatus.CALLED);
   }
 
   @Test

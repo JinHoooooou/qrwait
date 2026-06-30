@@ -2,9 +2,9 @@ package com.qrwait.api.waiting.presentation;
 
 import com.qrwait.api.shared.sse.SsePublisher;
 import com.qrwait.api.waiting.application.WaitingService;
+import com.qrwait.api.waiting.application.dto.MyWaitingStatusResponse;
 import com.qrwait.api.waiting.application.dto.RegisterWaitingRequest;
 import com.qrwait.api.waiting.application.dto.RegisterWaitingResponse;
-import com.qrwait.api.waiting.application.dto.WaitingStatusResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
@@ -53,7 +53,7 @@ public class WaitingController {
       @ApiResponse(responseCode = "404", description = "웨이팅을 찾을 수 없음")
   })
   @GetMapping("/waitings/{waitingId}")
-  public ResponseEntity<WaitingStatusResponse> getStatus(@PathVariable UUID waitingId) {
+  public ResponseEntity<MyWaitingStatusResponse> getStatus(@PathVariable UUID waitingId) {
     return ResponseEntity.ok(waitingService.getStatus(waitingId));
   }
 
