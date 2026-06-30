@@ -368,7 +368,7 @@
 - [x] `CallWaitingUseCase` 인터페이스 + Impl 구현
     - storeId 소유권 검증
     - `entry.call()` 호출 (WAITING → CALLED)
-    - 저장 후 해당 손님 SSE 채널에 `called` 이벤트 발송
+  - 저장 후 해당 손님 SSE 채널에 `waiting-called` 이벤트 발송
 - [x] `EnterWaitingUseCase` 인터페이스 + Impl 구현 (기존 시뮬레이션용 대체)
     - storeId 소유권 검증
     - `entry.enter()` 호출 (CALLED → ENTERED)
@@ -602,6 +602,7 @@
 
 - [x] 회원가입 → 온보딩 → 대시보드 접속 전체 플로우 수동 테스트
 - [x] 손님 QR 스캔 → 웨이팅 등록 → 점주 대시보드에 실시간 반영 확인
+- [ ] 점주 호출 → 호출된 손님 화면에만 "입장해 주세요!" 모달 표시 확인 (다른 대기 손님 화면엔 미표시)
 - [x] 점주 입장 처리 → 손님 화면 순서 갱신 확인
 - [x] 점주 노쇼 처리 → 대기열 갱신 확인
 

@@ -112,8 +112,14 @@ function WaitingStatusPage() {
             })
       })
 
-      es.addEventListener('called', () => {
-        if (!unmounted) setShowCalledModal(true)
+      es.addEventListener('waiting-called', (e) => {
+        if (unmounted) return
+        try {
+          const data = JSON.parse((e as MessageEvent).data)
+          if (data.waitingId === waitingId) setShowCalledModal(true)
+        } catch {
+          // payload 파싱 실패 시 무시
+        }
       })
     }
 
