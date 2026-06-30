@@ -34,6 +34,7 @@ function WaitingStatusPage() {
     if (!waitingId) return
     getWaiting(waitingId)
         .then((res) => {
+          setLoadError(null)
           if (res.status === 'CALLED') {
             navigate(`/waiting/${waitingId}/called`, {replace: true})
             return
