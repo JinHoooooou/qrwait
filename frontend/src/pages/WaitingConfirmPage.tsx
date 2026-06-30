@@ -1,18 +1,24 @@
 import {useEffect} from 'react'
 import {useNavigate, useParams} from 'react-router-dom'
 import useWaitingStore from '../store/waitingStore'
+import {useWaitingSse} from '../hooks/useWaitingSse'
 import Button from '../components/Button'
 
 function WaitingConfirmPage() {
   const navigate = useNavigate()
   const {waitingId} = useParams<{ waitingId: string }>()
-  const {waitingNumber, currentRank, estimatedWaitMinutes} = useWaitingStore()
+  const {waitingNumber, storeId, currentRank, estimatedWaitMinutes} = useWaitingStore()
 
   useEffect(() => {
     if (!waitingNumber) {
       navigate(`/waiting/${waitingId}/status`, {replace: true})
     }
   }, [waitingNumber, waitingId, navigate])
+
+  useWaitingSse(waitingId, storeId, {
+    enabled: !!waitingId && !!storeId && !!waitingNumber,
+    onCalled: () => navigate(`/waiting/${waitingId}/called`),
+  })
 
   if (!waitingNumber) return null
 
