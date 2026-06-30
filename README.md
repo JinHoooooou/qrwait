@@ -103,6 +103,8 @@ docker compose down -v     # 컨테이너 + 볼륨 삭제 (데이터 초기화)
 
 ## 관련 문서
 
-- [PRD (제품 요구사항)](./QRWait_PRD_v1.0.md)
-- [TRD (기술 요구사항)](./QRWait_TRD_v1.0.md)
-- [TASKS (구현 체크리스트)](./QRWait_TASKS_v1.0.md)
+> Phase 1·2 기획/설계 문서는 작업이 완료되어 아카이브되었습니다.
+
+- [PRD v2.0 (제품 요구사항)](./docs/archive/QRWait_PRD_v2.0.md)
+- [TRD v2.0 (기술 요구사항)](./docs/archive/QRWait_TRD_v2.0.md)
+- [TASKS v2.0 (구현 체크리스트)](./docs/archive/QRWait_TASKS_v2.0.md)
