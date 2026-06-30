@@ -3,6 +3,7 @@ import {BrowserRouter, Navigate, Route, Routes} from 'react-router-dom'
 import LandingPage from './pages/LandingPage'
 import WaitingConfirmPage from './pages/WaitingConfirmPage'
 import WaitingStatusPage from './pages/WaitingStatusPage'
+import WaitingCalledPage from './pages/WaitingCalledPage'
 import CancelPage from './pages/CancelPage'
 import NotFoundPage from './pages/NotFoundPage'
 import OwnerLoginPage from './pages/OwnerLoginPage'
@@ -47,6 +48,7 @@ function App() {
         <Route path="/wait" element={<LandingPage />} />
         <Route path="/waiting/:waitingId" element={<WaitingConfirmPage />} />
         <Route path="/waiting/:waitingId/status" element={<WaitingStatusPage />} />
+        <Route path="/waiting/:waitingId/called" element={<WaitingCalledPage />} />
         <Route path="/waiting/:waitingId/cancel" element={<CancelPage />} />
 
         {/* 점주 라우트 */}
