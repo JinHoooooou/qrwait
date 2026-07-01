@@ -1,12 +1,12 @@
-package com.qrwait.api.store.presentation;
+package com.qrwait.api.store.management.presentation;
 
-import com.qrwait.api.store.application.StoreService;
-import com.qrwait.api.store.application.StoreSettingsService;
 import com.qrwait.api.store.application.dto.StoreResponse;
-import com.qrwait.api.store.application.dto.StoreSettingsResponse;
-import com.qrwait.api.store.application.dto.UpdateStoreInfoRequest;
-import com.qrwait.api.store.application.dto.UpdateStoreSettingsRequest;
-import com.qrwait.api.store.application.dto.UpdateStoreStatusRequest;
+import com.qrwait.api.store.management.application.StoreService;
+import com.qrwait.api.store.management.application.StoreSettingsService;
+import com.qrwait.api.store.management.dto.StoreSettingsResponse;
+import com.qrwait.api.store.management.dto.UpdateStoreInfoRequest;
+import com.qrwait.api.store.management.dto.UpdateStoreSettingsRequest;
+import com.qrwait.api.store.management.dto.UpdateStoreStatusRequest;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;

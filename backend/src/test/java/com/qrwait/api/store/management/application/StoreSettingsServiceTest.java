@@ -1,12 +1,12 @@
-package com.qrwait.api.store.application;
+package com.qrwait.api.store.management.application;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 
-import com.qrwait.api.store.application.dto.StoreSettingsResponse;
-import com.qrwait.api.store.application.dto.UpdateStoreSettingsRequest;
+import com.qrwait.api.store.management.dto.StoreSettingsResponse;
+import com.qrwait.api.store.management.dto.UpdateStoreSettingsRequest;
 import com.qrwait.api.store.domain.Store;
 import com.qrwait.api.store.domain.StoreNotFoundException;
 import com.qrwait.api.store.domain.StoreRepository;

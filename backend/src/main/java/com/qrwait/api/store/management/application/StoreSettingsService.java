@@ -1,7 +1,7 @@
-package com.qrwait.api.store.application;
+package com.qrwait.api.store.management.application;
 
-import com.qrwait.api.store.application.dto.StoreSettingsResponse;
-import com.qrwait.api.store.application.dto.UpdateStoreSettingsRequest;
+import com.qrwait.api.store.management.dto.StoreSettingsResponse;
+import com.qrwait.api.store.management.dto.UpdateStoreSettingsRequest;
 import com.qrwait.api.store.domain.StoreNotFoundException;
 import com.qrwait.api.store.domain.StoreRepository;
 import com.qrwait.api.store.domain.StoreSettings;

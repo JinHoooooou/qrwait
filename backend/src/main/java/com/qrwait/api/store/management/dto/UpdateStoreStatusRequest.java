@@ -1,4 +1,4 @@
-package com.qrwait.api.store.application.dto;
+package com.qrwait.api.store.management.dto;
 
 import com.qrwait.api.store.domain.StoreStatus;
 import jakarta.validation.constraints.NotNull;

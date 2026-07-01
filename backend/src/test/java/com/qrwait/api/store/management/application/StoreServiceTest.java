@@ -1,4 +1,4 @@
-package com.qrwait.api.store.application;
+package com.qrwait.api.store.management.application;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -7,8 +7,8 @@ import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
 
 import com.qrwait.api.store.application.dto.StoreResponse;
-import com.qrwait.api.store.application.dto.UpdateStoreInfoRequest;
-import com.qrwait.api.store.application.dto.UpdateStoreStatusRequest;
+import com.qrwait.api.store.management.dto.UpdateStoreInfoRequest;
+import com.qrwait.api.store.management.dto.UpdateStoreStatusRequest;
 import com.qrwait.api.store.domain.Store;
 import com.qrwait.api.store.domain.StoreNotFoundException;
 import com.qrwait.api.store.domain.StoreRepository;

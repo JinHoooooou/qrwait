@@ -1,4 +1,4 @@
-package com.qrwait.api.store.application.dto;
+package com.qrwait.api.store.management.dto;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;

@@ -1,4 +1,4 @@
-package com.qrwait.api.store.presentation;
+package com.qrwait.api.store.management.presentation;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
@@ -11,10 +11,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.qrwait.api.shared.security.JwtAuthFilter;
 import com.qrwait.api.shared.security.JwtTokenProvider;
 import com.qrwait.api.shared.security.SecurityConfig;
-import com.qrwait.api.store.application.StoreService;
-import com.qrwait.api.store.application.StoreSettingsService;
 import com.qrwait.api.store.application.dto.StoreResponse;
-import com.qrwait.api.store.application.dto.StoreSettingsResponse;
+import com.qrwait.api.store.management.application.StoreService;
+import com.qrwait.api.store.management.application.StoreSettingsService;
+import com.qrwait.api.store.management.dto.StoreSettingsResponse;
 import com.qrwait.api.store.domain.StoreStatus;
 import java.util.UUID;
 import org.junit.jupiter.api.Test;
