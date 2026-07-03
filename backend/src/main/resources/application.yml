@@ -29,6 +29,11 @@ jwt:
   access-expiry: 3600      # 1시간 (초)
   refresh-expiry: 604800   # 7일 (초)
 
+sms:
+  app-key: ${NHN_SMS_APP_KEY:}
+  secret-key: ${NHN_SMS_SECRET_KEY:}
+  sender: ${NHN_SMS_SENDER_NUMBER:}
+
 logging:
   level:
     org.apache.catalina.core.ContainerBase: WARN
