@@ -121,6 +121,15 @@ function DashboardPage() {
                   } else {
                     setAlertBanner('대기자 수가 임계값을 초과했습니다.')
                   }
+                } else if (eventName === 'sms-send-failed') {
+                  try {
+                    const data = JSON.parse(line.slice(5).trim())
+                    setAlertBanner(
+                        `⚠️ #${data.waitingNumber}번 손님 SMS 발송 실패. 직접 연락해주세요. (${data.phoneNumber})`
+                    )
+                  } catch {
+                    setAlertBanner('⚠️ SMS 발송 실패. 손님에게 직접 연락해주세요.')
+                  }
                 }
                 eventName = ''
               }
