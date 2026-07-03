@@ -83,6 +83,11 @@ cp .env.example .env
 | `DB_PASSWORD`          | DB 비밀번호             | `yourpassword`        |
 | `CORS_ALLOWED_ORIGINS` | 프론트엔드 접근 도메인        | `http://192.168.0.10` |
 | `APP_BASE_URL`         | QR 코드에 인코딩될 베이스 URL | `http://192.168.0.10` |
+| `NHN_SMS_APP_KEY`        | NHN Cloud SMS 프로젝트 AppKey (선택)    | (콘솔에서 발급)          |
+| `NHN_SMS_SECRET_KEY`     | NHN Cloud SMS SecretKey (선택)      | (콘솔에서 발급)          |
+| `NHN_SMS_SENDER_NUMBER`  | 사전 등록된 발신번호, 하이픈 무관 (선택)          | `01099998888`         |
+
+> `NHN_SMS_*` 세 값은 **선택 사항**입니다. 미설정 시 앱 구동은 정상 진행되며, 손님 호출 시점에 SMS 발송이 실패하고 점주 대시보드 상단에 "⚠️ SMS 발송 실패, 직접 연락해주세요" 배너가 표시됩니다.
 
 ### 2. 전체 스택 기동
 
@@ -98,6 +103,51 @@ docker compose up --build
 docker compose down        # 컨테이너만 종료 (데이터 유지)
 docker compose down -v     # 컨테이너 + 볼륨 삭제 (데이터 초기화)
 ```
+
+---
+
+## SMS 알림 (NHN Cloud)
+
+손님이 화면을 닫아도 호출 알림을 받을 수 있도록, 점주가 호출 버튼을 누르는 시점에 NHN Cloud SMS로 손님 전화번호에 문자를 발송합니다.
+
+- 트리거: 점주 호출 (`WAITING` → `CALLED`)
+- 발송자: 사전 등록된 발신번호
+- 실패 처리: 재시도 없이 점주 대시보드에 SSE 배너로 즉시 알림 (과금 중복 방지)
+
+### 로컬 개발에서의 SMS 테스트
+
+세 가지 방식이 있습니다. 목적에 따라 선택하세요.
+
+#### 방식 A. 실 발송 검증 (본인 폰으로만)
+
+실제 문자가 도착하는지 확인하고 싶을 때:
+
+1. `NHN_SMS_APP_KEY` / `NHN_SMS_SECRET_KEY` / `NHN_SMS_SENDER_NUMBER` 세 값 세팅 후 백엔드 재기동.
+2. 손님 등록 화면에서 **본인 폰번호 입력** → 점주 계정으로 로그인해 해당 웨이팅에 "호출" 클릭.
+3. 폰에 SMS 도착 확인. NHN Cloud 콘솔의 "발송 결과 조회" 에서 상세 로그 확인 가능.
+
+**주의**: 손님 폰번호는 입력값 그대로 발송되므로, 로컬 테스트 시 반드시 본인 번호만 사용하세요. 회당 SMS 단문 요금(약 9원)이 회사 계정에서 차감됩니다.
+
+#### 방식 B. 실패 경로 검증 (배너 흐름 확인)
+
+발송 실패 시 점주 대시보드 배너가 뜨는지 확인할 때:
+
+1. `NHN_SMS_*` 환경변수를 **비워둔 채로** 백엔드 기동 (기본값).
+2. 손님 등록 → 점주 "호출" 클릭.
+3. 대시보드 상단에 `⚠️ #N번 손님 SMS 발송 실패. 직접 연락해주세요. (010-XXXX-XXXX)` 배너 표시 확인.
+
+#### 방식 C. 자동화 테스트
+
+`NhnCloudSmsClientTest` 가 MockWebServer 로 성공/실패 응답 시나리오를 검증합니다.
+
+```bash
+cd backend && ./gradlew test --tests "*.NhnCloudSmsClientTest"
+```
+
+### 관련 스펙
+
+- 설계: [`docs/superpowers/specs/2026-07-03-sms-notification-design.md`](./docs/superpowers/specs/2026-07-03-sms-notification-design.md)
+- 구현 플랜: [`docs/superpowers/plans/2026-07-03-sms-notification-implementation.md`](./docs/superpowers/plans/2026-07-03-sms-notification-implementation.md)
 
 ---
 
