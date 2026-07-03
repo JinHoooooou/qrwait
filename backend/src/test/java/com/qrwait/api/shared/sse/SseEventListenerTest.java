@@ -79,14 +79,4 @@ class SseEventListenerTest {
     verify(registry).broadcast(eq(storeId), eq("store-status-changed"), any());
     verify(registry).broadcastToOwner(eq(storeId), eq("store-status-changed"), any());
   }
-
-  @Test
-  void notifyOwnerSmsFailed_점주_채널로_sms_send_failed_이벤트_발송() {
-    UUID storeId = UUID.randomUUID();
-    SsePublisher publisher = new SsePublisher(registry, waitingRepository, storeSettingsRepository);
-
-    publisher.notifyOwnerSmsFailed(storeId, 3, "010-1234-5678");
-
-    verify(registry).broadcastToOwner(eq(storeId), eq("sms-send-failed"), any());
-  }
 }

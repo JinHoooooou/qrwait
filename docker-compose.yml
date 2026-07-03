@@ -36,6 +36,9 @@ services:
       SPRING_DATA_REDIS_HOST: redis
       APP_BASE_URL: ${APP_BASE_URL}
       JWT_SECRET: ${JWT_SECRET}
+      NHN_SMS_APP_KEY: ${NHN_SMS_APP_KEY:-}
+      NHN_SMS_SECRET_KEY: ${NHN_SMS_SECRET_KEY:-}
+      NHN_SMS_SENDER_NUMBER: ${NHN_SMS_SENDER_NUMBER:-}
     depends_on:
       db:
         condition: service_healthy
