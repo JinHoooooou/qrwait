@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.MediaType;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.client.RestClientException;
 
@@ -29,6 +30,7 @@ public class NhnCloudSmsClient implements SmsClient {
       response = restClient.post()
           .uri(PATH_TEMPLATE, properties.appKey())
           .header("X-Secret-Key", properties.secretKey())
+          .contentType(MediaType.APPLICATION_JSON)
           .body(body)
           .retrieve()
           .body(NhnSmsResponse.class);

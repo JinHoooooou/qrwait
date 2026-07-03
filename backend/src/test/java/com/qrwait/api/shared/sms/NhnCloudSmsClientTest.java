@@ -48,6 +48,7 @@ class NhnCloudSmsClientTest {
     RecordedRequest request = server.takeRequest();
     assertThat(request.getPath()).isEqualTo("/sms/v3.0/appKeys/APPKEY123/sender/sms");
     assertThat(request.getHeader("X-Secret-Key")).isEqualTo("SECRET456");
+    assertThat(request.getHeader("Content-Type")).contains("application/json");
     String body = request.getBody().readUtf8();
     assertThat(body).contains("\"sendNo\":\"01099998888\"");
     assertThat(body).contains("\"recipientNo\":\"01012345678\""); // 하이픈 제거
@@ -66,5 +67,13 @@ class NhnCloudSmsClientTest {
     assertThatThrownBy(() -> client.send("010-1234-5678", "테스트"))
         .isInstanceOf(SmsSendException.class)
         .hasMessageContaining("INVALID_SENDER");
+  }
+
+  @Test
+  void send_HTTP_오류_응답에서_SmsSendException을_던진다() {
+    server.enqueue(new MockResponse().setResponseCode(500));
+
+    assertThatThrownBy(() -> client.send("010-1234-5678", "테스트"))
+        .isInstanceOf(SmsSendException.class);
   }
 }
