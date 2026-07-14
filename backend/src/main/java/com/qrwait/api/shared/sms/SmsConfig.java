@@ -10,7 +10,7 @@ import org.springframework.web.client.RestClient;
 @EnableConfigurationProperties(SmsProperties.class)
 public class SmsConfig {
 
-  private static final String NHN_CLOUD_SMS_BASE_URL = "https://api-sms.cloud.toast.com";
+  private static final String NHN_CLOUD_SMS_BASE_URL = "https://sms.api.nhncloudservice.com";
   private static final int TIMEOUT_MS = 3_000;
 
   @Bean
