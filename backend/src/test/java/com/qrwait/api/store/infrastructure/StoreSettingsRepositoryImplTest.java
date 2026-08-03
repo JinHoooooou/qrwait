@@ -6,10 +6,10 @@ import com.qrwait.api.store.domain.Store;
 import com.qrwait.api.store.domain.StoreRepository;
 import com.qrwait.api.store.domain.StoreSettings;
 import com.qrwait.api.store.domain.StoreSettingsRepository;
+import com.qrwait.api.support.IntegrationTestSupport;
 import java.util.Optional;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.flyway.FlywayAutoConfiguration;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Import;
@@ -17,9 +17,9 @@ import org.springframework.test.context.ActiveProfiles;
 
 @DataJpaTest
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
-@Import({FlywayAutoConfiguration.class, StoreRepositoryImpl.class, StoreSettingsRepositoryImpl.class})
+@Import({StoreRepositoryImpl.class, StoreSettingsRepositoryImpl.class})
 @ActiveProfiles("test")
-class StoreSettingsRepositoryImplTest {
+class StoreSettingsRepositoryImplTest extends IntegrationTestSupport {
 
   @Autowired
   private StoreRepository storeRepository;
