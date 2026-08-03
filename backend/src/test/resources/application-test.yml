@@ -11,7 +11,7 @@ spring:
         dialect: org.hibernate.dialect.PostgreSQLDialect
 
   flyway:
-    enabled: true             # 운영과 동일하게 V1__init.sql 실제 실행
+    enabled: false            # 스키마는 IntegrationTestSupport가 공유 컨테이너에 한 번 마이그레이션한다
 
 cors:
   allowed-origins: http://localhost:5173
