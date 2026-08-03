@@ -107,6 +107,14 @@ public class SsePublisher {
     registry.broadcastToOwner(storeId, "store-status-changed", data);
   }
 
+  /**
+   * SMS 발송 실패 시 호출. 점주 채널에만 발신하며 손님 채널에는 영향 없다.
+   */
+  public void notifyOwnerSmsFailed(UUID storeId, int waitingNumber, String phoneNumber) {
+    registry.broadcastToOwner(storeId, "sms-send-failed",
+        Map.of("waitingNumber", waitingNumber, "phoneNumber", phoneNumber));
+  }
+
   private WaitingStatusResponse buildStoreStatus(UUID storeId) {
     int total = waitingRepository.countByStoreIdAndStatus(storeId, WaitingStatus.WAITING);
     int estimated = storeSettingsRepository.findByStoreId(storeId)
