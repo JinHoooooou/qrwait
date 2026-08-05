@@ -2,6 +2,7 @@ package com.qrwait.api.shared.redis;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import com.qrwait.api.support.IntegrationTestSupport;
 import java.util.Optional;
 import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
@@ -14,7 +15,7 @@ import org.springframework.test.context.ActiveProfiles;
 @DataRedisTest
 @Import(RefreshTokenRepository.class)
 @ActiveProfiles("test")
-class RefreshTokenRepositoryTest {
+class RefreshTokenRepositoryTest extends IntegrationTestSupport {
 
   @Autowired
   private RefreshTokenRepository refreshTokenRepository;

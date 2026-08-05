@@ -1,25 +1,17 @@
 spring:
   datasource:
-    url: jdbc:postgresql://localhost:5434/qrwait
-    username: qrwait
-    password: CHANGEME
     driver-class-name: org.postgresql.Driver
 
   jpa:
     hibernate:
-      ddl-auto: create-drop   # 테스트 시 Hibernate가 테이블 생성/삭제
+      ddl-auto: validate      # Flyway가 스키마 소유, Hibernate는 엔티티↔스키마 일치 검증만
     show-sql: false
     properties:
       hibernate:
         dialect: org.hibernate.dialect.PostgreSQLDialect
 
   flyway:
-    enabled: false            # 테스트에서는 Flyway 비활성화
-
-  data:
-    redis:
-      host: localhost
-      port: 6379
+    enabled: false            # 스키마는 IntegrationTestSupport가 공유 컨테이너에 한 번 마이그레이션한다
 
 cors:
   allowed-origins: http://localhost:5173
