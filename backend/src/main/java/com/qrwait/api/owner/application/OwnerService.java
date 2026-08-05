@@ -1,5 +1,6 @@
 package com.qrwait.api.owner.application;
 
+import com.qrwait.api.owner.application.dto.ChangePasswordRequest;
 import com.qrwait.api.owner.application.dto.LoginRequest;
 import com.qrwait.api.owner.application.dto.LoginResponse;
 import com.qrwait.api.owner.application.dto.SignUpRequest;
@@ -8,6 +9,7 @@ import com.qrwait.api.owner.domain.DuplicateEmailException;
 import com.qrwait.api.owner.domain.InvalidCredentialsException;
 import com.qrwait.api.owner.domain.Owner;
 import com.qrwait.api.owner.domain.OwnerRepository;
+import com.qrwait.api.owner.domain.SamePasswordException;
 import com.qrwait.api.shared.redis.RefreshTokenRepository;
 import com.qrwait.api.shared.security.JwtTokenProvider;
 import com.qrwait.api.store.domain.Store;
@@ -91,5 +93,22 @@ public class OwnerService {
     }
 
     return jwtTokenProvider.generateAccessToken(ownerId);
+  }
+
+  @Transactional
+  public void changePassword(UUID ownerId, ChangePasswordRequest request) {
+    Owner owner = ownerRepository.findById(ownerId)
+        .orElseThrow(InvalidCredentialsException::new);
+
+    if (!passwordEncoder.matches(request.getCurrentPassword(), owner.getPasswordHash())) {
+      throw new InvalidCredentialsException();
+    }
+    if (passwordEncoder.matches(request.getNewPassword(), owner.getPasswordHash())) {
+      throw new SamePasswordException();
+    }
+
+    String newPasswordHash = passwordEncoder.encode(request.getNewPassword());
+    ownerRepository.save(owner.changePassword(newPasswordHash));
+    refreshTokenRepository.delete(ownerId);
   }
 }

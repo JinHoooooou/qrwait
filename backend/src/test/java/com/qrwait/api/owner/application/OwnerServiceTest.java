@@ -9,6 +9,7 @@ import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 
+import com.qrwait.api.owner.application.dto.ChangePasswordRequest;
 import com.qrwait.api.owner.application.dto.LoginRequest;
 import com.qrwait.api.owner.application.dto.LoginResponse;
 import com.qrwait.api.owner.application.dto.SignUpRequest;
@@ -17,6 +18,7 @@ import com.qrwait.api.owner.domain.DuplicateEmailException;
 import com.qrwait.api.owner.domain.InvalidCredentialsException;
 import com.qrwait.api.owner.domain.Owner;
 import com.qrwait.api.owner.domain.OwnerRepository;
+import com.qrwait.api.owner.domain.SamePasswordException;
 import com.qrwait.api.shared.redis.RefreshTokenRepository;
 import com.qrwait.api.shared.security.JwtTokenProvider;
 import com.qrwait.api.store.domain.Store;
@@ -30,6 +32,7 @@ import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -197,6 +200,49 @@ class OwnerServiceTest {
         .isInstanceOf(InvalidCredentialsException.class);
   }
 
+  // ===== changePassword =====
+
+  @Test
+  void changePassword_정상변경_새해시저장_refreshToken삭제() {
+    String encoded = passwordEncoder.encode("oldPassword1");
+    Owner owner = Owner.restore(ownerId, "owner@test.com", encoded, LocalDateTime.now());
+    given(ownerRepository.findById(ownerId)).willReturn(Optional.of(owner));
+
+    ownerService.changePassword(ownerId, createChangePasswordRequest("oldPassword1", "newPassword1"));
+
+    ArgumentCaptor<Owner> captor = ArgumentCaptor.forClass(Owner.class);
+    verify(ownerRepository).save(captor.capture());
+    assertThat(passwordEncoder.matches("newPassword1", captor.getValue().getPasswordHash())).isTrue();
+    verify(refreshTokenRepository).delete(ownerId);
+  }
+
+  @Test
+  void changePassword_현재비번_불일치_예외발생() {
+    Owner owner = Owner.restore(ownerId, "owner@test.com", passwordEncoder.encode("correct1"), LocalDateTime.now());
+    given(ownerRepository.findById(ownerId)).willReturn(Optional.of(owner));
+
+    assertThatThrownBy(() ->
+        ownerService.changePassword(ownerId, createChangePasswordRequest("wrongPassword", "newPassword1")))
+        .isInstanceOf(InvalidCredentialsException.class);
+
+    verify(ownerRepository, never()).save(any());
+    verify(refreshTokenRepository, never()).delete(any());
+  }
+
+  @Test
+  void changePassword_새비번이_현재와동일_예외발생() {
+    String encoded = passwordEncoder.encode("samePassword1");
+    Owner owner = Owner.restore(ownerId, "owner@test.com", encoded, LocalDateTime.now());
+    given(ownerRepository.findById(ownerId)).willReturn(Optional.of(owner));
+
+    assertThatThrownBy(() ->
+        ownerService.changePassword(ownerId, createChangePasswordRequest("samePassword1", "samePassword1")))
+        .isInstanceOf(SamePasswordException.class);
+
+    verify(ownerRepository, never()).save(any());
+    verify(refreshTokenRepository, never()).delete(any());
+  }
+
   private SignUpRequest createSignUpRequest(String email, String password, String storeName, String address) {
     SignUpRequest request = new SignUpRequest();
     ReflectionTestUtils.setField(request, "email", email);
@@ -210,6 +256,13 @@ class OwnerServiceTest {
     LoginRequest request = new LoginRequest();
     ReflectionTestUtils.setField(request, "email", email);
     ReflectionTestUtils.setField(request, "password", password);
+    return request;
+  }
+
+  private ChangePasswordRequest createChangePasswordRequest(String current, String newPassword) {
+    ChangePasswordRequest request = new ChangePasswordRequest();
+    ReflectionTestUtils.setField(request, "currentPassword", current);
+    ReflectionTestUtils.setField(request, "newPassword", newPassword);
     return request;
   }
 }
