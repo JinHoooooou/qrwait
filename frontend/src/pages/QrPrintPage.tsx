@@ -31,6 +31,7 @@ function QrPrintPage() {
         <div style={styles.printContent}>
           <img src={qrUrl} alt="QR 코드" style={styles.qrImage}/>
           <p style={styles.storeName}>{store.name}</p>
+          <p style={styles.footer}>(주) qwaiting.co.kr</p>
         </div>
 
         <style>{`
@@ -81,6 +82,12 @@ const styles: Record<string, React.CSSProperties> = {
   storeName: {
     fontSize: '1.75rem',
     fontWeight: 700,
+    textAlign: 'center',
+    margin: 0,
+  },
+  footer: {
+    fontSize: '0.875rem',
+    color: '#6b7280',
     textAlign: 'center',
     margin: 0,
   },
