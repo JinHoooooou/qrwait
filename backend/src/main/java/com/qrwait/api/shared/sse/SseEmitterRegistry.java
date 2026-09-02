@@ -81,4 +81,34 @@ public class SseEmitterRegistry {
       removeOwner(storeId, emitter);
     }
   }
+
+  // ===== heartbeat =====
+
+  /**
+   * 등록된 모든 손님/점주 emitter에 주석(comment) 라인을 전송한다. 프록시·모바일 NAT의 유휴 연결 종료를 방지하고,
+   * 스트림을 버퍼링하는 브라우저의 버퍼를 flush시킨다. 전송 실패한 emitter는 제거한다.
+   */
+  public void sendHeartbeat() {
+    emitters.forEach((storeId, list) -> {
+      for (SseEmitter emitter : list) {
+        if (!sendComment(emitter)) {
+          remove(storeId, emitter);
+        }
+      }
+    });
+    ownerEmitters.forEach((storeId, emitter) -> {
+      if (!sendComment(emitter)) {
+        removeOwner(storeId, emitter);
+      }
+    });
+  }
+
+  private boolean sendComment(SseEmitter emitter) {
+    try {
+      emitter.send(SseEmitter.event().comment("keepalive"));
+      return true;
+    } catch (IOException | RuntimeException e) {
+      return false;
+    }
+  }
 }

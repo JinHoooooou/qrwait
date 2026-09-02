@@ -145,4 +145,44 @@ class SseEmitterRegistryTest {
 
     verify(brokenEmitter, times(1)).send(any(SseEmitter.SseEventBuilder.class));
   }
+
+  // ===== heartbeat =====
+
+  @Test
+  void sendHeartbeat_손님과_점주_Emitter_모두에_전송() throws IOException {
+    UUID storeId = UUID.randomUUID();
+    SseEmitter customer = mock(SseEmitter.class);
+    SseEmitter owner = mock(SseEmitter.class);
+
+    registry.register(storeId, customer);
+    registry.registerOwner(storeId, owner);
+
+    registry.sendHeartbeat();
+
+    verify(customer, times(1)).send(any(SseEmitter.SseEventBuilder.class));
+    verify(owner, times(1)).send(any(SseEmitter.SseEventBuilder.class));
+  }
+
+  @Test
+  void sendHeartbeat_전송_실패한_Emitter는_제거됨() throws IOException {
+    UUID storeId = UUID.randomUUID();
+    SseEmitter broken = mock(SseEmitter.class);
+    SseEmitter healthy = mock(SseEmitter.class);
+
+    doThrow(new IOException("연결 끊김")).when(broken).send(any(SseEmitter.SseEventBuilder.class));
+
+    registry.register(storeId, broken);
+    registry.register(storeId, healthy);
+
+    registry.sendHeartbeat();
+    registry.sendHeartbeat();
+
+    verify(broken, times(1)).send(any(SseEmitter.SseEventBuilder.class));
+    verify(healthy, times(2)).send(any(SseEmitter.SseEventBuilder.class));
+  }
+
+  @Test
+  void sendHeartbeat_구독자_없으면_예외_없이_스킵() {
+    assertThatNoException().isThrownBy(() -> registry.sendHeartbeat());
+  }
 }

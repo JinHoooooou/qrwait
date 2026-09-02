@@ -18,17 +18,22 @@ import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 @RequiredArgsConstructor
 public class SsePublisher {
 
-  private static final long SSE_TIMEOUT_MS = 30 * 60 * 1000L; // 30분
+  /**
+   * 스트림을 버퍼링하는 브라우저(삼성 인터넷 등)가 이벤트를 즉시 디스패치하도록, 연결 직후 전송하는 주석 패딩 크기.
+   * 일부 브라우저는 수신 버퍼가 ~1~2KB를 넘기 전까지 EventSource 이벤트를 넘겨주지 않는다.
+   */
+  private static final int INITIAL_PADDING_SIZE = 2048;
 
   private final SseEmitterRegistry registry;
   private final WaitingRepository waitingRepository;
   private final StoreSettingsRepository storeSettingsRepository;
+  private final SseEmitterFactory emitterFactory;
 
   /**
    * 손님을 storeId 단위 SSE 채널에 구독시킨다. 연결 즉시 현재 대기 현황을 초기 이벤트로 전송한다.
    */
   public SseEmitter subscribe(UUID storeId, UUID waitingId) {
-    SseEmitter emitter = new SseEmitter(SSE_TIMEOUT_MS);
+    SseEmitter emitter = emitterFactory.create();
 
     emitter.onCompletion(() -> registry.remove(storeId, emitter));
     emitter.onTimeout(() -> registry.remove(storeId, emitter));
@@ -37,6 +42,7 @@ public class SsePublisher {
     registry.register(storeId, emitter);
 
     try {
+      sendInitialPadding(emitter);
       emitter.send(SseEmitter.event()
           .name("waiting-updated")
           .data(buildStoreStatus(storeId)));
@@ -52,7 +58,7 @@ public class SsePublisher {
    * 점주를 storeId 단위 SSE 채널에 구독시킨다. 기존 연결이 있으면 교체한다. 연결 즉시 현재 대기 현황을 초기 이벤트로 전송한다.
    */
   public SseEmitter subscribeOwner(UUID storeId) {
-    SseEmitter emitter = new SseEmitter(SSE_TIMEOUT_MS);
+    SseEmitter emitter = emitterFactory.create();
 
     emitter.onCompletion(() -> registry.removeOwner(storeId, emitter));
     emitter.onTimeout(() -> registry.removeOwner(storeId, emitter));
@@ -61,6 +67,7 @@ public class SsePublisher {
     registry.registerOwner(storeId, emitter);
 
     try {
+      sendInitialPadding(emitter);
       emitter.send(SseEmitter.event()
           .name("waiting-updated")
           .data(buildStoreStatus(storeId)));
@@ -70,6 +77,10 @@ public class SsePublisher {
     }
 
     return emitter;
+  }
+
+  private void sendInitialPadding(SseEmitter emitter) throws IOException {
+    emitter.send(SseEmitter.event().comment(" ".repeat(INITIAL_PADDING_SIZE)));
   }
 
   /**

@@ -34,7 +34,8 @@ class SseEventListenerTest {
 
   @BeforeEach
   void setUp() {
-    SsePublisher ssePublisher = new SsePublisher(registry, waitingRepository, storeSettingsRepository);
+    SsePublisher ssePublisher = new SsePublisher(
+        registry, waitingRepository, storeSettingsRepository, new SseEmitterFactory());
     listener = new SseEventListener(ssePublisher);
   }
 
