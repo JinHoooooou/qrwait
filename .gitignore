@@ -52,3 +52,7 @@ secrets/
 
 # ===== 환경별 설정 (프로덕션) =====
 backend/src/main/resources/application-prod.yml
+
+# ===== 내부 작업 문서 (원격에 올리지 않음) =====
+docs/superpowers/
+docs/archive/superpowers/
