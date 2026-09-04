@@ -15,6 +15,8 @@ function StoreSettingsPage() {
   const [closeTime, setCloseTime] = useState('22:00')
   const [alertThreshold, setAlertThreshold] = useState(10)
   const [alertEnabled, setAlertEnabled] = useState(true)
+  const [businessDayStart, setBusinessDayStart] = useState('05:00:00')
+  const [callGraceMinutes, setCallGraceMinutes] = useState(5)
   const [formulaExample, setFormulaExample] = useState('')
 
   const [loading, setLoading] = useState(true)
@@ -33,6 +35,8 @@ function StoreSettingsPage() {
         setCloseTime(data.closeTime ?? '22:00')
         setAlertThreshold(data.alertThreshold)
         setAlertEnabled(data.alertEnabled)
+        setBusinessDayStart(data.businessDayStart)
+        setCallGraceMinutes(data.callGraceMinutes)
         setFormulaExample(data.estimatedWaitFormulaExample)
       })
       .catch(() => setError('설정을 불러오지 못했습니다.'))
@@ -55,6 +59,8 @@ function StoreSettingsPage() {
         closeTime,
         alertThreshold,
         alertEnabled,
+        businessDayStart,
+        callGraceMinutes,
       })
       showToast()
     } catch (err) {
@@ -171,6 +177,35 @@ function StoreSettingsPage() {
             onChange={(e) => setAlertEnabled(e.target.checked)}
             style={styles.checkbox}
           />
+        </label>
+      </section>
+
+      {/* 영업일·호출 설정 */}
+      <section style={styles.section}>
+        <p style={styles.sectionTitle}>영업일·호출 설정</p>
+
+        <label style={styles.label}>
+          영업일 시작 시각
+          <input
+            style={styles.input}
+            type="time"
+            value={businessDayStart.slice(0, 5)}
+            onChange={(e) => setBusinessDayStart(e.target.value ? `${e.target.value}:00` : businessDayStart)}
+          />
+          <small style={styles.hint}>이 시각을 기준으로 대기번호가 1번부터 다시 시작합니다. 새벽 영업분은 전날로 집계됩니다.</small>
+        </label>
+
+        <label style={styles.label}>
+          호출 유예 시간 (분)
+          <input
+            style={styles.input}
+            type="number"
+            min={0}
+            max={60}
+            value={callGraceMinutes}
+            onChange={(e) => setCallGraceMinutes(Number(e.target.value))}
+          />
+          <small style={styles.hint}>호출 후 이 시간이 지나면 대기 목록에서 강조 표시됩니다. 자동으로 취소되지는 않습니다.</small>
         </label>
       </section>
 
