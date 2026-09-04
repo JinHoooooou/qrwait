@@ -69,7 +69,8 @@ class StoreSettingsServiceTest {
   void updateSettings_정상_업데이트() {
     Store store = Store.restore(storeId, ownerId, "테스트 매장", "서울", StoreStatus.OPEN, LocalDateTime.now());
     StoreSettings settings = StoreSettings.createDefault(storeId);
-    StoreSettings updated = settings.update(10, 20, LocalTime.of(9, 0), LocalTime.of(22, 0), 5, false);
+    StoreSettings updated = settings.update(10, 20, LocalTime.of(9, 0), LocalTime.of(22, 0), 5, false,
+        LocalTime.of(5, 0), 5);
 
     given(storeRepository.getByOwnerId(ownerId)).willReturn(store);
     given(storeSettingsRepository.findByStoreId(storeId)).willReturn(Optional.of(settings));
@@ -82,6 +83,8 @@ class StoreSettingsServiceTest {
     ReflectionTestUtils.setField(request, "closeTime", LocalTime.of(22, 0));
     ReflectionTestUtils.setField(request, "alertThreshold", 5);
     ReflectionTestUtils.setField(request, "alertEnabled", false);
+    ReflectionTestUtils.setField(request, "businessDayStart", LocalTime.of(5, 0));
+    ReflectionTestUtils.setField(request, "callGraceMinutes", 5);
 
     StoreSettingsResponse response = storeSettingsService.updateSettings(ownerId, request);
 

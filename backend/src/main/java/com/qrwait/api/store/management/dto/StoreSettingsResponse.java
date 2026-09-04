@@ -10,12 +10,14 @@ public record StoreSettingsResponse(
     LocalTime closeTime,
     int alertThreshold,
     boolean alertEnabled,
+    LocalTime businessDayStart,
+    int callGraceMinutes,
     String estimatedWaitFormulaExample
 ) {
 
   public static StoreSettingsResponse from(StoreSettings settings) {
-    String formula = "대기 " + settings.getTableCount() + "팀 × "
-        + settings.getAvgTurnoverMinutes() + "분 / " + settings.getTableCount() + "테이블";
+    String formula = "앞선 팀 수 × " + settings.getAvgTurnoverMinutes()
+        + "분 ÷ " + settings.getTableCount() + "테이블";
     return new StoreSettingsResponse(
         settings.getTableCount(),
         settings.getAvgTurnoverMinutes(),
@@ -23,6 +25,8 @@ public record StoreSettingsResponse(
         settings.getCloseTime(),
         settings.getAlertThreshold(),
         settings.isAlertEnabled(),
+        settings.getBusinessDayStart(),
+        settings.getCallGraceMinutes(),
         formula
     );
   }

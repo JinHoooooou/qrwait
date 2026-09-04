@@ -2,6 +2,7 @@ package com.qrwait.api.store.management.dto;
 
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotNull;
 import java.time.LocalTime;
 import lombok.Getter;
 
@@ -24,4 +25,11 @@ public class UpdateStoreSettingsRequest {
   private int alertThreshold;
 
   private boolean alertEnabled;
+
+  @NotNull
+  private LocalTime businessDayStart;
+
+  @Min(0)
+  @Max(60)
+  private int callGraceMinutes;
 }

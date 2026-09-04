@@ -42,8 +42,15 @@ public class StoreSettingsJpaEntity {
   @Column(name = "alert_enabled", nullable = false)
   private boolean alertEnabled;
 
+  @Column(name = "business_day_start", nullable = false)
+  private LocalTime businessDayStart;
+
+  @Column(name = "call_grace_minutes", nullable = false)
+  private int callGraceMinutes;
+
   private StoreSettingsJpaEntity(UUID id, UUID storeId, int tableCount, int avgTurnoverMinutes,
-      LocalTime openTime, LocalTime closeTime, int alertThreshold, boolean alertEnabled) {
+      LocalTime openTime, LocalTime closeTime, int alertThreshold, boolean alertEnabled,
+      LocalTime businessDayStart, int callGraceMinutes) {
     this.id = id;
     this.storeId = storeId;
     this.tableCount = tableCount;
@@ -52,17 +59,20 @@ public class StoreSettingsJpaEntity {
     this.closeTime = closeTime;
     this.alertThreshold = alertThreshold;
     this.alertEnabled = alertEnabled;
+    this.businessDayStart = businessDayStart;
+    this.callGraceMinutes = callGraceMinutes;
   }
 
   public static StoreSettingsJpaEntity from(StoreSettings settings) {
     return new StoreSettingsJpaEntity(settings.getId(), settings.getStoreId(),
         settings.getTableCount(), settings.getAvgTurnoverMinutes(),
         settings.getOpenTime(), settings.getCloseTime(),
-        settings.getAlertThreshold(), settings.isAlertEnabled());
+        settings.getAlertThreshold(), settings.isAlertEnabled(),
+        settings.getBusinessDayStart(), settings.getCallGraceMinutes());
   }
 
   public StoreSettings toDomain() {
     return StoreSettings.restore(id, storeId, tableCount, avgTurnoverMinutes,
-        openTime, closeTime, alertThreshold, alertEnabled);
+        openTime, closeTime, alertThreshold, alertEnabled, businessDayStart, callGraceMinutes);
   }
 }

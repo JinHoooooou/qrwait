@@ -38,7 +38,9 @@ public class StoreSettingsService {
         request.getOpenTime(),
         request.getCloseTime(),
         request.getAlertThreshold(),
-        request.isAlertEnabled()
+        request.isAlertEnabled(),
+        request.getBusinessDayStart(),
+        request.getCallGraceMinutes()
     );
 
     return StoreSettingsResponse.from(storeSettingsRepository.save(updated));

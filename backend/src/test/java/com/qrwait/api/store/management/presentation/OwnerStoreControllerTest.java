@@ -16,6 +16,7 @@ import com.qrwait.api.store.management.application.StoreService;
 import com.qrwait.api.store.management.application.StoreSettingsService;
 import com.qrwait.api.store.management.dto.StoreSettingsResponse;
 import com.qrwait.api.store.domain.StoreStatus;
+import java.time.LocalTime;
 import java.util.UUID;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -70,7 +71,8 @@ class OwnerStoreControllerTest {
     UUID ownerId = UUID.randomUUID();
 
     given(storeSettingsService.getSettings(eq(ownerId)))
-        .willReturn(new StoreSettingsResponse(5, 30, null, null, 10, true, "대기 5팀 × 30분 / 5테이블"));
+        .willReturn(new StoreSettingsResponse(5, 30, null, null, 10, true,
+            LocalTime.of(5, 0), 5, "앞선 팀 수 × 30분 ÷ 5테이블"));
 
     given(jwtTokenProvider.validateToken(any())).willReturn(true);
     given(jwtTokenProvider.extractOwnerId(any())).willReturn(ownerId);
