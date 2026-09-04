@@ -54,14 +54,3 @@ CREATE TABLE store_settings
   alert_threshold      INT         NOT NULL DEFAULT 10,
   alert_enabled        BOOLEAN     NOT NULL DEFAULT true
 );
-
--- =============================================
--- 개발 환경 전용 시드 데이터
--- =============================================
-INSERT INTO owners (id, email, password_hash, created_at)
-VALUES ('00000000-0000-0000-0000-000000000000', 'dev@qrwait.com', 'dev-password-hash', now());
-
-INSERT INTO stores (id, owner_id, name, created_at)
-VALUES ('00000000-0000-0000-0000-000000000001', '00000000-0000-0000-0000-000000000000', '맛있는 한식당', now()),
-       ('00000000-0000-0000-0000-000000000002', '00000000-0000-0000-0000-000000000000', '행복한 분식집', now()),
-       ('00000000-0000-0000-0000-000000000003', '00000000-0000-0000-0000-000000000000', '즐거운 카페', now());

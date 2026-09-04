@@ -2,6 +2,7 @@ package com.qrwait.api.store.infrastructure;
 
 import com.qrwait.api.store.domain.Store;
 import com.qrwait.api.store.domain.StoreRepository;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
@@ -26,5 +27,12 @@ public class StoreRepositoryImpl implements StoreRepository {
   @Override
   public Store save(Store store) {
     return storeJpaRepository.save(StoreJpaEntity.from(store)).toDomain();
+  }
+
+  @Override
+  public List<Store> findAll() {
+    return storeJpaRepository.findAll().stream()
+        .map(StoreJpaEntity::toDomain)
+        .toList();
   }
 }

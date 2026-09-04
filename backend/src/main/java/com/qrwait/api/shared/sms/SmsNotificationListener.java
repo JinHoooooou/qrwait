@@ -1,5 +1,6 @@
 package com.qrwait.api.shared.sms;
 
+import com.qrwait.api.shared.privacy.PhoneNumberMasker;
 import com.qrwait.api.shared.sse.SsePublisher;
 import com.qrwait.api.waiting.domain.event.WaitingCalledEvent;
 import lombok.RequiredArgsConstructor;
@@ -27,7 +28,7 @@ public class SmsNotificationListener {
       smsClient.send(event.phoneNumber(), message);
     } catch (SmsSendException e) {
       log.error("SMS 발송 실패: waitingNumber={}, phone={}",
-          event.waitingNumber(), event.phoneNumber(), e);
+          event.waitingNumber(), PhoneNumberMasker.mask(event.phoneNumber()), e);
       ssePublisher.notifyOwnerSmsFailed(
           event.storeId(), event.waitingNumber(), event.phoneNumber());
     }
