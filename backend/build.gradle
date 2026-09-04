@@ -23,6 +23,11 @@ repositories {
 	mavenCentral()
 }
 
+// Spring Boot 3.5 BOM 이 고정한 Testcontainers 1.21.0 은 docker-java 가 Docker Engine 29(API 1.55, 최소 1.40)에
+// 구버전 API 로 ping 하면서 400 을 받아 "Could not find a valid Docker environment" 로 실패한다. 로컬 Docker Desktop 이
+// 업그레이드된 환경에서 재현되는 environment drift 이므로 BOM 핀을 명시적으로 오버라이드한다.
+ext['testcontainers.version'] = '1.21.4'
+
 dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
 	implementation 'org.springframework.boot:spring-boot-starter-data-redis'
