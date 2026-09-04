@@ -13,6 +13,7 @@ import {
   type MyStoreResponse,
   noShowWaiting,
   type OwnerWaitingItem,
+  postponeWaiting,
   type StoreStatus,
   updateStoreStatus,
 } from '../api/owner'
@@ -52,6 +53,15 @@ function DashboardPage() {
   const retryCountRef = useRef(0)
   const retryTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const activeRef = useRef(true)
+
+  const [now, setNow] = useState(() => Date.now())
+  useEffect(() => {
+    const timer = setInterval(() => setNow(Date.now()), 1000)
+    return () => clearInterval(timer)
+  }, [])
+
+  const isGraceExpired = (w: OwnerWaitingItem) =>
+      w.graceDeadline !== null && new Date(w.graceDeadline).getTime() < now
 
   const fetchWaitingList = useCallback(async () => {
     const list = await getWaitingList()
@@ -285,13 +295,19 @@ function DashboardPage() {
           ) : (
               <div style={styles.waitingList}>
                 {waitingList.map((item) => (
-                    <div key={item.waitingId} style={styles.waitingCard}>
+                    <div
+                        key={item.waitingId}
+                        style={isGraceExpired(item) ? {...styles.waitingCard, ...styles.waitingCardGraceExpired} : styles.waitingCard}
+                    >
                       <div style={styles.waitingInfo}>
                         <span style={styles.waitingNumber}>#{item.waitingNumber}</span>
                         <span style={styles.waitingName}>{item.phoneNumber}</span>
                         <span style={styles.waitingMeta}>{item.partySize}명 · {item.elapsedMinutes}분 경과</span>
                         {item.status === 'CALLED' && (
                             <span style={styles.calledBadge}>호출됨</span>
+                        )}
+                        {isGraceExpired(item) && (
+                            <span style={styles.graceExpiredBadge}>⏰ 유예 시간 초과</span>
                         )}
                       </div>
                       <div style={styles.actionButtons}>
@@ -320,6 +336,17 @@ function DashboardPage() {
                                   )}
                               >
                                 입장
+                              </button>
+                              <button
+                                  style={{...styles.actionBtn, ...styles.postponeBtn}}
+                                  disabled={actionLoading === item.waitingId}
+                                  onClick={() => handleAction(
+                                      `#${item.waitingNumber} ${item.phoneNumber} 손님을 미루기 처리할까요?`,
+                                      item.waitingId,
+                                      postponeWaiting,
+                                  )}
+                              >
+                                미루기
                               </button>
                               <button
                                   style={{...styles.actionBtn, ...styles.noshowBtn}}
@@ -456,6 +483,18 @@ const styles: Record<string, React.CSSProperties> = {
     flexDirection: 'column',
     gap: '0.75rem',
   },
+  waitingCardGraceExpired: {
+    backgroundColor: '#fef2f2',
+    border: '1px solid #fecaca',
+  },
+  graceExpiredBadge: {
+    backgroundColor: '#fee2e2',
+    color: '#dc2626',
+    fontSize: '0.75rem',
+    fontWeight: 600,
+    padding: '0.125rem 0.5rem',
+    borderRadius: '999px',
+  },
   waitingInfo: {
     display: 'flex',
     alignItems: 'center',
@@ -503,6 +542,10 @@ const styles: Record<string, React.CSSProperties> = {
   enterBtn: {
     backgroundColor: '#dcfce7',
     color: '#16a34a',
+  },
+  postponeBtn: {
+    backgroundColor: '#fef3c7',
+    color: '#d97706',
   },
   noshowBtn: {
     backgroundColor: '#fee2e2',

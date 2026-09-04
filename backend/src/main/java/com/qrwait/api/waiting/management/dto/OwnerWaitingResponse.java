@@ -1,6 +1,7 @@
 package com.qrwait.api.waiting.management.dto;
 
 import com.qrwait.api.waiting.domain.WaitingStatus;
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 public record OwnerWaitingResponse(
@@ -9,7 +10,8 @@ public record OwnerWaitingResponse(
     String phoneNumber,
     int partySize,
     WaitingStatus status,
-    long elapsedMinutes
+    long elapsedMinutes,
+    LocalDateTime graceDeadline
 ) {
 
 }

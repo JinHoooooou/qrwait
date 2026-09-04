@@ -31,6 +31,7 @@ export interface WaitingStatusResponse {
   totalWaiting: number
   estimatedWaitMinutes: number
   status: 'WAITING' | 'CALLED'
+  graceDeadline: string | null
 }
 
 export interface CreateStoreRequest {
