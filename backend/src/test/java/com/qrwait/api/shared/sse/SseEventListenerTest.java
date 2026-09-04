@@ -11,8 +11,10 @@ import com.qrwait.api.store.domain.event.StoreStatusChangedEvent;
 import com.qrwait.api.waiting.domain.WaitingRepository;
 import com.qrwait.api.waiting.domain.WaitingStatus;
 import com.qrwait.api.waiting.domain.event.WaitingCalledEvent;
+import com.qrwait.api.waiting.domain.event.WaitingPostponedEvent;
 import com.qrwait.api.waiting.domain.event.WaitingRegisteredEvent;
 import com.qrwait.api.waiting.domain.event.WaitingUpdatedEvent;
+import java.util.Map;
 import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -42,7 +44,7 @@ class SseEventListenerTest {
   @Test
   void onWaitingRegistered_손님과_점주에게_브로드캐스트() {
     UUID storeId = UUID.randomUUID();
-    given(waitingRepository.countByStoreIdAndStatus(storeId, WaitingStatus.WAITING)).willReturn(3);
+    given(waitingRepository.countByStoreIdAndStatus(eq(storeId), any(), eq(WaitingStatus.WAITING))).willReturn(3);
 
     listener.onWaitingRegistered(new WaitingRegisteredEvent(storeId));
 
@@ -53,7 +55,7 @@ class SseEventListenerTest {
   @Test
   void onWaitingUpdated_손님과_점주에게_브로드캐스트() {
     UUID storeId = UUID.randomUUID();
-    given(waitingRepository.countByStoreIdAndStatus(storeId, WaitingStatus.WAITING)).willReturn(2);
+    given(waitingRepository.countByStoreIdAndStatus(eq(storeId), any(), eq(WaitingStatus.WAITING))).willReturn(2);
 
     listener.onWaitingUpdated(new WaitingUpdatedEvent(storeId));
 
@@ -69,6 +71,19 @@ class SseEventListenerTest {
     listener.onWaitingCalled(new WaitingCalledEvent(storeId, waitingId, "010-1234-5678", 1, "테스트 매장"));
 
     verify(registry).broadcast(eq(storeId), eq("waiting-called"), any());
+  }
+
+  @Test
+  void onWaitingPostponed_손님_미루기_이벤트와_대기현황_갱신을_모두_브로드캐스트() {
+    UUID storeId = UUID.randomUUID();
+    UUID waitingId = UUID.randomUUID();
+    given(waitingRepository.countByStoreIdAndStatus(eq(storeId), any(), eq(WaitingStatus.WAITING))).willReturn(1);
+
+    listener.onWaitingPostponed(new WaitingPostponedEvent(storeId, waitingId));
+
+    verify(registry).broadcast(eq(storeId), eq("waiting-postponed"), eq(Map.of("waitingId", waitingId)));
+    verify(registry).broadcast(eq(storeId), eq("waiting-updated"), any());
+    verify(registry).broadcastToOwner(eq(storeId), eq("waiting-updated"), any());
   }
 
   @Test
