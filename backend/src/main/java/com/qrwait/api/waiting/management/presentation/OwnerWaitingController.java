@@ -77,4 +77,13 @@ public class OwnerWaitingController {
     waitingManagementService.noShow(ownerId, waitingId);
     return ResponseEntity.noContent().build();
   }
+
+  @Operation(summary = "호출 미루기")
+  @PostMapping("/waitings/{waitingId}/postpone")
+  public ResponseEntity<Void> postponeWaiting(
+      @AuthenticationPrincipal UUID ownerId,
+      @PathVariable UUID waitingId) {
+    waitingManagementService.postpone(ownerId, waitingId);
+    return ResponseEntity.noContent().build();
+  }
 }

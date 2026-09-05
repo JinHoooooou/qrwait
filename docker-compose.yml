@@ -39,6 +39,7 @@ services:
       NHN_SMS_APP_KEY: ${NHN_SMS_APP_KEY:-}
       NHN_SMS_SECRET_KEY: ${NHN_SMS_SECRET_KEY:-}
       NHN_SMS_SENDER_NUMBER: ${NHN_SMS_SENDER_NUMBER:-}
+      PHONE_HASH_SECRET: ${PHONE_HASH_SECRET}
     depends_on:
       db:
         condition: service_healthy

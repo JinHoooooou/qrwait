@@ -4,9 +4,14 @@ import com.qrwait.api.store.domain.StoreSettingsRepository;
 import com.qrwait.api.store.domain.StoreStatus;
 import com.qrwait.api.waiting.customer.dto.WaitingStatusResponse;
 import com.qrwait.api.waiting.domain.WaitingRepository;
+import com.qrwait.api.store.domain.StoreSettings;
 import com.qrwait.api.waiting.domain.WaitingStatus;
 import java.io.IOException;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -23,6 +28,7 @@ public class SsePublisher {
    * 일부 브라우저는 수신 버퍼가 ~1~2KB를 넘기 전까지 EventSource 이벤트를 넘겨주지 않는다.
    */
   private static final int INITIAL_PADDING_SIZE = 2048;
+  private static final LocalTime DEFAULT_OPEN_TIME = LocalTime.of(5, 0);
 
   private final SseEmitterRegistry registry;
   private final WaitingRepository waitingRepository;
@@ -110,6 +116,14 @@ public class SsePublisher {
   }
 
   /**
+   * 미루기(호출 취소) 시 호출. 호출 화면에 있던 손님이 대기 화면으로 돌아가도록 알린다.
+   * 클라이언트가 자신의 waitingId 와 비교해 처리한다.
+   */
+  public void broadcastPostponed(UUID storeId, UUID waitingId) {
+    registry.broadcast(storeId, "waiting-postponed", Map.of("waitingId", waitingId));
+  }
+
+  /**
    * 매장 영업 상태 변경 시 호출. 손님 전체 + 점주에게 변경된 상태를 브로드캐스트한다.
    */
   public void broadcastStoreStatus(UUID storeId, StoreStatus status) {
@@ -127,9 +141,17 @@ public class SsePublisher {
   }
 
   private WaitingStatusResponse buildStoreStatus(UUID storeId) {
-    int total = waitingRepository.countByStoreIdAndStatus(storeId, WaitingStatus.WAITING);
-    int estimated = storeSettingsRepository.findByStoreId(storeId)
-        .map(settings -> settings.calculateEstimatedWait(total))
+    Optional<StoreSettings> settings = storeSettingsRepository.findByStoreId(storeId);
+    LocalDateTime now = LocalDateTime.now();
+    LocalDate businessDate = settings
+        .map(s -> s.businessDateOf(now))
+        .orElseGet(() -> now.toLocalTime().isBefore(DEFAULT_OPEN_TIME)
+            ? now.toLocalDate().minusDays(1)
+            : now.toLocalDate());
+
+    int total = waitingRepository.countByStoreIdAndStatus(storeId, businessDate, WaitingStatus.WAITING);
+    int estimated = settings
+        .map(s -> s.calculateEstimatedWait(total))
         .orElse(total * 5);
     return new WaitingStatusResponse(total, total, estimated);
   }

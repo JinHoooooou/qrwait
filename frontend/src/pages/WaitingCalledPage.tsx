@@ -17,6 +17,8 @@ function WaitingCalledPage() {
 
   const [initialized, setInitialized] = useState(false)
   const [ended, setEnded] = useState(false)
+  const [graceDeadline, setGraceDeadline] = useState<string | null>(null)
+  const [remainingSeconds, setRemainingSeconds] = useState<number | null>(null)
 
   // 입장완료/취소/노쇼로 더 이상 CALLED가 아닌 경우 종료 처리
   const endSession = useCallback(() => {
@@ -32,8 +34,10 @@ function WaitingCalledPage() {
           if (res.status === 'WAITING') {
             // 아직 호출 전 (비정상 진입) → 실시간 현황으로
             navigate(`/waiting/${waitingId}/status`, {replace: true})
+            return
           }
           // CALLED면 그대로 유지
+          setGraceDeadline(res.graceDeadline)
         })
         .catch((err: unknown) => {
           const status = (err as { status?: number }).status
@@ -47,9 +51,21 @@ function WaitingCalledPage() {
     refresh()
   }, [refresh])
 
+  useEffect(() => {
+    if (!graceDeadline) return
+    const tick = () => {
+      const diff = Math.floor((new Date(graceDeadline).getTime() - Date.now()) / 1000)
+      setRemainingSeconds(diff > 0 ? diff : 0)
+    }
+    tick()
+    const timer = setInterval(tick, 1000)
+    return () => clearInterval(timer)
+  }, [graceDeadline])
+
   useWaitingSse(waitingId, resolvedStoreId, {
     enabled: !!waitingId && !!resolvedStoreId && !ended,
     onUpdated: refresh,
+    onPostponed: () => navigate(`/waiting/${waitingId}/status`, {replace: true}),
   })
 
   if (!initialized) return null
@@ -75,6 +91,14 @@ function WaitingCalledPage() {
         </div>
 
         <p style={styles.desc}>순서가 되었습니다. 지금 입장해 주세요.</p>
+
+        {remainingSeconds !== null && (
+            <p style={remainingSeconds > 0 ? styles.graceDesc : styles.graceExpiredDesc}>
+              {remainingSeconds > 0
+                  ? `${Math.floor(remainingSeconds / 60)}분 ${remainingSeconds % 60}초 안에 입장해 주세요`
+                  : '입장 시간이 지났습니다. 매장에 문의해 주세요.'}
+            </p>
+        )}
 
         <div style={styles.buttons}>
           <Button variant="secondary" onClick={() => navigate(`/waiting/${waitingId}/cancel`)}>
@@ -128,6 +152,18 @@ const styles: Record<string, React.CSSProperties> = {
   desc: {
     fontSize: '0.875rem',
     color: '#6b7280',
+    textAlign: 'center',
+  },
+  graceDesc: {
+    fontSize: '0.875rem',
+    fontWeight: 600,
+    color: '#d97706',
+    textAlign: 'center',
+  },
+  graceExpiredDesc: {
+    fontSize: '0.875rem',
+    fontWeight: 600,
+    color: '#dc2626',
     textAlign: 'center',
   },
   buttons: {

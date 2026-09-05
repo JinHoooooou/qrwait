@@ -2,6 +2,7 @@ package com.qrwait.api.shared.sse;
 
 import com.qrwait.api.store.domain.event.StoreStatusChangedEvent;
 import com.qrwait.api.waiting.domain.event.WaitingCalledEvent;
+import com.qrwait.api.waiting.domain.event.WaitingPostponedEvent;
 import com.qrwait.api.waiting.domain.event.WaitingRegisteredEvent;
 import com.qrwait.api.waiting.domain.event.WaitingUpdatedEvent;
 import lombok.RequiredArgsConstructor;
@@ -28,6 +29,12 @@ public class SseEventListener {
   @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
   public void onWaitingCalled(WaitingCalledEvent event) {
     ssePublisher.broadcastCalled(event.storeId(), event.waitingId());
+  }
+
+  @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
+  public void onWaitingPostponed(WaitingPostponedEvent event) {
+    ssePublisher.broadcastPostponed(event.storeId(), event.waitingId());
+    ssePublisher.broadcastUpdate(event.storeId());
   }
 
   @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)

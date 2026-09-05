@@ -118,6 +118,9 @@ function HistoryPage() {
                     <span style={{...styles.status, color: STATUS_COLORS[entry.status]}}>
                       {STATUS_LABELS[entry.status]}
                     </span>
+                    <span style={styles.waited}>
+                      {entry.waitedMinutes !== null ? `대기 ${entry.waitedMinutes}분` : '-'}
+                    </span>
                     <span style={styles.time}>{formatTime(entry.createdAt)}</span>
                   </div>
               ))}
@@ -204,6 +207,12 @@ const styles: Record<string, React.CSSProperties> = {
   status: {
     fontWeight: 600,
     minWidth: '3.5rem',
+    textAlign: 'right',
+  },
+  waited: {
+    color: '#6b7280',
+    fontSize: '0.8125rem',
+    minWidth: '4.5rem',
     textAlign: 'right',
   },
   time: {

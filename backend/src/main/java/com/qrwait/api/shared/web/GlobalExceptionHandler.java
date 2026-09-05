@@ -6,6 +6,7 @@ import com.qrwait.api.shared.qr.QrCodeGenerationException;
 import com.qrwait.api.store.domain.StoreNotAvailableException;
 import com.qrwait.api.store.domain.StoreNotFoundException;
 import com.qrwait.api.waiting.domain.WaitingNotFoundException;
+import com.qrwait.api.waiting.domain.WaitingNumberConflictException;
 import java.util.stream.Collectors;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.FieldError;
@@ -66,5 +67,11 @@ public class GlobalExceptionHandler {
   @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
   public ErrorResponse handleQrCodeGeneration(QrCodeGenerationException e) {
     return ErrorResponse.of("QR_GENERATION_FAILED", e.getMessage());
+  }
+
+  @ExceptionHandler(WaitingNumberConflictException.class)
+  @ResponseStatus(HttpStatus.CONFLICT)
+  public ErrorResponse handleWaitingNumberConflict(WaitingNumberConflictException e) {
+    return ErrorResponse.of("WAITING_NUMBER_CONFLICT", e.getMessage());
   }
 }

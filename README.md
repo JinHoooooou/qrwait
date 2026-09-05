@@ -7,7 +7,7 @@
 ```
 qr-wait/
 ├── backend/                   # Spring Boot 3.x API 서버
-├── frontend/                  # React 18 + Vite SPA
+├── frontend/                  # React 19 + Vite SPA
 ├── docker-compose.dev.yml     # 로컬 개발 환경 인프라 (PostgreSQL + Redis)
 ├── docker-compose.yml         # 전체 스택 배포 (backend + frontend + db + redis)
 ├── .env.example               # 환경변수 템플릿
@@ -19,9 +19,10 @@ qr-wait/
 | 구분               | 기술                                                           |
 |------------------|--------------------------------------------------------------|
 | Backend          | Java 21, Spring Boot 3.5, Spring Data JPA, Spring Data Redis |
-| Frontend         | React 18, Vite, TypeScript, Zustand                          |
+| Frontend         | React 19, Vite, TypeScript, Zustand                          |
 | Database         | PostgreSQL 15                                                |
-| Cache / Realtime | Redis 7, Spring SseEmitter                                   |
+| Cache            | Redis 7 (JWT Refresh Token 저장)                              |
+| 실시간             | Spring SseEmitter (인메모리 레지스트리 · 단일 인스턴스 전제)      |
 | 인프라              | Docker, Docker Compose, Nginx                                |
 
 ## 주요 기능
@@ -41,6 +42,8 @@ qr-wait/
 ```bash
 docker compose -f docker-compose.dev.yml up -d
 ```
+
+> 기존 로컬 DB가 있다면 `docker compose -f docker-compose.dev.yml down -v` 로 초기화한 뒤 기동하세요 (Flyway가 스키마를 소유하도록 바뀌었습니다).
 
 ### 2. 백엔드 실행
 
@@ -153,7 +156,20 @@ cd backend && ./gradlew test --tests "*.NhnCloudSmsClientTest"
 
 ## 관련 문서
 
-> Phase 1·2 기획/설계 문서는 작업이 완료되어 아카이브되었습니다.
+### 현행 문서
+
+| 알고 싶은 것 | 볼 곳 |
+|------------|------|
+| 백엔드 아키텍처 규칙 (패키지 위치·계층 책임) | [`backend/CLAUDE.md`](./backend/CLAUDE.md) |
+| 설계 의사결정 기록 (ADR) | [`backend/BACKEND_DECISIONS.md`](./backend/BACKEND_DECISIONS.md) |
+| 기능별 설계 스펙 | [`docs/superpowers/specs/`](./docs/superpowers/specs/) — 파일명 앞 날짜가 최신인 것 |
+| 기능별 구현 플랜 | [`docs/superpowers/plans/`](./docs/superpowers/plans/) |
+| 수동 QA 시나리오 | [`docs/QA-test-cases.md`](./docs/QA-test-cases.md) |
+
+### 아카이브 (역사 기록 — 구현 근거 아님)
+
+> ⚠️ 아래 v2.0 문서는 **2026-04-03 시점 기록**이며 현행 구현과 여러 곳에서 어긋납니다.
+> 참조하기 전에 **[`docs/archive/README.md`](./docs/archive/README.md)의 드리프트 목록을 먼저 확인하세요.**
 
 - [PRD v2.0 (제품 요구사항)](./docs/archive/QRWait_PRD_v2.0.md)
 - [TRD v2.0 (기술 요구사항)](./docs/archive/QRWait_TRD_v2.0.md)

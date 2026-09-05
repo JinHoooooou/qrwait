@@ -41,10 +41,11 @@ class WaitingRepositoryImplTest extends IntegrationTestSupport {
 
   @Test
   void findByStoreIdAndStatus_returnsMatchingEntries() {
-    waitingRepository.save(WaitingEntry.create(savedStore.getId(), "010-1111-1111", 2, 1));
-    waitingRepository.save(WaitingEntry.create(savedStore.getId(), "010-2222-2222", 3, 2));
+    waitingRepository.save(WaitingEntry.create(savedStore.getId(), "010-1111-1111", 2, 1, LocalDate.now()));
+    waitingRepository.save(WaitingEntry.create(savedStore.getId(), "010-2222-2222", 3, 2, LocalDate.now()));
 
-    List<WaitingEntry> result = waitingRepository.findByStoreIdAndStatus(savedStore.getId(), WaitingStatus.WAITING);
+    List<WaitingEntry> result = waitingRepository
+        .findByStoreIdAndStatus(savedStore.getId(), LocalDate.now(), WaitingStatus.WAITING);
 
     assertThat(result).hasSize(2);
     assertThat(result).allMatch(e -> e.getStatus() == WaitingStatus.WAITING);
@@ -52,22 +53,46 @@ class WaitingRepositoryImplTest extends IntegrationTestSupport {
 
   @Test
   void countByStoreIdAndStatus_returnsCorrectCount() {
-    waitingRepository.save(WaitingEntry.create(savedStore.getId(), "010-1111-1111", 2, 1));
-    waitingRepository.save(WaitingEntry.create(savedStore.getId(), "010-2222-2222", 3, 2));
+    waitingRepository.save(WaitingEntry.create(savedStore.getId(), "010-1111-1111", 2, 1, LocalDate.now()));
+    waitingRepository.save(WaitingEntry.create(savedStore.getId(), "010-2222-2222", 3, 2, LocalDate.now()));
 
-    int count = waitingRepository.countByStoreIdAndStatus(savedStore.getId(), WaitingStatus.WAITING);
+    int count = waitingRepository.countByStoreIdAndStatus(savedStore.getId(), LocalDate.now(), WaitingStatus.WAITING);
 
     assertThat(count).isEqualTo(2);
   }
 
   @Test
-  void countByStatusForStoreAndDate_상태별_집계() {
-    waitingRepository.save(WaitingEntry.create(savedStore.getId(), "010-0000-0001", 2, 1));
-    waitingRepository.save(WaitingEntry.create(savedStore.getId(), "010-0000-0002", 2, 2));
+  void countByStatusForStoreAndBusinessDate_상태별_집계() {
+    waitingRepository.save(WaitingEntry.create(savedStore.getId(), "010-0000-0001", 2, 1, LocalDate.now()));
+    waitingRepository.save(WaitingEntry.create(savedStore.getId(), "010-0000-0002", 2, 2, LocalDate.now()));
 
-    var counts = waitingRepository.countByStatusForStoreAndDate(savedStore.getId(), LocalDate.now());
+    var counts = waitingRepository.countByStatusForStoreAndBusinessDate(savedStore.getId(), LocalDate.now());
 
     assertThat(counts.get(WaitingStatus.WAITING)).isEqualTo(2L);
     assertThat(DailySummary.from(counts).getTotalRegistered()).isEqualTo(2L);
+  }
+
+  @Test
+  void findActiveByStoreId_excludesOtherBusinessDates() {
+    LocalDate today = LocalDate.of(2026, 9, 2);
+    LocalDate yesterday = LocalDate.of(2026, 9, 1);
+    waitingRepository.save(WaitingEntry.create(savedStore.getId(), "010-1111-1111", 2, 1, yesterday));
+    waitingRepository.save(WaitingEntry.create(savedStore.getId(), "010-2222-2222", 2, 1, today));
+
+    List<WaitingEntry> result = waitingRepository.findActiveByStoreId(savedStore.getId(), today);
+
+    assertThat(result).hasSize(1);
+    assertThat(result.get(0).getBusinessDate()).isEqualTo(today);
+  }
+
+  @Test
+  void findNextWaitingNumber_countsPerBusinessDate() {
+    LocalDate day1 = LocalDate.of(2026, 9, 1);
+    LocalDate day2 = LocalDate.of(2026, 9, 2);
+    waitingRepository.save(WaitingEntry.create(savedStore.getId(), "010-1111-1111", 2, 1, day1));
+    waitingRepository.save(WaitingEntry.create(savedStore.getId(), "010-2222-2222", 2, 2, day1));
+
+    assertThat(waitingRepository.findNextWaitingNumber(savedStore.getId(), day1)).isEqualTo(3);
+    assertThat(waitingRepository.findNextWaitingNumber(savedStore.getId(), day2)).isEqualTo(1);
   }
 }

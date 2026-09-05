@@ -177,7 +177,8 @@ function LandingPage() {
                       style={styles.checkbox}
                   />
                   <span style={styles.consentText}>
-                    전화번호는 웨이팅 호출 알림 목적으로만 사용됩니다.
+                    전화번호는 웨이팅 호출 알림에 사용합니다. 영업일이 끝나면 전체 번호는 폐기하고,
+                    뒤 4자리와 식별할 수 없는 형태로 변환한 값만 이력 관리 및 반복 노쇼 방지를 위해 보관합니다.
                   </span>
                 </label>
 

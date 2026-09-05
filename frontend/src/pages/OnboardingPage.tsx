@@ -6,6 +6,7 @@ import {getStoreQrUrl} from '../api/waiting'
 import useOwnerStore from '../store/ownerStore'
 
 const TOTAL_STEPS = 3
+const DEFAULT_CALL_GRACE_MINUTES = 5
 
 function OnboardingPage() {
   const navigate = useNavigate()
@@ -45,6 +46,7 @@ function OnboardingPage() {
         closeTime,
         alertThreshold,
         alertEnabled,
+        callGraceMinutes: DEFAULT_CALL_GRACE_MINUTES,
       })
       setStep(3)
     } catch (err) {
@@ -130,7 +132,7 @@ function OnboardingPage() {
                       style={styles.input}
                       type="time"
                       value={openTime}
-                      onChange={(e) => setOpenTime(e.target.value)}
+                      onChange={(e) => setOpenTime(e.target.value ? e.target.value : openTime)}
                   />
                 </label>
                 <label style={{...styles.label, flex: 1}}>

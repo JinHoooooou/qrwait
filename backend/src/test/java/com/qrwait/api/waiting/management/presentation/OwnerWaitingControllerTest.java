@@ -4,6 +4,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.willDoNothing;
+import static org.mockito.Mockito.verify;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -83,7 +84,7 @@ class OwnerWaitingControllerTest {
     given(jwtTokenProvider.extractOwnerId(any())).willReturn(ownerId);
     given(waitingManagementService.getWaitingList(eq(ownerId)))
         .willReturn(List.of(
-            new OwnerWaitingResponse(waitingId, 1, "010-1234-5678", 2, WaitingStatus.WAITING, 5L)
+            new OwnerWaitingResponse(waitingId, 1, "010-1234-5678", 2, WaitingStatus.WAITING, 5L, null)
         ));
 
     mockMvc.perform(get("/api/owner/stores/me/waitings")
@@ -185,6 +186,30 @@ class OwnerWaitingControllerTest {
         .andExpect(status().isNoContent());
   }
 
+  // ===== postpone =====
+
+  @Test
+  void postponeWaiting_인증없음_401반환() throws Exception {
+    mockMvc.perform(post("/api/owner/waitings/" + UUID.randomUUID() + "/postpone"))
+        .andExpect(status().isUnauthorized());
+  }
+
+  @Test
+  void postponeWaiting_인증된_점주_204반환() throws Exception {
+    UUID ownerId = UUID.randomUUID();
+    UUID waitingId = UUID.randomUUID();
+
+    given(jwtTokenProvider.validateToken(any())).willReturn(true);
+    given(jwtTokenProvider.extractOwnerId(any())).willReturn(ownerId);
+    willDoNothing().given(waitingManagementService).postpone(eq(ownerId), eq(waitingId));
+
+    mockMvc.perform(post("/api/owner/waitings/" + waitingId + "/postpone")
+            .header("Authorization", "Bearer test-token"))
+        .andExpect(status().isNoContent());
+
+    verify(waitingManagementService).postpone(eq(ownerId), eq(waitingId));
+  }
+
   // ===== getTodayWaitings =====
 
   @Test
@@ -202,7 +227,7 @@ class OwnerWaitingControllerTest {
     given(jwtTokenProvider.extractOwnerId(any())).willReturn(ownerId);
     given(waitingManagementService.getTodayWaitings(eq(ownerId)))
         .willReturn(List.of(new TodayWaitingResponse(
-            waitingId, 1, "010-1234-5678", 2, WaitingStatus.ENTERED, java.time.LocalDateTime.now()
+            waitingId, 1, "010-1234-5678", 2, WaitingStatus.ENTERED, java.time.LocalDateTime.now(), 15L
         )));
 
     mockMvc.perform(get("/api/owner/stores/me/waitings/today")

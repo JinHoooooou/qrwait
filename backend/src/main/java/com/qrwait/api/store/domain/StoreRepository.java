@@ -1,5 +1,6 @@
 package com.qrwait.api.store.domain;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -10,6 +11,8 @@ public interface StoreRepository {
   Optional<Store> findByOwnerId(UUID ownerId);
 
   Store save(Store store);
+
+  List<Store> findAll();
 
   default Store getByOwnerId(UUID ownerId) {
     return findByOwnerId(ownerId)

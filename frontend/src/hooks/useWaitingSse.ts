@@ -8,6 +8,7 @@ interface UseWaitingSseOptions {
   enabled: boolean
   onUpdated?: () => void
   onCalled?: () => void
+  onPostponed?: () => void
   onConnectionChange?: (status: SseConnectionStatus) => void
 }
 
@@ -19,10 +20,12 @@ export function useWaitingSse(
   const {enabled} = options
   const onUpdatedRef = useRef(options.onUpdated)
   const onCalledRef = useRef(options.onCalled)
+  const onPostponedRef = useRef(options.onPostponed)
   const onConnectionChangeRef = useRef(options.onConnectionChange)
 
   onUpdatedRef.current = options.onUpdated
   onCalledRef.current = options.onCalled
+  onPostponedRef.current = options.onPostponed
   onConnectionChangeRef.current = options.onConnectionChange
 
   useEffect(() => {
@@ -65,6 +68,16 @@ export function useWaitingSse(
         try {
           const data = JSON.parse((e as MessageEvent).data)
           if (data.waitingId === waitingId) onCalledRef.current?.()
+        } catch {
+          // payload 파싱 실패 시 무시
+        }
+      })
+
+      es.addEventListener('waiting-postponed', (e) => {
+        if (unmounted) return
+        try {
+          const data = JSON.parse((e as MessageEvent).data)
+          if (data.waitingId === waitingId) onPostponedRef.current?.()
         } catch {
           // payload 파싱 실패 시 무시
         }

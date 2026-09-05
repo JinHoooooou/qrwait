@@ -71,7 +71,7 @@ class OwnerServiceTest {
     SignUpRequest request = createSignUpRequest("owner@test.com", "password123", "테스트 매장", "서울시 강남구");
     Owner savedOwner = Owner.restore(ownerId, "owner@test.com", "hashed", LocalDateTime.now());
     Store savedStore = Store.restore(storeId, ownerId, "테스트 매장", "서울시 강남구", null, LocalDateTime.now());
-    StoreSettings savedSettings = StoreSettings.restore(UUID.randomUUID(), storeId, 5, 30, LocalTime.of(9, 0), LocalTime.of(22, 0), 10, true);
+    StoreSettings savedSettings = StoreSettings.restore(UUID.randomUUID(), storeId, 5, 30, LocalTime.of(9, 0), LocalTime.of(22, 0), 10, true, 5);
 
     given(ownerRepository.findByEmail("owner@test.com")).willReturn(Optional.empty());
     given(ownerRepository.save(any(Owner.class))).willReturn(savedOwner);

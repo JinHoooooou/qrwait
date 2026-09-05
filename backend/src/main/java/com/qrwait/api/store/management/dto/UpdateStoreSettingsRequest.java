@@ -2,6 +2,7 @@ package com.qrwait.api.store.management.dto;
 
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotNull;
 import java.time.LocalTime;
 import lombok.Getter;
 
@@ -16,7 +17,9 @@ public class UpdateStoreSettingsRequest {
   @Max(120)
   private int avgTurnoverMinutes;
 
+  @NotNull
   private LocalTime openTime;
+
   private LocalTime closeTime;
 
   @Min(1)
@@ -24,4 +27,8 @@ public class UpdateStoreSettingsRequest {
   private int alertThreshold;
 
   private boolean alertEnabled;
+
+  @Min(0)
+  @Max(60)
+  private int callGraceMinutes;
 }

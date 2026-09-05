@@ -1,9 +1,11 @@
 package com.qrwait.api.waiting.management.application;
 
+import com.qrwait.api.shared.privacy.PhoneNumberMasker;
 import com.qrwait.api.shared.sse.SsePublisher;
 import com.qrwait.api.store.domain.Store;
 import com.qrwait.api.store.domain.StoreNotFoundException;
 import com.qrwait.api.store.domain.StoreRepository;
+import com.qrwait.api.store.domain.StoreSettingsRepository;
 import com.qrwait.api.waiting.management.dto.DailySummaryResponse;
 import com.qrwait.api.waiting.management.dto.OwnerWaitingResponse;
 import com.qrwait.api.waiting.management.dto.TodayWaitingResponse;
@@ -11,10 +13,13 @@ import com.qrwait.api.waiting.domain.DailySummary;
 import com.qrwait.api.waiting.domain.WaitingEntry;
 import com.qrwait.api.waiting.domain.WaitingNotFoundException;
 import com.qrwait.api.waiting.domain.WaitingRepository;
+import com.qrwait.api.store.domain.StoreSettings;
 import com.qrwait.api.waiting.domain.event.WaitingCalledEvent;
+import com.qrwait.api.waiting.domain.event.WaitingPostponedEvent;
 import com.qrwait.api.waiting.domain.event.WaitingUpdatedEvent;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.UUID;
@@ -28,16 +33,23 @@ import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 @RequiredArgsConstructor
 public class WaitingManagementService {
 
+  private static final LocalTime DEFAULT_OPEN_TIME = LocalTime.of(5, 0);
+  private static final int DEFAULT_CALL_GRACE_MINUTES = 5;
+
   private final WaitingRepository waitingRepository;
   private final StoreRepository storeRepository;
+  private final StoreSettingsRepository storeSettingsRepository;
   private final SsePublisher ssePublisher;
   private final ApplicationEventPublisher eventPublisher;
 
   @Transactional(readOnly = true)
   public List<OwnerWaitingResponse> getWaitingList(UUID ownerId) {
     UUID storeId = storeRepository.getByOwnerId(ownerId).getId();
-    return waitingRepository.findActiveByStoreId(storeId).stream()
-        .map(this::toOwnerWaitingResponse)
+    int graceMinutes = storeSettingsRepository.findByStoreId(storeId)
+        .map(StoreSettings::getCallGraceMinutes)
+        .orElse(DEFAULT_CALL_GRACE_MINUTES);
+    return waitingRepository.findActiveByStoreId(storeId, currentBusinessDate(storeId)).stream()
+        .map(entry -> toOwnerWaitingResponse(entry, graceMinutes))
         .toList();
   }
 
@@ -45,7 +57,7 @@ public class WaitingManagementService {
   public DailySummaryResponse getDailySummary(UUID ownerId) {
     UUID storeId = storeRepository.getByOwnerId(ownerId).getId();
     DailySummary summary = DailySummary.from(
-        waitingRepository.countByStatusForStoreAndDate(storeId, LocalDate.now())
+        waitingRepository.countByStatusForStoreAndBusinessDate(storeId, currentBusinessDate(storeId))
     );
     return DailySummaryResponse.from(summary);
   }
@@ -78,19 +90,20 @@ public class WaitingManagementService {
     eventPublisher.publishEvent(new WaitingUpdatedEvent(noShowed.getStoreId()));
   }
 
+  @Transactional
+  public void postpone(UUID ownerId, UUID waitingId) {
+    WaitingEntry postponed = loadOwnedEntry(ownerId, waitingId).entry().postpone();
+    waitingRepository.save(postponed);
+    eventPublisher.publishEvent(
+        new WaitingPostponedEvent(postponed.getStoreId(), postponed.getId()));
+  }
+
   @Transactional(readOnly = true)
   public List<TodayWaitingResponse> getTodayWaitings(UUID ownerId) {
     UUID storeId = storeRepository.getByOwnerId(ownerId).getId();
-    return waitingRepository.findAllByStoreIdAndDate(storeId, LocalDate.now())
+    return waitingRepository.findAllByStoreIdAndBusinessDate(storeId, currentBusinessDate(storeId))
         .stream()
-        .map(entry -> new TodayWaitingResponse(
-            entry.getId(),
-            entry.getWaitingNumber(),
-            entry.getPhoneNumber(),
-            entry.getPartySize(),
-            entry.getStatus(),
-            entry.getCreatedAt()
-        ))
+        .map(TodayWaitingResponse::from)
         .toList();
   }
 
@@ -99,16 +112,24 @@ public class WaitingManagementService {
     return ssePublisher.subscribeOwner(storeId);
   }
 
-  private OwnerWaitingResponse toOwnerWaitingResponse(WaitingEntry entry) {
+  /** 매장의 현재 영업일. 설정이 없으면 기본값(05:00) 기준으로 계산한다. */
+  private LocalDate currentBusinessDate(UUID storeId) {
+    LocalDateTime now = LocalDateTime.now();
+    return storeSettingsRepository.findByStoreId(storeId)
+        .map(s -> s.businessDateOf(now))
+        .orElseGet(() -> now.toLocalTime().isBefore(DEFAULT_OPEN_TIME)
+            ? now.toLocalDate().minusDays(1)
+            : now.toLocalDate());
+  }
+
+  private OwnerWaitingResponse toOwnerWaitingResponse(WaitingEntry entry, int graceMinutes) {
     long elapsedMinutes = ChronoUnit.MINUTES.between(entry.getCreatedAt(), LocalDateTime.now());
+    LocalDateTime graceDeadline = entry.getCalledAt() == null
+        ? null
+        : entry.getCalledAt().plusMinutes(graceMinutes);
     return new OwnerWaitingResponse(
-        entry.getId(),
-        entry.getWaitingNumber(),
-        entry.getPhoneNumber(),
-        entry.getPartySize(),
-        entry.getStatus(),
-        elapsedMinutes
-    );
+        entry.getId(), entry.getWaitingNumber(), PhoneNumberMasker.mask(entry.getPhoneNumber()),
+        entry.getPartySize(), entry.getStatus(), elapsedMinutes, graceDeadline);
   }
 
   private OwnedEntry loadOwnedEntry(UUID ownerId, UUID waitingId) {

@@ -43,20 +43,22 @@ export const refreshToken = (): Promise<{ accessToken: string; ownerId: string; 
 export interface UpdateStoreSettingsRequest {
   tableCount: number
   avgTurnoverMinutes: number
-  openTime: string | null
+  openTime: string
   closeTime: string | null
   alertThreshold: number
   alertEnabled: boolean
+  callGraceMinutes: number
 }
 
 export interface StoreSettingsResponse {
   tableCount: number
   avgTurnoverMinutes: number
-  openTime: string | null
+  openTime: string
   closeTime: string | null
   alertThreshold: number
   alertEnabled: boolean
   estimatedWaitFormulaExample: string
+  callGraceMinutes: number
 }
 
 export const getStoreSettings = (): Promise<StoreSettingsResponse> =>
@@ -81,6 +83,7 @@ export interface OwnerWaitingItem {
   partySize: number
   status: 'WAITING' | 'CALLED'
   elapsedMinutes: number
+  graceDeadline: string | null
 }
 
 export interface DailySummary {
@@ -112,6 +115,9 @@ export const enterWaiting = (waitingId: string): Promise<void> =>
 export const noShowWaiting = (waitingId: string): Promise<void> =>
     ownerClient.post(`/owner/waitings/${waitingId}/noshow`).then((res) => res.data)
 
+export const postponeWaiting = (waitingId: string): Promise<void> =>
+    ownerClient.post(`/owner/waitings/${waitingId}/postpone`).then((res) => res.data)
+
 export interface TodayWaiting {
   waitingId: string
   waitingNumber: number
@@ -119,6 +125,7 @@ export interface TodayWaiting {
   partySize: number
   status: 'WAITING' | 'CALLED' | 'ENTERED' | 'NO_SHOW' | 'CANCELLED'
   createdAt: string
+  waitedMinutes: number | null
 }
 
 export const getTodayWaitings = (): Promise<TodayWaiting[]> =>
