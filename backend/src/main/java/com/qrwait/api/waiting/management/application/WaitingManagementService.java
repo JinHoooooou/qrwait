@@ -33,7 +33,7 @@ import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 @RequiredArgsConstructor
 public class WaitingManagementService {
 
-  private static final LocalTime DEFAULT_BUSINESS_DAY_START = LocalTime.of(5, 0);
+  private static final LocalTime DEFAULT_OPEN_TIME = LocalTime.of(5, 0);
   private static final int DEFAULT_CALL_GRACE_MINUTES = 5;
 
   private final WaitingRepository waitingRepository;
@@ -117,7 +117,7 @@ public class WaitingManagementService {
     LocalDateTime now = LocalDateTime.now();
     return storeSettingsRepository.findByStoreId(storeId)
         .map(s -> s.businessDateOf(now))
-        .orElseGet(() -> now.toLocalTime().isBefore(DEFAULT_BUSINESS_DAY_START)
+        .orElseGet(() -> now.toLocalTime().isBefore(DEFAULT_OPEN_TIME)
             ? now.toLocalDate().minusDays(1)
             : now.toLocalDate());
   }

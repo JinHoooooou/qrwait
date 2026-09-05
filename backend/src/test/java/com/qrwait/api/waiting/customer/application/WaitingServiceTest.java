@@ -256,7 +256,7 @@ class WaitingServiceTest {
         LocalDate.now(), calledAt, null, null);
 
     StoreSettings settings = StoreSettings.restore(UUID.randomUUID(), storeId, 5, 30,
-        null, null, 10, true, LocalTime.of(5, 0), 7); // callGraceMinutes=7
+        null, null, 10, true, 7); // callGraceMinutes=7
 
     given(waitingRepository.findById(waitingId)).willReturn(Optional.of(called));
     given(waitingRepository.findByStoreIdAndStatus(storeId, called.getBusinessDate(), WaitingStatus.WAITING))

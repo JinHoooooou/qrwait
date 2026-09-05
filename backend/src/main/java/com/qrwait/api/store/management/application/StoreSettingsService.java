@@ -39,7 +39,6 @@ public class StoreSettingsService {
         request.getCloseTime(),
         request.getAlertThreshold(),
         request.isAlertEnabled(),
-        request.getBusinessDayStart(),
         request.getCallGraceMinutes()
     );
 

@@ -104,7 +104,7 @@ class WaitingManagementServiceTest {
         LocalDate.now(), calledAt, null, null);
 
     StoreSettings settings = StoreSettings.restore(UUID.randomUUID(), storeId, 5, 30,
-        null, null, 10, true, LocalTime.of(5, 0), 7); // callGraceMinutes=7
+        LocalTime.of(5, 0), null, 10, true, 7); // callGraceMinutes=7
 
     given(storeRepository.getByOwnerId(ownerId))
         .willReturn(Store.restore(storeId, ownerId, "테스트 매장", "서울", StoreStatus.OPEN, LocalDateTime.now()));

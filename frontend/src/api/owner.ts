@@ -43,23 +43,21 @@ export const refreshToken = (): Promise<{ accessToken: string; ownerId: string; 
 export interface UpdateStoreSettingsRequest {
   tableCount: number
   avgTurnoverMinutes: number
-  openTime: string | null
+  openTime: string
   closeTime: string | null
   alertThreshold: number
   alertEnabled: boolean
-  businessDayStart: string
   callGraceMinutes: number
 }
 
 export interface StoreSettingsResponse {
   tableCount: number
   avgTurnoverMinutes: number
-  openTime: string | null
+  openTime: string
   closeTime: string | null
   alertThreshold: number
   alertEnabled: boolean
   estimatedWaitFormulaExample: string
-  businessDayStart: string
   callGraceMinutes: number
 }
 

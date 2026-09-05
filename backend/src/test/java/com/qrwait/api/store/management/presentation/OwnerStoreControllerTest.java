@@ -72,7 +72,7 @@ class OwnerStoreControllerTest {
 
     given(storeSettingsService.getSettings(eq(ownerId)))
         .willReturn(new StoreSettingsResponse(5, 30, null, null, 10, true,
-            LocalTime.of(5, 0), 5, "앞선 팀 수 × 30분 ÷ 5테이블"));
+            5, "앞선 팀 수 × 30분 ÷ 5테이블"));
 
     given(jwtTokenProvider.validateToken(any())).willReturn(true);
     given(jwtTokenProvider.extractOwnerId(any())).willReturn(ownerId);

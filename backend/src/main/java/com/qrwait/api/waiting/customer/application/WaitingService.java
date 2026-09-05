@@ -32,7 +32,7 @@ public class WaitingService {
 
   private static final int DEFAULT_MINUTES_PER_PERSON = 5;
   private static final int DEFAULT_CALL_GRACE_MINUTES = 5;
-  private static final LocalTime DEFAULT_BUSINESS_DAY_START = LocalTime.of(5, 0);
+  private static final LocalTime DEFAULT_OPEN_TIME = LocalTime.of(5, 0);
 
   /**
    * 채번 경합 재시도 상한. 이 값은 임의의 튜닝 노브가 아니라 "매장당 동시 등록 처리량 상한"이다.
@@ -157,7 +157,7 @@ public class WaitingService {
 
   /** 매장 설정이 없을 때의 영업일 기준. StoreSettings 기본값(05:00)과 같아야 한다. */
   private LocalDate defaultBusinessDate(LocalDateTime at) {
-    return at.toLocalTime().isBefore(DEFAULT_BUSINESS_DAY_START)
+    return at.toLocalTime().isBefore(DEFAULT_OPEN_TIME)
         ? at.toLocalDate().minusDays(1)
         : at.toLocalDate();
   }

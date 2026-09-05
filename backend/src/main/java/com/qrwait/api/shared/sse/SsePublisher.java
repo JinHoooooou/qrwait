@@ -28,7 +28,7 @@ public class SsePublisher {
    * 일부 브라우저는 수신 버퍼가 ~1~2KB를 넘기 전까지 EventSource 이벤트를 넘겨주지 않는다.
    */
   private static final int INITIAL_PADDING_SIZE = 2048;
-  private static final LocalTime DEFAULT_BUSINESS_DAY_START = LocalTime.of(5, 0);
+  private static final LocalTime DEFAULT_OPEN_TIME = LocalTime.of(5, 0);
 
   private final SseEmitterRegistry registry;
   private final WaitingRepository waitingRepository;
@@ -145,7 +145,7 @@ public class SsePublisher {
     LocalDateTime now = LocalDateTime.now();
     LocalDate businessDate = settings
         .map(s -> s.businessDateOf(now))
-        .orElseGet(() -> now.toLocalTime().isBefore(DEFAULT_BUSINESS_DAY_START)
+        .orElseGet(() -> now.toLocalTime().isBefore(DEFAULT_OPEN_TIME)
             ? now.toLocalDate().minusDays(1)
             : now.toLocalDate());
 

@@ -15,7 +15,6 @@ function StoreSettingsPage() {
   const [closeTime, setCloseTime] = useState('22:00')
   const [alertThreshold, setAlertThreshold] = useState(10)
   const [alertEnabled, setAlertEnabled] = useState(true)
-  const [businessDayStart, setBusinessDayStart] = useState('05:00:00')
   const [callGraceMinutes, setCallGraceMinutes] = useState(5)
   const [formulaExample, setFormulaExample] = useState('')
 
@@ -31,11 +30,10 @@ function StoreSettingsPage() {
       .then((data) => {
         setTableCount(data.tableCount)
         setAvgTurnoverMinutes(data.avgTurnoverMinutes)
-        setOpenTime(data.openTime ?? '09:00')
+        setOpenTime(data.openTime)
         setCloseTime(data.closeTime ?? '22:00')
         setAlertThreshold(data.alertThreshold)
         setAlertEnabled(data.alertEnabled)
-        setBusinessDayStart(data.businessDayStart)
         setCallGraceMinutes(data.callGraceMinutes)
         setFormulaExample(data.estimatedWaitFormulaExample)
       })
@@ -59,7 +57,6 @@ function StoreSettingsPage() {
         closeTime,
         alertThreshold,
         alertEnabled,
-        businessDayStart,
         callGraceMinutes,
       })
       showToast()
@@ -138,7 +135,7 @@ function StoreSettingsPage() {
               style={styles.input}
               type="time"
               value={openTime}
-              onChange={(e) => setOpenTime(e.target.value)}
+              onChange={(e) => setOpenTime(e.target.value ? e.target.value : openTime)}
             />
           </label>
           <label style={{...styles.label, flex: 1}}>
@@ -151,6 +148,7 @@ function StoreSettingsPage() {
             />
           </label>
         </div>
+        <small style={styles.hint}>시작 시간을 기준으로 대기번호가 1번부터 다시 시작합니다. 새벽 영업분은 전날로 집계됩니다.</small>
       </section>
 
       {/* 알림 설정 */}
@@ -180,20 +178,9 @@ function StoreSettingsPage() {
         </label>
       </section>
 
-      {/* 영업일·호출 설정 */}
+      {/* 호출 설정 */}
       <section style={styles.section}>
-        <p style={styles.sectionTitle}>영업일·호출 설정</p>
-
-        <label style={styles.label}>
-          영업일 시작 시각
-          <input
-            style={styles.input}
-            type="time"
-            value={businessDayStart.slice(0, 5)}
-            onChange={(e) => setBusinessDayStart(e.target.value ? `${e.target.value}:00` : businessDayStart)}
-          />
-          <small style={styles.hint}>이 시각을 기준으로 대기번호가 1번부터 다시 시작합니다. 새벽 영업분은 전날로 집계됩니다.</small>
-        </label>
+        <p style={styles.sectionTitle}>호출 설정</p>
 
         <label style={styles.label}>
           호출 유예 시간 (분)

@@ -11,14 +11,14 @@ import org.junit.jupiter.api.Test;
 
 class StoreSettingsTest {
 
-  private StoreSettings settings(int tableCount, int avgTurnoverMinutes, LocalTime businessDayStart) {
+  private StoreSettings settings(int tableCount, int avgTurnoverMinutes, LocalTime openTime) {
     return StoreSettings.restore(
         UUID.randomUUID(), UUID.randomUUID(), tableCount, avgTurnoverMinutes,
-        null, null, 10, true, businessDayStart, 5);
+        openTime, null, 10, true, 5);
   }
 
   @Test
-  void businessDateOf_영업일_시작_이전이면_전날() {
+  void businessDateOf_영업_시작_이전이면_전날() {
     StoreSettings s = settings(5, 30, LocalTime.of(5, 0));
 
     LocalDate result = s.businessDateOf(LocalDateTime.of(2026, 9, 2, 4, 59));
@@ -27,7 +27,7 @@ class StoreSettingsTest {
   }
 
   @Test
-  void businessDateOf_영업일_시작_정각이면_당일() {
+  void businessDateOf_영업_시작_정각이면_당일() {
     StoreSettings s = settings(5, 30, LocalTime.of(5, 0));
 
     LocalDate result = s.businessDateOf(LocalDateTime.of(2026, 9, 2, 5, 0));
@@ -80,7 +80,7 @@ class StoreSettingsTest {
   void update_테이블_수가_0이면_예외() {
     StoreSettings s = settings(5, 30, LocalTime.of(5, 0));
 
-    assertThatThrownBy(() -> s.update(0, 30, null, null, 10, true, LocalTime.of(5, 0), 5))
+    assertThatThrownBy(() -> s.update(0, 30, null, null, 10, true, 5))
         .isInstanceOf(IllegalArgumentException.class)
         .hasMessageContaining("테이블 수");
   }
@@ -89,25 +89,25 @@ class StoreSettingsTest {
   void update_유예_시간이_음수면_예외() {
     StoreSettings s = settings(5, 30, LocalTime.of(5, 0));
 
-    assertThatThrownBy(() -> s.update(5, 30, null, null, 10, true, LocalTime.of(5, 0), -1))
+    assertThatThrownBy(() -> s.update(5, 30, LocalTime.of(9, 0), null, 10, true, -1))
         .isInstanceOf(IllegalArgumentException.class)
         .hasMessageContaining("유예");
   }
 
   @Test
-  void update_영업일_시작_시각이_null이면_예외() {
+  void update_영업_시작_시각이_null이면_예외() {
     StoreSettings s = settings(5, 30, LocalTime.of(5, 0));
 
-    assertThatThrownBy(() -> s.update(5, 30, null, null, 10, true, null, 5))
+    assertThatThrownBy(() -> s.update(5, 30, null, null, 10, true, 5))
         .isInstanceOf(IllegalArgumentException.class)
-        .hasMessageContaining("영업일 시작 시각");
+        .hasMessageContaining("영업 시작 시각");
   }
 
   @Test
   void createDefault_기본값은_05시_5분() {
     StoreSettings s = StoreSettings.createDefault(UUID.randomUUID());
 
-    assertThat(s.getBusinessDayStart()).isEqualTo(LocalTime.of(5, 0));
+    assertThat(s.getOpenTime()).isEqualTo(LocalTime.of(5, 0));
     assertThat(s.getCallGraceMinutes()).isEqualTo(5);
   }
 }

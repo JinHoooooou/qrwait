@@ -10,7 +10,6 @@ public record StoreSettingsResponse(
     LocalTime closeTime,
     int alertThreshold,
     boolean alertEnabled,
-    LocalTime businessDayStart,
     int callGraceMinutes,
     String estimatedWaitFormulaExample
 ) {
@@ -25,7 +24,6 @@ public record StoreSettingsResponse(
         settings.getCloseTime(),
         settings.getAlertThreshold(),
         settings.isAlertEnabled(),
-        settings.getBusinessDayStart(),
         settings.getCallGraceMinutes(),
         formula
     );

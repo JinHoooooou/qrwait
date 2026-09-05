@@ -27,7 +27,7 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class WaitingRetentionService {
 
-  private static final LocalTime DEFAULT_BUSINESS_DAY_START = LocalTime.of(5, 0);
+  private static final LocalTime DEFAULT_OPEN_TIME = LocalTime.of(5, 0);
 
   /**
    * 한 번의 배치 실행이 매장당 가명처리할 최대 건수. 배포 직후 첫 실행처럼 밀린 이력이 많을 때
@@ -66,7 +66,7 @@ public class WaitingRetentionService {
   private LocalDate currentBusinessDate(UUID storeId, LocalDateTime now) {
     return storeSettingsRepository.findByStoreId(storeId)
         .map(s -> s.businessDateOf(now))
-        .orElseGet(() -> now.toLocalTime().isBefore(DEFAULT_BUSINESS_DAY_START)
+        .orElseGet(() -> now.toLocalTime().isBefore(DEFAULT_OPEN_TIME)
             ? now.toLocalDate().minusDays(1)
             : now.toLocalDate());
   }

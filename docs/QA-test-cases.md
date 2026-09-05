@@ -97,7 +97,7 @@
 | TC-REG-07 ⚠️ | storeId 누락 진입           | -            | `/wait`에 storeId 없이 진입                       | "유효하지 않은 QR 코드입니다." 표시                                                                         |                                      |
 | TC-REG-08 ✅  | 대기번호 순차 증가              | 매장 OPEN      | 연속 2건 등록                                     | waitingNumber가 직전 +1                                                                           | `findNextWaitingNumber`              |
 | TC-REG-09 🔁 | 등록 시 점주 알림              | 점주 대시보드 구독 중 | 손님 등록 발생                                     | 점주 화면에 `waiting-registered` → 목록 갱신                                                            |                                      |
-| TC-REG-10 ✅ | 영업일 기준 대기번호 리셋          | 전날 마감 대기 존재    | 매장 설정 `businessDayStart` 시각 이후 첫 등록          | waitingNumber가 1부터 다시 시작 (전날 번호와 무관)                                                        | `businessDateOf` 05:00 기본값          |
+| TC-REG-10 ✅ | 영업일 기준 대기번호 리셋          | 전날 마감 대기 존재    | 매장 설정 `openTime`(영업 시작 시각) 이후 첫 등록          | waitingNumber가 1부터 다시 시작 (전날 번호와 무관)                                                        | `businessDateOf` 는 `openTime` 을 경계로 씀, 기본값 05:00          |
 
 ---
 
