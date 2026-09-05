@@ -2,12 +2,9 @@ import {useEffect, useState} from 'react'
 import {useNavigate} from 'react-router-dom'
 import Button from '../components/Button'
 import {getStoreSettings, updateStoreSettings} from '../api/owner'
-import {getStoreQrUrl} from '../api/waiting'
-import useOwnerStore from '../store/ownerStore'
 
 function StoreSettingsPage() {
   const navigate = useNavigate()
-  const storeId = useOwnerStore((s) => s.storeId)
 
   const [tableCount, setTableCount] = useState(5)
   const [avgTurnoverMinutes, setAvgTurnoverMinutes] = useState(30)
@@ -21,9 +18,6 @@ function StoreSettingsPage() {
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState<string | null>(null)
-  const [toast, setToast] = useState(false)
-
-  const qrUrl = storeId ? getStoreQrUrl(storeId) : null
 
   useEffect(() => {
     getStoreSettings()
@@ -41,11 +35,6 @@ function StoreSettingsPage() {
       .finally(() => setLoading(false))
   }, [])
 
-  const showToast = () => {
-    setToast(true)
-    setTimeout(() => setToast(false), 3000)
-  }
-
   const handleSave = async () => {
     setSaving(true)
     setError(null)
@@ -59,24 +48,11 @@ function StoreSettingsPage() {
         alertEnabled,
         callGraceMinutes,
       })
-      showToast()
+      navigate('/owner/dashboard')
     } catch (err) {
       setError(err instanceof Error ? err.message : '저장에 실패했습니다.')
-    } finally {
       setSaving(false)
     }
-  }
-
-  const handleDownloadQr = async () => {
-    if (!qrUrl) return
-    const res = await fetch(qrUrl)
-    const blob = await res.blob()
-    const url = URL.createObjectURL(blob)
-    const a = document.createElement('a')
-    a.href = url
-    a.download = 'qr-code.png'
-    a.click()
-    URL.revokeObjectURL(url)
   }
 
   if (loading) return null
@@ -156,7 +132,7 @@ function StoreSettingsPage() {
         <p style={styles.sectionTitle}>알림 설정</p>
 
         <label style={styles.label}>
-          대기자 알림 임계값 (팀)
+          혼잡 알림 기준 (팀)
           <input
             style={styles.input}
             type="number"
@@ -165,10 +141,11 @@ function StoreSettingsPage() {
             value={alertThreshold}
             onChange={(e) => setAlertThreshold(Number(e.target.value))}
           />
+          <small style={styles.hint}>대기 팀이 이 수 이상이 되면 알려드려요.</small>
         </label>
 
         <label style={styles.toggleLabel}>
-          <span>대기자 수 초과 알림</span>
+          <span>혼잡 알림 받기</span>
           <input
             type="checkbox"
             checked={alertEnabled}
@@ -196,27 +173,9 @@ function StoreSettingsPage() {
         </label>
       </section>
 
-      {/* QR 코드 */}
-      {qrUrl && (
-        <section style={styles.section}>
-          <p style={styles.sectionTitle}>QR 코드</p>
-          <div style={styles.qrCard}>
-            <img src={qrUrl} alt="QR 코드" style={styles.qrImage} />
-          </div>
-          <Button variant="secondary" onClick={handleDownloadQr}>
-            PNG 다운로드
-          </Button>
-        </section>
-      )}
-
       <Button onClick={handleSave} disabled={saving}>
         {saving ? '저장 중...' : '저장'}
       </Button>
-
-      {/* 토스트 알림 */}
-      {toast && (
-        <div style={styles.toast}>설정이 저장되었습니다.</div>
-      )}
     </div>
   )
 }
@@ -298,35 +257,9 @@ const styles: Record<string, React.CSSProperties> = {
     fontSize: '0.8rem',
     color: '#6b7280',
   },
-  qrCard: {
-    display: 'flex',
-    justifyContent: 'center',
-    padding: '1.5rem',
-    borderRadius: '0.75rem',
-    backgroundColor: '#fff',
-    border: '1px solid #e2e8f0',
-  },
-  qrImage: {
-    width: 180,
-    height: 180,
-  },
   error: {
     fontSize: '0.875rem',
     color: '#dc2626',
-  },
-  toast: {
-    position: 'fixed',
-    bottom: '2rem',
-    left: '50%',
-    transform: 'translateX(-50%)',
-    backgroundColor: '#111827',
-    color: '#fff',
-    padding: '0.75rem 1.5rem',
-    borderRadius: '999px',
-    fontSize: '0.875rem',
-    fontWeight: 500,
-    zIndex: 200,
-    whiteSpace: 'nowrap',
   },
 }
 
