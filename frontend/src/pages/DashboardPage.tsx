@@ -219,6 +219,9 @@ function DashboardPage() {
             <Button variant="secondary" onClick={() => navigate('/owner/qr-print')} style={styles.headerBtn}>
               QR 인쇄
             </Button>
+            <Button variant="secondary" onClick={() => navigate('/owner/settings')} style={styles.headerBtn}>
+              설정
+            </Button>
             <Button variant="secondary" onClick={handleLogout} style={styles.headerBtn}>
               로그아웃
             </Button>
