@@ -86,13 +86,23 @@ cp .env.example .env
 | `DB_PASSWORD`          | DB 비밀번호             | `yourpassword`        |
 | `CORS_ALLOWED_ORIGINS` | 프론트엔드 접근 도메인        | `http://192.168.0.10` |
 | `APP_BASE_URL`         | QR 코드에 인코딩될 베이스 URL | `http://192.168.0.10` |
+| `JWT_SECRET`           | JWT 서명 시크릿 (Base64, 32바이트 이상) | `openssl rand -base64 32` |
+| `PHONE_HASH_SECRET`    | 전화번호 가명처리용 HMAC 비밀키 (Base64, 32바이트 이상) — 교체 시 기존 해시와 매칭이 끊겨 반복 노쇼 이력이 단절됨 | `openssl rand -base64 32` |
 | `NHN_SMS_APP_KEY`        | NHN Cloud SMS 프로젝트 AppKey (선택)    | (콘솔에서 발급)          |
 | `NHN_SMS_SECRET_KEY`     | NHN Cloud SMS SecretKey (선택)      | (콘솔에서 발급)          |
 | `NHN_SMS_SENDER_NUMBER`  | 사전 등록된 발신번호, 하이픈 무관 (선택)          | `01099998888`         |
 
 > `NHN_SMS_*` 세 값은 **선택 사항**입니다. 미설정 시 앱 구동은 정상 진행되며, 손님 호출 시점에 SMS 발송이 실패하고 점주 대시보드 상단에 "⚠️ SMS 발송 실패, 직접 연락해주세요" 배너가 표시됩니다.
 
-### 2. 전체 스택 기동
+### 2. 프로덕션 설정 파일 생성
+
+```bash
+cp backend/src/main/resources/application-prod.yml.example backend/src/main/resources/application-prod.yml
+```
+
+이 파일은 `.gitignore`에 포함되어 있어 커밋되지 않으며, `docker compose up --build` 시 이미지에 포함되어 `prod` 프로필로 로드됩니다. 최초 1회만 생성하면 됩니다.
+
+### 3. 전체 스택 기동
 
 ```bash
 docker compose up --build
@@ -100,7 +110,7 @@ docker compose up --build
 
 서비스 접속: `http://localhost` (또는 같은 네트워크의 `http://{PC_IP}`)
 
-### 3. 종료
+### 4. 종료
 
 ```bash
 docker compose down        # 컨테이너만 종료 (데이터 유지)
