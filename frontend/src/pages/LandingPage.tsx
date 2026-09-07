@@ -34,6 +34,8 @@ function LandingPage() {
   const [phoneNumber, setPhoneNumber] = useState('')
   const [partySize, setPartySize] = useState(1)
   const [agreed, setAgreed] = useState(false)
+  const [phoneError, setPhoneError] = useState(false)
+  const [consentError, setConsentError] = useState(false)
   const [submitting, setSubmitting] = useState(false)
 
   const setWaiting = useWaitingStore((s) => s.setWaiting)
@@ -84,7 +86,15 @@ function LandingPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    if (!storeId || !phoneNumber.trim() || !agreed) return
+    if (!storeId) return
+    if (!phoneNumber.trim()) {
+      setPhoneError(true)
+      return
+    }
+    if (!agreed) {
+      setConsentError(true)
+      return
+    }
 
     setSubmitting(true)
     try {
@@ -141,12 +151,19 @@ function LandingPage() {
                       style={styles.input}
                       type="tel"
                       value={phoneNumber}
-                      onChange={(e) => setPhoneNumber(formatPhoneNumber(e.target.value))}
+                      onChange={(e) => {
+                        const formatted = formatPhoneNumber(e.target.value)
+                        setPhoneNumber(formatted)
+                        if (formatted.trim()) setPhoneError(false)
+                      }}
                       maxLength={13}
                       placeholder="010-XXXX-XXXX"
                       required
                   />
                 </label>
+                {phoneError && (
+                    <p style={styles.fieldErrorText}>전화번호를 입력해주세요.</p>
+                )}
 
                 <label style={styles.label}>
                   인원수
@@ -173,7 +190,10 @@ function LandingPage() {
                   <input
                       type="checkbox"
                       checked={agreed}
-                      onChange={(e) => setAgreed(e.target.checked)}
+                      onChange={(e) => {
+                        setAgreed(e.target.checked)
+                        if (e.target.checked) setConsentError(false)
+                      }}
                       style={styles.checkbox}
                   />
                   <span style={styles.consentText}>
@@ -181,8 +201,15 @@ function LandingPage() {
                     뒤 4자리와 식별할 수 없는 형태로 변환한 값만 이력 관리 및 반복 노쇼 방지를 위해 보관합니다.
                   </span>
                 </label>
+                {consentError && (
+                    <p style={styles.fieldErrorText}>웨이팅 등록에 동의해주세요.</p>
+                )}
 
-                <Button type="submit" disabled={submitting || !agreed}>
+                <Button
+                    type="submit"
+                    disabled={submitting}
+                    style={!phoneNumber.trim() || !agreed ? styles.submitBtnPending : undefined}
+                >
                   {submitting ? '등록 중...' : '웨이팅 등록'}
                 </Button>
               </form>
@@ -301,6 +328,15 @@ const styles: Record<string, React.CSSProperties> = {
     fontSize: '0.8125rem',
     color: '#6b7280',
     lineHeight: 1.5,
+  },
+  fieldErrorText: {
+    fontSize: '0.8125rem',
+    color: '#dc2626',
+    marginTop: '-0.5rem',
+  },
+  submitBtnPending: {
+    backgroundColor: '#d1d5db',
+    color: '#6b7280',
   },
 }
 

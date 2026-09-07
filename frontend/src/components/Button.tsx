@@ -23,12 +23,18 @@ const styles = {
     backgroundColor: '#f3f4f6',
     color: '#374151',
   } as React.CSSProperties,
+  disabled: {
+    backgroundColor: '#d1d5db',
+    color: '#6b7280',
+    cursor: 'not-allowed',
+  } as React.CSSProperties,
 }
 
-function Button({ variant = 'primary', style, ...props }: ButtonProps) {
+function Button({ variant = 'primary', style, disabled, ...props }: ButtonProps) {
   return (
     <button
-      style={{ ...styles.base, ...styles[variant], ...style }}
+      disabled={disabled}
+      style={{ ...styles.base, ...styles[variant], ...(disabled ? styles.disabled : null), ...style }}
       {...props}
     />
   )
