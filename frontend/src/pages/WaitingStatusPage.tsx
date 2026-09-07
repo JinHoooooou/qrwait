@@ -16,6 +16,8 @@ function WaitingStatusPage() {
   const session = getWaitingSession()
   const resolvedStoreId = storeId ?? session?.storeId ?? null
   const resolvedWaitingNumber = waitingNumber ?? session?.waitingNumber ?? null
+  // 세션 종료(clearWaiting) 이후에도 "처음으로" 버튼이 매장을 기억하도록 마운트 시점 값을 보존
+  const [capturedStoreId] = useState(resolvedStoreId)
 
   const [connectionStatus, setConnectionStatus] = useState<SseConnectionStatus>('connecting')
   const [expired, setExpired] = useState(false)
@@ -25,7 +27,7 @@ function WaitingStatusPage() {
   // API 응답 이후에만 리다이렉트 평가
   useEffect(() => {
     if (!resolvedStoreId && initialized && !expired) {
-      navigate('/', {replace: true})
+      navigate('/wait', {replace: true})
     }
   }, [resolvedStoreId, initialized, expired, navigate])
 
@@ -89,7 +91,9 @@ function WaitingStatusPage() {
           <div style={styles.expiredIcon}>✓</div>
           <p style={styles.expiredTitle}>웨이팅이 종료되었습니다</p>
           <p style={styles.expiredDesc}>취소되었거나 이미 입장이 완료된 웨이팅입니다.</p>
-          <Button onClick={() => navigate('/')}>처음으로</Button>
+          <Button onClick={() => navigate(capturedStoreId ? `/wait?storeId=${capturedStoreId}` : '/wait')}>
+            처음으로
+          </Button>
         </div>
     )
   }

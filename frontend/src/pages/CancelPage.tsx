@@ -1,14 +1,18 @@
 import {useState} from 'react'
 import {useNavigate, useParams} from 'react-router-dom'
 import {cancelWaiting} from '../api/waiting'
-import {clearWaitingSession} from '../utils/session'
+import {clearWaitingSession, getWaitingSession} from '../utils/session'
 import useWaitingStore from '../store/waitingStore'
 import Button from '../components/Button'
 
 function CancelPage() {
   const navigate = useNavigate()
   const {waitingId} = useParams<{ waitingId: string }>()
-  const clearWaiting = useWaitingStore((s) => s.clearWaiting)
+  const {storeId, clearWaiting} = useWaitingStore()
+  const session = getWaitingSession()
+  const resolvedStoreId = storeId ?? session?.storeId ?? null
+  // 세션 종료(clearWaiting) 이후에도 "처음으로" 버튼이 매장을 기억하도록 마운트 시점 값을 보존
+  const [capturedStoreId] = useState(resolvedStoreId)
 
   const [cancelling, setCancelling] = useState(false)
   const [cancelled, setCancelled] = useState(false)
@@ -34,7 +38,9 @@ function CancelPage() {
         <div style={styles.container}>
           <div style={styles.badge}>취소 완료</div>
           <p style={styles.message}>웨이팅이 취소되었습니다.</p>
-          <Button onClick={() => navigate('/')}>처음으로</Button>
+          <Button onClick={() => navigate(capturedStoreId ? `/wait?storeId=${capturedStoreId}` : '/wait')}>
+            처음으로
+          </Button>
         </div>
     )
   }
