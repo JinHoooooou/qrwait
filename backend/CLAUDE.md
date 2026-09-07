@@ -185,6 +185,7 @@ com.qrwait.api
 - **부수효과(외부 연동):** 상태 변경 후 `ApplicationEventPublisher`로 도메인 이벤트(`event/XxxEvent`)를 발행한다. SMS 발송 등 외부 연동은
   `@TransactionalEventListener(phase = AFTER_COMMIT)` 리스너에서 처리한다 (커밋 후 실행).
 - **실시간 전송:** 클라이언트(손님/점주) 푸시는 항상 `SsePublisher`를 경유한다. Service가 SseEmitter를 직접 다루지 않는다.
+- **마이그레이션 불변성:** 한 번이라도 실제 환경(배포 서버, 다른 개발자 로컬 등)에 적용된 `db/migration/V*.sql`은 이후 절대 수정하지 않는다. 스키마를 바꾸려면 항상 새 버전 파일(`V{n+1}__...sql`)을 추가한다. 이미 적용된 파일을 고치면 Flyway가 체크섬 불일치로 검증에 실패해 배포 자체가 막힌다 — 아직 어디에도 적용 안 된 로컬 전용 마이그레이션(막 추가한 것)만 예외적으로 수정 가능하다.
 
 ---
 
