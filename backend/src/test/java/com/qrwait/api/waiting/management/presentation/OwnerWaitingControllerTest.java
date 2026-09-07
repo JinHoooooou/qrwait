@@ -2,6 +2,7 @@ package com.qrwait.api.waiting.management.presentation;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.isNull;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.willDoNothing;
 import static org.mockito.Mockito.verify;
@@ -225,7 +226,7 @@ class OwnerWaitingControllerTest {
 
     given(jwtTokenProvider.validateToken(any())).willReturn(true);
     given(jwtTokenProvider.extractOwnerId(any())).willReturn(ownerId);
-    given(waitingManagementService.getTodayWaitings(eq(ownerId)))
+    given(waitingManagementService.getTodayWaitings(eq(ownerId), isNull()))
         .willReturn(List.of(new TodayWaitingResponse(
             waitingId, 1, "010-1234-5678", 2, WaitingStatus.ENTERED, java.time.LocalDateTime.now(), 15L
         )));
@@ -236,5 +237,22 @@ class OwnerWaitingControllerTest {
         .andExpect(jsonPath("$[0].phoneNumber").value("010-1234-5678"))
         .andExpect(jsonPath("$[0].waitingNumber").value(1))
         .andExpect(jsonPath("$[0].status").value("ENTERED"));
+  }
+
+  @Test
+  void getTodayWaitings_date_파라미터_전달() throws Exception {
+    UUID ownerId = UUID.randomUUID();
+
+    given(jwtTokenProvider.validateToken(any())).willReturn(true);
+    given(jwtTokenProvider.extractOwnerId(any())).willReturn(ownerId);
+    given(waitingManagementService.getTodayWaitings(eq(ownerId), eq(java.time.LocalDate.of(2026, 8, 1))))
+        .willReturn(List.of());
+
+    mockMvc.perform(get("/api/owner/stores/me/waitings/today?date=2026-08-01")
+            .header("Authorization", "Bearer test-token"))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$").isEmpty());
+
+    verify(waitingManagementService).getTodayWaitings(eq(ownerId), eq(java.time.LocalDate.of(2026, 8, 1)));
   }
 }

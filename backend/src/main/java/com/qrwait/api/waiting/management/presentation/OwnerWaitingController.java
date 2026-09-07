@@ -6,9 +6,11 @@ import com.qrwait.api.waiting.management.dto.OwnerWaitingResponse;
 import com.qrwait.api.waiting.management.dto.TodayWaitingResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -16,6 +18,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
@@ -45,10 +48,12 @@ public class OwnerWaitingController {
     return ResponseEntity.ok(waitingManagementService.getDailySummary(ownerId));
   }
 
-  @Operation(summary = "오늘의 웨이팅 이력 전체 조회")
+  @Operation(summary = "웨이팅 이력 전체 조회 (date 미지정 시 오늘)")
   @GetMapping("/stores/me/waitings/today")
-  public ResponseEntity<List<TodayWaitingResponse>> getTodayWaitings(@AuthenticationPrincipal UUID ownerId) {
-    return ResponseEntity.ok(waitingManagementService.getTodayWaitings(ownerId));
+  public ResponseEntity<List<TodayWaitingResponse>> getTodayWaitings(
+      @AuthenticationPrincipal UUID ownerId,
+      @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date) {
+    return ResponseEntity.ok(waitingManagementService.getTodayWaitings(ownerId, date));
   }
 
   @Operation(summary = "손님 호출")

@@ -44,29 +44,57 @@ function tabKeyToStatusParam(key: TabKey): string | null {
   return key
 }
 
+const todayStr = () => {
+  const d = new Date()
+  const mm = String(d.getMonth() + 1).padStart(2, '0')
+  const dd = String(d.getDate()).padStart(2, '0')
+  return `${d.getFullYear()}-${mm}-${dd}`
+}
+
 function HistoryPage() {
   const navigate = useNavigate()
   const [searchParams, setSearchParams] = useSearchParams()
   const [entries, setEntries] = useState<TodayWaiting[]>([])
-  const [loading, setLoading] = useState(true)
+  const [loadedDate, setLoadedDate] = useState<string | null>(null)
   const [error, setError] = useState<string | null>(null)
 
   const activeTab = statusParamToTabKey(searchParams.get('status'))
+  const selectedDate = searchParams.get('date') || todayStr()
+  const isToday = selectedDate === todayStr()
+  const loading = loadedDate !== selectedDate
 
   useEffect(() => {
-    getTodayWaitings()
-        .then(setEntries)
-        .catch(() => setError('이력을 불러오지 못했습니다.'))
-        .finally(() => setLoading(false))
-  }, [])
+    let cancelled = false
+    getTodayWaitings(isToday ? undefined : selectedDate)
+        .then((data) => {
+          if (cancelled) return
+          setEntries(data)
+          setError(null)
+        })
+        .catch(() => {
+          if (!cancelled) setError('이력을 불러오지 못했습니다.')
+        })
+        .finally(() => {
+          if (!cancelled) setLoadedDate(selectedDate)
+        })
+    return () => {
+      cancelled = true
+    }
+  }, [selectedDate, isToday])
 
   const handleTabChange = (key: TabKey) => {
     const param = tabKeyToStatusParam(key)
-    if (param === null) {
-      setSearchParams({})
-    } else {
-      setSearchParams({status: param})
-    }
+    const next = new URLSearchParams(searchParams)
+    if (param === null) next.delete('status')
+    else next.set('status', param)
+    setSearchParams(next)
+  }
+
+  const handleDateChange = (value: string) => {
+    const next = new URLSearchParams(searchParams)
+    if (value === todayStr()) next.delete('date')
+    else next.set('date', value)
+    setSearchParams(next)
   }
 
   const currentTab = TABS.find((t) => t.key === activeTab)!
@@ -77,54 +105,64 @@ function HistoryPage() {
     return `${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`
   }
 
-  if (loading) return <LoadingSpinner/>
-
   return (
       <div style={styles.container}>
         <div style={styles.header}>
           <button style={styles.backBtn} onClick={() => navigate('/owner/dashboard')}>
             ← 대시보드
           </button>
-          <h1 style={styles.title}>오늘의 웨이팅</h1>
+          <h1 style={styles.title}>{isToday ? '오늘의 웨이팅' : '웨이팅 이력'}</h1>
         </div>
+
+        <input
+            type="date"
+            style={styles.dateInput}
+            value={selectedDate}
+            max={todayStr()}
+            onChange={(e) => e.target.value && handleDateChange(e.target.value)}
+        />
 
         {error && <ErrorMessage message={error}/>}
 
-        <div style={styles.tabs}>
-          {TABS.map(({key, label}) => (
-              <button
-                  key={key}
-                  style={{
-                    ...styles.tab,
-                    backgroundColor: activeTab === key ? '#3b82f6' : '#f3f4f6',
-                    color: activeTab === key ? '#fff' : '#374151',
-                  }}
-                  onClick={() => handleTabChange(key)}
-              >
-                {label}
-              </button>
-          ))}
-        </div>
+        {loading ? <LoadingSpinner/> : (
+            <>
+              <div style={styles.tabs}>
+                {TABS.map(({key, label}) => (
+                    <button
+                        key={key}
+                        style={{
+                          ...styles.tab,
+                          backgroundColor: activeTab === key ? '#3b82f6' : '#f3f4f6',
+                          color: activeTab === key ? '#fff' : '#374151',
+                        }}
+                        onClick={() => handleTabChange(key)}
+                    >
+                      {label}
+                    </button>
+                ))}
+              </div>
 
-        {filtered.length === 0 ? (
-            <p style={styles.empty}>해당 항목이 없습니다.</p>
-        ) : (
-            <div style={styles.list}>
-              {filtered.map((entry) => (
-                  <div key={entry.waitingId} style={styles.card}>
-                    <span style={styles.number}>#{entry.waitingNumber}</span>
-                    <span style={styles.phone}>{entry.phoneNumber}</span>
-                    <span style={styles.meta}>{entry.partySize}명</span>
-                    <span style={{...styles.status, color: STATUS_COLORS[entry.status]}}>
-                      {STATUS_LABELS[entry.status]}
-                    </span>
-                    <span style={styles.waited}>
-                      {entry.waitedMinutes !== null ? `대기 ${entry.waitedMinutes}분` : '-'}
-                    </span>
-                    <span style={styles.time}>{formatTime(entry.createdAt)}</span>
+              {filtered.length === 0 ? (
+                  <p style={styles.empty}>해당 항목이 없습니다.</p>
+              ) : (
+                  <div style={styles.list}>
+                    {filtered.map((entry) => (
+                        <div key={entry.waitingId} style={styles.card}>
+                          <span style={styles.number}>#{entry.waitingNumber}</span>
+                          <span style={styles.phone}>{entry.phoneNumber}</span>
+                          <span style={styles.meta}>{entry.partySize}명</span>
+                          <span style={{...styles.status, color: STATUS_COLORS[entry.status]}}>
+                            {STATUS_LABELS[entry.status]}
+                          </span>
+                          <span style={styles.waited}>
+                            {entry.waitedMinutes !== null ? `대기 ${entry.waitedMinutes}분` : '-'}
+                          </span>
+                          <span style={styles.time}>{formatTime(entry.createdAt)}</span>
+                        </div>
+                    ))}
                   </div>
-              ))}
-            </div>
+              )}
+            </>
         )}
       </div>
   )
@@ -156,6 +194,13 @@ const styles: Record<string, React.CSSProperties> = {
     fontSize: '1.125rem',
     fontWeight: 700,
     margin: 0,
+  },
+  dateInput: {
+    padding: '0.625rem 0.75rem',
+    borderRadius: '0.5rem',
+    border: '1px solid #d1d5db',
+    fontSize: '0.875rem',
+    alignSelf: 'flex-start',
   },
   tabs: {
     display: 'flex',
