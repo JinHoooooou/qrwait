@@ -1,7 +1,7 @@
 import {useCallback, useEffect, useState} from 'react'
 import {useNavigate, useParams} from 'react-router-dom'
 import useWaitingStore from '../store/waitingStore'
-import {getWaiting} from '../api/waiting'
+import {getStore, getWaiting} from '../api/waiting'
 import {clearWaitingSession, getWaitingSession} from '../utils/session'
 import {useWaitingSse} from '../hooks/useWaitingSse'
 import Button from '../components/Button'
@@ -14,11 +14,22 @@ function WaitingCalledPage() {
   const session = getWaitingSession()
   const resolvedStoreId = storeId ?? session?.storeId ?? null
   const resolvedWaitingNumber = waitingNumber ?? session?.waitingNumber ?? null
+  // 세션 종료(clearWaiting) 이후에도 "처음으로" 버튼이 매장을 기억하도록 마운트 시점 값을 보존
+  const [capturedStoreId] = useState(resolvedStoreId)
+  const goToStart = () => navigate(capturedStoreId ? `/wait?storeId=${capturedStoreId}` : '/wait')
 
   const [initialized, setInitialized] = useState(false)
   const [ended, setEnded] = useState(false)
   const [graceDeadline, setGraceDeadline] = useState<string | null>(null)
   const [remainingSeconds, setRemainingSeconds] = useState<number | null>(null)
+  const [storeName, setStoreName] = useState<string | null>(null)
+
+  useEffect(() => {
+    if (!resolvedStoreId) return
+    getStore(resolvedStoreId).then((res) => setStoreName(res.name)).catch(() => {
+      // 매장명은 부가 정보이므로 조회 실패해도 화면은 정상 진행
+    })
+  }, [resolvedStoreId])
 
   // 입장완료/취소/노쇼로 더 이상 CALLED가 아닌 경우 종료 처리
   const endSession = useCallback(() => {
@@ -76,7 +87,7 @@ function WaitingCalledPage() {
           <div style={styles.endedIcon}>✓</div>
           <p style={styles.endedTitle}>웨이팅이 종료되었습니다</p>
           <p style={styles.endedDesc}>입장이 완료되었거나 취소된 웨이팅입니다.</p>
-          <Button onClick={() => navigate('/')}>처음으로</Button>
+          <Button onClick={goToStart}>처음으로</Button>
         </div>
     )
   }
@@ -84,6 +95,8 @@ function WaitingCalledPage() {
   return (
       <div style={styles.container}>
         <div style={styles.callBadge}>입장해 주세요!</div>
+
+        {storeName && <p style={styles.storeName}>{storeName}</p>}
 
         <div style={styles.card}>
           <p style={styles.label}>내 웨이팅 번호</p>
@@ -129,6 +142,11 @@ const styles: Record<string, React.CSSProperties> = {
     borderRadius: '999px',
     fontSize: '1rem',
     fontWeight: 700,
+  },
+  storeName: {
+    fontSize: '1.125rem',
+    fontWeight: 700,
+    textAlign: 'center',
   },
   card: {
     width: '100%',
