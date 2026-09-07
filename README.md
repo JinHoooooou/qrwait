@@ -117,6 +117,22 @@ docker compose down        # 컨테이너만 종료 (데이터 유지)
 docker compose down -v     # 컨테이너 + 볼륨 삭제 (데이터 초기화)
 ```
 
+### 로컬에서 전체 스택 미리 테스트하기
+
+실제 배포 전에 컨테이너 빌드가 정상 동작하는지 로컬에서 미리 확인하려면, 서비스 정의는 그대로 두고 값만 로컬용으로 채운 `.env.local`을 따로 만들어 씁니다 (`.gitignore`에 포함되어 커밋되지 않습니다).
+
+```bash
+cp .env.example .env.local
+```
+
+`.env.local`에서 `CORS_ALLOWED_ORIGINS`, `APP_BASE_URL`을 `http://localhost`로, 나머지는 임의 값으로 채운 뒤:
+
+```bash
+docker compose --env-file .env.local up --build
+```
+
+`application-prod.yml`은 실제 배포용과 동일한 파일을 그대로 씁니다. 값만 다를 뿐 배포 때와 같은 설정 경로(`prod` 프로필)를 그대로 검증하는 것이 목적이므로, 별도의 compose 파일을 만들지 않습니다.
+
 ---
 
 ## SMS 알림 (NHN Cloud)
