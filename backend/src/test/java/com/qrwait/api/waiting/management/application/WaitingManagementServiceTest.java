@@ -6,6 +6,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 
 import com.qrwait.api.shared.sse.SsePublisher;
@@ -379,7 +380,7 @@ class WaitingManagementServiceTest {
     given(waitingRepository.findAllByStoreIdAndBusinessDate(eq(storeId), any(LocalDate.class)))
         .willReturn(List.of(waiting, entered));
 
-    List<TodayWaitingResponse> result = service.getTodayWaitings(ownerId);
+    List<TodayWaitingResponse> result = service.getTodayWaitings(ownerId, null);
 
     assertThat(result).hasSize(2);
     assertThat(result.get(0).phoneNumber()).isEqualTo("****-0001");
@@ -389,11 +390,38 @@ class WaitingManagementServiceTest {
   }
 
   @Test
+  void getTodayWaitings_날짜_지정시_해당_영업일로_조회() {
+    LocalDate requestedDate = LocalDate.now().minusDays(3);
+    WaitingEntry waiting = WaitingEntry.restore(
+        UUID.randomUUID(),
+        storeId,
+        "010-1111-0003",
+        2,
+        1,
+        WaitingStatus.ENTERED,
+        LocalDateTime.now().minusDays(3),
+        requestedDate, null, null, null
+    );
+
+    given(storeRepository.getByOwnerId(ownerId))
+        .willReturn(Store.restore(storeId, ownerId, "테스트 매장", "서울", StoreStatus.OPEN, LocalDateTime.now()));
+    given(waitingRepository.findAllByStoreIdAndBusinessDate(storeId, requestedDate))
+        .willReturn(List.of(waiting));
+
+    List<TodayWaitingResponse> result = service.getTodayWaitings(ownerId, requestedDate);
+
+    assertThat(result).hasSize(1);
+    assertThat(result.get(0).phoneNumber()).isEqualTo("****-0003");
+    // 특정 날짜가 주어지면 오늘(currentBusinessDate) 계산을 위한 조회는 필요 없다
+    verify(storeSettingsRepository, never()).findByStoreId(any());
+  }
+
+  @Test
   void getTodayWaitings_매장_없음_예외발생() {
     given(storeRepository.getByOwnerId(ownerId))
         .willThrow(new StoreNotFoundException("ownerId=" + ownerId));
 
-    assertThatThrownBy(() -> service.getTodayWaitings(ownerId))
+    assertThatThrownBy(() -> service.getTodayWaitings(ownerId, null))
         .isInstanceOf(StoreNotFoundException.class);
   }
 }

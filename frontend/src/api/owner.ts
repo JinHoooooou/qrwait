@@ -128,5 +128,6 @@ export interface TodayWaiting {
   waitedMinutes: number | null
 }
 
-export const getTodayWaitings = (): Promise<TodayWaiting[]> =>
-    ownerClient.get('/owner/stores/me/waitings/today').then((res) => res.data)
+export const getTodayWaitings = (date?: string): Promise<TodayWaiting[]> =>
+    ownerClient.get('/owner/stores/me/waitings/today', {params: date ? {date} : undefined})
+        .then((res) => res.data)

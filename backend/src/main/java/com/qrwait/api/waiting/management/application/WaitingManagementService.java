@@ -98,10 +98,12 @@ public class WaitingManagementService {
         new WaitingPostponedEvent(postponed.getStoreId(), postponed.getId()));
   }
 
+  /** {@code date} 가 없으면 오늘(현재 영업일) 기준으로 조회한다. */
   @Transactional(readOnly = true)
-  public List<TodayWaitingResponse> getTodayWaitings(UUID ownerId) {
+  public List<TodayWaitingResponse> getTodayWaitings(UUID ownerId, LocalDate date) {
     UUID storeId = storeRepository.getByOwnerId(ownerId).getId();
-    return waitingRepository.findAllByStoreIdAndBusinessDate(storeId, currentBusinessDate(storeId))
+    LocalDate businessDate = date != null ? date : currentBusinessDate(storeId);
+    return waitingRepository.findAllByStoreIdAndBusinessDate(storeId, businessDate)
         .stream()
         .map(TodayWaitingResponse::from)
         .toList();
