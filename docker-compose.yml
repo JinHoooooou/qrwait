@@ -29,6 +29,7 @@ services:
     build:
       context: ./backend
     environment:
+      TZ: Asia/Seoul
       SPRING_PROFILES_ACTIVE: prod
       DB_HOST: db
       DB_PORT: 5432
