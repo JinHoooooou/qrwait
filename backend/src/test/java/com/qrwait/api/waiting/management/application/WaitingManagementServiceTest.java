@@ -90,7 +90,7 @@ class WaitingManagementServiceTest {
     assertThat(result).hasSize(2);
     assertThat(result.get(0).phoneNumber()).isEqualTo("****-0001");
     assertThat(result.get(0).status()).isEqualTo(WaitingStatus.WAITING);
-    assertThat(result.get(0).elapsedMinutes()).isGreaterThanOrEqualTo(10);
+    assertThat(result.get(0).createdAt()).isEqualTo(waiting.getCreatedAt());
     // WAITING 상태(calledAt == null)이므로 graceDeadline은 null
     assertThat(result.get(0).graceDeadline()).isNull();
     assertThat(result.get(1).phoneNumber()).isEqualTo("****-0002");

@@ -10,7 +10,7 @@ public record OwnerWaitingResponse(
     String phoneNumber,
     int partySize,
     WaitingStatus status,
-    long elapsedMinutes,
+    LocalDateTime createdAt,
     LocalDateTime graceDeadline
 ) {
 
