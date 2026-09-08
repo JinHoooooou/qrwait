@@ -14,6 +14,7 @@ import StoreSettingsPage from './pages/StoreSettingsPage'
 import QrPrintPage from './pages/QrPrintPage'
 import HistoryPage from './pages/HistoryPage'
 import PrivateRoute from './components/PrivateRoute'
+import GuestRoute from './components/GuestRoute'
 import useOwnerStore from './store/ownerStore'
 import {refreshToken} from './api/owner'
 
@@ -53,8 +54,8 @@ function App() {
 
         {/* 점주 라우트 */}
         <Route path="/" element={<RootRedirect/>}/>
-        <Route path="/owner/login" element={<OwnerLoginPage/>}/>
-        <Route path="/owner/signup" element={<OwnerSignupPage/>}/>
+        <Route path="/owner/login" element={<GuestRoute><OwnerLoginPage/></GuestRoute>}/>
+        <Route path="/owner/signup" element={<GuestRoute><OwnerSignupPage/></GuestRoute>}/>
         <Route path="/owner/onboarding" element={<PrivateRoute><OnboardingPage/></PrivateRoute>}/>
         <Route path="/owner/dashboard" element={<PrivateRoute><DashboardPage/></PrivateRoute>}/>
         <Route path="/owner/settings" element={<PrivateRoute><StoreSettingsPage/></PrivateRoute>}/>
