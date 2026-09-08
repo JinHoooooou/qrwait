@@ -63,6 +63,9 @@ function DashboardPage() {
   const isGraceExpired = (w: OwnerWaitingItem) =>
       w.graceDeadline !== null && new Date(w.graceDeadline).getTime() < now
 
+  const elapsedMinutes = (w: OwnerWaitingItem) =>
+      Math.max(0, Math.floor((now - new Date(w.createdAt).getTime()) / 60000))
+
   const fetchWaitingList = useCallback(async () => {
     const list = await getWaitingList()
     setWaitingList(list)
@@ -305,7 +308,7 @@ function DashboardPage() {
                       <div style={styles.waitingInfo}>
                         <span style={styles.waitingNumber}>#{item.waitingNumber}</span>
                         <span style={styles.waitingName}>{item.phoneNumber}</span>
-                        <span style={styles.waitingMeta}>{item.partySize}명 · {item.elapsedMinutes}분 경과</span>
+                        <span style={styles.waitingMeta}>{item.partySize}명 · {elapsedMinutes(item)}분 경과</span>
                         {item.status === 'CALLED' && (
                             <span style={styles.calledBadge}>호출됨</span>
                         )}

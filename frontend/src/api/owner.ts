@@ -82,7 +82,7 @@ export interface OwnerWaitingItem {
   phoneNumber: string
   partySize: number
   status: 'WAITING' | 'CALLED'
-  elapsedMinutes: number
+  createdAt: string
   graceDeadline: string | null
 }
 

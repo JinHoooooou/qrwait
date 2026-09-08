@@ -20,7 +20,6 @@ import com.qrwait.api.waiting.domain.event.WaitingUpdatedEvent;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
-import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
@@ -125,13 +124,12 @@ public class WaitingManagementService {
   }
 
   private OwnerWaitingResponse toOwnerWaitingResponse(WaitingEntry entry, int graceMinutes) {
-    long elapsedMinutes = ChronoUnit.MINUTES.between(entry.getCreatedAt(), LocalDateTime.now());
     LocalDateTime graceDeadline = entry.getCalledAt() == null
         ? null
         : entry.getCalledAt().plusMinutes(graceMinutes);
     return new OwnerWaitingResponse(
         entry.getId(), entry.getWaitingNumber(), PhoneNumberMasker.mask(entry.getPhoneNumber()),
-        entry.getPartySize(), entry.getStatus(), elapsedMinutes, graceDeadline);
+        entry.getPartySize(), entry.getStatus(), entry.getCreatedAt(), graceDeadline);
   }
 
   private OwnedEntry loadOwnedEntry(UUID ownerId, UUID waitingId) {

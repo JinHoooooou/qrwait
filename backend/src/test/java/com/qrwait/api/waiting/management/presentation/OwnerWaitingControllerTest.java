@@ -85,7 +85,8 @@ class OwnerWaitingControllerTest {
     given(jwtTokenProvider.extractOwnerId(any())).willReturn(ownerId);
     given(waitingManagementService.getWaitingList(eq(ownerId)))
         .willReturn(List.of(
-            new OwnerWaitingResponse(waitingId, 1, "010-1234-5678", 2, WaitingStatus.WAITING, 5L, null)
+            new OwnerWaitingResponse(waitingId, 1, "010-1234-5678", 2, WaitingStatus.WAITING,
+                java.time.LocalDateTime.now().minusMinutes(5), null)
         ));
 
     mockMvc.perform(get("/api/owner/stores/me/waitings")
