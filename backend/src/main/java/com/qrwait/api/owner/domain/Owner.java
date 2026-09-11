@@ -26,4 +26,8 @@ public class Owner {
   public static Owner restore(UUID id, String email, String passwordHash, LocalDateTime createdAt) {
     return new Owner(id, email, passwordHash, createdAt);
   }
+
+  public Owner changePassword(String newPasswordHash) {
+    return new Owner(id, email, newPasswordHash, createdAt);
+  }
 }

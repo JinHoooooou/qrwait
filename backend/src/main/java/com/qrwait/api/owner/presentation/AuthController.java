@@ -2,6 +2,7 @@ package com.qrwait.api.owner.presentation;
 
 import com.qrwait.api.owner.application.OwnerService;
 import com.qrwait.api.owner.application.dto.AccessTokenResponse;
+import com.qrwait.api.owner.application.dto.ChangePasswordRequest;
 import com.qrwait.api.owner.application.dto.LoginRequest;
 import com.qrwait.api.owner.application.dto.LoginResponse;
 import com.qrwait.api.owner.application.dto.SignUpRequest;
@@ -58,6 +59,17 @@ public class AuthController {
   public ResponseEntity<AccessTokenResponse> refresh(@CookieValue(REFRESH_TOKEN_COOKIE) String refreshToken) {
     String newAccessToken = ownerService.refresh(refreshToken);
     return ResponseEntity.ok(new AccessTokenResponse(newAccessToken));
+  }
+
+  @PostMapping("/password")
+  public ResponseEntity<Void> changePassword(
+      @AuthenticationPrincipal UUID ownerId,
+      @Valid @RequestBody ChangePasswordRequest request,
+      HttpServletResponse httpResponse
+  ) {
+    ownerService.changePassword(ownerId, request);
+    clearRefreshTokenCookie(httpResponse);
+    return ResponseEntity.noContent().build();
   }
 
   private void setRefreshTokenCookie(HttpServletResponse response, String refreshToken) {

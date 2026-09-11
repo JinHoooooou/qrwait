@@ -2,6 +2,7 @@ package com.qrwait.api.shared.web;
 
 import com.qrwait.api.owner.domain.DuplicateEmailException;
 import com.qrwait.api.owner.domain.InvalidCredentialsException;
+import com.qrwait.api.owner.domain.SamePasswordException;
 import com.qrwait.api.shared.qr.QrCodeGenerationException;
 import com.qrwait.api.store.domain.StoreNotAvailableException;
 import com.qrwait.api.store.domain.StoreNotFoundException;
@@ -22,6 +23,12 @@ public class GlobalExceptionHandler {
   @ResponseStatus(HttpStatus.UNAUTHORIZED)
   public ErrorResponse handleInvalidCredentials(InvalidCredentialsException e) {
     return ErrorResponse.of("INVALID_CREDENTIALS", e.getMessage());
+  }
+
+  @ExceptionHandler(SamePasswordException.class)
+  @ResponseStatus(HttpStatus.BAD_REQUEST)
+  public ErrorResponse handleSamePassword(SamePasswordException e) {
+    return ErrorResponse.of("SAME_PASSWORD", e.getMessage());
   }
 
   @ExceptionHandler(DuplicateEmailException.class)

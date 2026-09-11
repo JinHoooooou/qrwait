@@ -3,6 +3,7 @@ package com.qrwait.api.shared.security;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
+import org.springframework.http.HttpMethod;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -28,6 +29,7 @@ public class SecurityConfig {
         .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
         .securityContext(sc -> sc.securityContextRepository(new RequestAttributeSecurityContextRepository()))
         .authorizeHttpRequests(auth -> auth
+            .requestMatchers(HttpMethod.POST, "/api/auth/password").hasRole("OWNER")
             .requestMatchers("/api/auth/**", "/api/stores/**", "/api/waitings/**").permitAll()
             .requestMatchers("/api/owner/**").hasRole("OWNER")
             .anyRequest().authenticated())
