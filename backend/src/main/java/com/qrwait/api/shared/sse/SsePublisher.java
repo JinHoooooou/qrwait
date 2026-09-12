@@ -61,6 +61,32 @@ public class SsePublisher {
   }
 
   /**
+   * 등록 전 손님(랜딩 화면)을 storeId 단위 SSE 채널에 구독시킨다. {@link #subscribe}와 같은 채널이라
+   * 등록 여부와 무관하게 매장 상태 변경({@code store-status-changed})을 실시간으로 받는다.
+   */
+  public SseEmitter subscribeToStore(UUID storeId) {
+    SseEmitter emitter = emitterFactory.create();
+
+    emitter.onCompletion(() -> registry.remove(storeId, emitter));
+    emitter.onTimeout(() -> registry.remove(storeId, emitter));
+    emitter.onError(e -> registry.remove(storeId, emitter));
+
+    registry.register(storeId, emitter);
+
+    try {
+      sendInitialPadding(emitter);
+      emitter.send(SseEmitter.event()
+          .name("waiting-updated")
+          .data(buildStoreStatus(storeId)));
+    } catch (IOException e) {
+      log.warn("랜딩 손님 초기 SSE 이벤트 전송 실패 — storeId={}", storeId);
+      registry.remove(storeId, emitter);
+    }
+
+    return emitter;
+  }
+
+  /**
    * 점주를 storeId 단위 SSE 채널에 구독시킨다. 기존 연결이 있으면 교체한다. 연결 즉시 현재 대기 현황을 초기 이벤트로 전송한다.
    */
   public SseEmitter subscribeOwner(UUID storeId) {

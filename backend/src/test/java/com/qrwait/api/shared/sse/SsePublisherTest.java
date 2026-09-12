@@ -76,6 +76,30 @@ class SsePublisherTest {
         .hasSizeGreaterThanOrEqualTo(2048);
   }
 
+  @Test
+  void subscribeToStore_storeId_채널에_등록한다() {
+    UUID storeId = UUID.randomUUID();
+    SseEmitter emitter = Mockito.mock(SseEmitter.class);
+    when(emitterFactory.create()).thenReturn(emitter);
+
+    publisher.subscribeToStore(storeId);
+
+    verify(registry).register(eq(storeId), eq(emitter));
+  }
+
+  @Test
+  void subscribeToStore_연결_직후_2KB_이상의_패딩_주석을_먼저_전송() throws IOException {
+    UUID storeId = UUID.randomUUID();
+    SseEmitter emitter = Mockito.mock(SseEmitter.class);
+    when(emitterFactory.create()).thenReturn(emitter);
+
+    publisher.subscribeToStore(storeId);
+
+    assertThat(firstSentPayload(emitter))
+        .startsWith(":")
+        .hasSizeGreaterThanOrEqualTo(2048);
+  }
+
   private static String firstSentPayload(SseEmitter emitter) throws IOException {
     ArgumentCaptor<SseEventBuilder> captor = ArgumentCaptor.forClass(SseEventBuilder.class);
     verify(emitter, Mockito.atLeastOnce()).send(captor.capture());
