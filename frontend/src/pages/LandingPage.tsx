@@ -8,12 +8,18 @@ import Button from '../components/Button'
 import LoadingSpinner from '../components/LoadingSpinner'
 import ErrorMessage from '../components/ErrorMessage'
 
-const formatPhoneNumber = (value: string): string => {
-  const digits = value.replace(/\D/g, '')
-  if (digits.length <= 3) return digits
-  if (digits.length <= 7) return `${digits.slice(0, 3)}-${digits.slice(3)}`
-  return `${digits.slice(0, 3)}-${digits.slice(3, 7)}-${digits.slice(7, 11)}`
+// 휴대폰 번호는 010 고정이라 입력은 뒤 8자리(가운데 4 + 끝 4)만 받는다.
+const PHONE_DIGITS_LENGTH = 8
+
+// 붙여넣기로 "010-1234-5678"·"01012345678" 전체가 들어와도 앞의 010을 인식해 걷어내고 숫자만 남긴다.
+const extractPhoneDigits = (value: string): string => {
+  let digits = value.replace(/\D/g, '')
+  if (digits.startsWith('010')) digits = digits.slice(3)
+  return digits.slice(0, PHONE_DIGITS_LENGTH)
 }
+
+const formatPhoneDigits = (digits: string): string =>
+  digits.length > 4 ? `${digits.slice(0, 4)}-${digits.slice(4)}` : digits
 
 const STATUS_MESSAGES: Record<string, string> = {
   BREAK: '현재 브레이크타임입니다.',
@@ -29,13 +35,14 @@ function LandingPage() {
   const [store, setStore] = useState<StoreResponse | null>(null)
   const [waitingStatus, setWaitingStatus] = useState<StoreWaitingStatus | null>(null)
   const [loading, setLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
+  const [loadError, setLoadError] = useState<string | null>(null)
 
-  const [phoneNumber, setPhoneNumber] = useState('')
+  const [phoneDigits, setPhoneDigits] = useState('')
   const [partySize, setPartySize] = useState(1)
   const [agreed, setAgreed] = useState(false)
   const [phoneError, setPhoneError] = useState(false)
   const [consentError, setConsentError] = useState(false)
+  const [submitError, setSubmitError] = useState<string | null>(null)
   const [submitting, setSubmitting] = useState(false)
 
   const setWaiting = useWaitingStore((s) => s.setWaiting)
@@ -49,7 +56,7 @@ function LandingPage() {
     }
 
     if (!storeId) {
-      setError('유효하지 않은 QR 코드입니다.')
+      setLoadError('유효하지 않은 QR 코드입니다.')
       setLoading(false)
       return
     }
@@ -59,7 +66,7 @@ function LandingPage() {
           setStore(storeData)
           setWaitingStatus(statusData)
         })
-        .catch(() => setError('매장 정보를 불러올 수 없습니다.'))
+        .catch(() => setLoadError('매장 정보를 불러올 수 없습니다.'))
         .finally(() => setLoading(false))
   }, [storeId, navigate])
 
@@ -87,7 +94,7 @@ function LandingPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     if (!storeId) return
-    if (!phoneNumber.trim()) {
+    if (phoneDigits.length !== PHONE_DIGITS_LENGTH) {
       setPhoneError(true)
       return
     }
@@ -96,10 +103,11 @@ function LandingPage() {
       return
     }
 
+    setSubmitError(null)
     setSubmitting(true)
     try {
       const res = await registerWaiting(storeId, {
-        phoneNumber: phoneNumber.trim(),
+        phoneNumber: `010-${formatPhoneDigits(phoneDigits)}`,
         partySize,
       })
       setWaiting({
@@ -113,14 +121,14 @@ function LandingPage() {
       saveWaitingSession(res.waitingId, storeId, res.waitingNumber)
       navigate(`/waiting/${res.waitingId}`)
     } catch {
-      setError('웨이팅 등록에 실패했습니다. 다시 시도해주세요.')
+      setSubmitError('웨이팅 등록에 실패했습니다. 다시 시도해주세요.')
     } finally {
       setSubmitting(false)
     }
   }
 
   if (loading) return <LoadingSpinner/>
-  if (error) return <div style={styles.container}><ErrorMessage message={error}/></div>
+  if (loadError) return <div style={styles.container}><ErrorMessage message={loadError}/></div>
 
   const statusMessage = store?.status ? STATUS_MESSAGES[store.status] : null
 
@@ -147,22 +155,26 @@ function LandingPage() {
               <form onSubmit={handleSubmit} style={styles.form}>
                 <label style={styles.label}>
                   전화번호
-                  <input
-                      style={styles.input}
-                      type="tel"
-                      value={phoneNumber}
-                      onChange={(e) => {
-                        const formatted = formatPhoneNumber(e.target.value)
-                        setPhoneNumber(formatted)
-                        if (formatted.trim()) setPhoneError(false)
-                      }}
-                      maxLength={13}
-                      placeholder="010-XXXX-XXXX"
-                      required
-                  />
+                  <div style={styles.phoneRow}>
+                    <span style={styles.phonePrefix}>010</span>
+                    <span style={styles.phoneDash}>-</span>
+                    <input
+                        style={styles.phoneInput}
+                        type="tel"
+                        value={formatPhoneDigits(phoneDigits)}
+                        onChange={(e) => {
+                          const digits = extractPhoneDigits(e.target.value)
+                          setPhoneDigits(digits)
+                          if (digits.length === PHONE_DIGITS_LENGTH) setPhoneError(false)
+                        }}
+                        maxLength={9}
+                        placeholder="XXXX-XXXX"
+                        required
+                    />
+                  </div>
                 </label>
                 {phoneError && (
-                    <p style={styles.fieldErrorText}>전화번호를 입력해주세요.</p>
+                    <p style={styles.fieldErrorText}>나머지 번호 8자리를 입력해주세요.</p>
                 )}
 
                 <label style={styles.label}>
@@ -205,10 +217,14 @@ function LandingPage() {
                     <p style={styles.fieldErrorText}>웨이팅 등록에 동의해주세요.</p>
                 )}
 
+                {submitError && (
+                    <p style={styles.fieldErrorText}>{submitError}</p>
+                )}
+
                 <Button
                     type="submit"
                     disabled={submitting}
-                    style={!phoneNumber.trim() || !agreed ? styles.submitBtnPending : undefined}
+                    style={phoneDigits.length !== PHONE_DIGITS_LENGTH || !agreed ? styles.submitBtnPending : undefined}
                 >
                   {submitting ? '등록 중...' : '웨이팅 등록'}
                 </Button>
@@ -284,12 +300,29 @@ const styles: Record<string, React.CSSProperties> = {
     fontWeight: 600,
     fontSize: '0.875rem',
   },
-  input: {
+  phoneRow: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '0.25rem',
     padding: '0.75rem',
     borderRadius: '0.5rem',
     border: '1px solid #d1d5db',
-    fontSize: '1rem',
+  },
+  phonePrefix: {
+    color: '#374151',
+    fontWeight: 600,
+  },
+  phoneDash: {
+    color: '#9ca3af',
+  },
+  phoneInput: {
+    flex: 1,
+    minWidth: 0,
+    border: 'none',
     outline: 'none',
+    fontSize: '1rem',
+    padding: 0,
+    fontFamily: 'inherit',
   },
   stepper: {
     display: 'flex',
