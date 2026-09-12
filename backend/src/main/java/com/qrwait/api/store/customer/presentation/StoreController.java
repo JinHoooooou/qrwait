@@ -1,5 +1,6 @@
 package com.qrwait.api.store.customer.presentation;
 
+import com.qrwait.api.shared.sse.SsePublisher;
 import com.qrwait.api.store.application.dto.StoreResponse;
 import com.qrwait.api.store.customer.application.StoreViewService;
 import com.qrwait.api.waiting.customer.application.WaitingService;
@@ -16,6 +17,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 @Tag(name = "Store", description = "매장 관련 API")
 @RestController
@@ -25,6 +27,7 @@ public class StoreController {
 
   private final StoreViewService storeViewService;
   private final WaitingService waitingService;
+  private final SsePublisher ssePublisher;
 
   @Operation(summary = "매장 조회", description = "storeId로 매장 정보를 조회합니다.")
   @ApiResponses({
@@ -56,5 +59,13 @@ public class StoreController {
   @GetMapping("/{storeId}/waitings/status")
   public ResponseEntity<WaitingStatusResponse> getStoreWaitingStatus(@PathVariable UUID storeId) {
     return ResponseEntity.ok(waitingService.getStoreWaitingStatus(storeId));
+  }
+
+  @Operation(summary = "매장 상태 실시간 구독 (SSE)",
+      description = "등록 전 손님이 매장 영업 상태 변경(운영중/브레이크타임/만석/영업종료)을 실시간으로 수신합니다.")
+  @ApiResponse(responseCode = "200", description = "SSE 스트림 연결 성공")
+  @GetMapping(value = "/{storeId}/stream", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
+  public SseEmitter stream(@PathVariable UUID storeId) {
+    return ssePublisher.subscribeToStore(storeId);
   }
 }

@@ -1,5 +1,6 @@
 package com.qrwait.api.store.customer.presentation;
 
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -9,6 +10,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.qrwait.api.shared.security.JwtAuthFilter;
 import com.qrwait.api.shared.security.JwtTokenProvider;
 import com.qrwait.api.shared.security.SecurityConfig;
+import com.qrwait.api.shared.sse.SsePublisher;
 import com.qrwait.api.store.application.dto.StoreResponse;
 import com.qrwait.api.store.customer.application.StoreViewService;
 import com.qrwait.api.store.domain.StoreNotFoundException;
@@ -22,6 +24,7 @@ import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 @WebMvcTest(StoreController.class)
 @Import({SecurityConfig.class, JwtAuthFilter.class})
@@ -38,6 +41,8 @@ class StoreControllerTest {
   StoreViewService storeViewService;
   @MockitoBean
   WaitingService waitingService;
+  @MockitoBean
+  SsePublisher ssePublisher;
 
   @Test
   void getStore_존재하는_storeId_200반환() throws Exception {
@@ -60,5 +65,14 @@ class StoreControllerTest {
     mockMvc.perform(get("/api/stores/" + unknownId))
         .andExpect(status().isNotFound())
         .andExpect(jsonPath("$.code").value("STORE_NOT_FOUND"));
+  }
+
+  @Test
+  void stream_비로그인_손님도_200반환() throws Exception {
+    UUID storeId = UUID.randomUUID();
+    given(ssePublisher.subscribeToStore(eq(storeId))).willReturn(new SseEmitter());
+
+    mockMvc.perform(get("/api/stores/{storeId}/stream", storeId))
+        .andExpect(status().isOk());
   }
 }
