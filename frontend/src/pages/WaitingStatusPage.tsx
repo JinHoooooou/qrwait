@@ -4,6 +4,7 @@ import useWaitingStore from '../store/waitingStore'
 import {getWaiting} from '../api/waiting'
 import {clearWaitingSession, getWaitingSession} from '../utils/session'
 import {useWaitingSse, type SseConnectionStatus} from '../hooks/useWaitingSse'
+import {WAITING_ENDED_MESSAGES, type WaitingEndedReason} from '../utils/waitingEndedMessages'
 import Button from '../components/Button'
 
 function WaitingStatusPage() {
@@ -20,18 +21,18 @@ function WaitingStatusPage() {
   const [capturedStoreId] = useState(resolvedStoreId)
 
   const [connectionStatus, setConnectionStatus] = useState<SseConnectionStatus>('connecting')
-  const [expired, setExpired] = useState(false)
+  const [endedReason, setEndedReason] = useState<WaitingEndedReason | null>(null)
   const [initialized, setInitialized] = useState(false)
   const [loadError, setLoadError] = useState<string | null>(null)
 
   // API 응답 이후에만 리다이렉트 평가
   useEffect(() => {
-    if (!resolvedStoreId && initialized && !expired) {
+    if (!resolvedStoreId && initialized && !endedReason) {
       navigate('/wait', {replace: true})
     }
-  }, [resolvedStoreId, initialized, expired, navigate])
+  }, [resolvedStoreId, initialized, endedReason, navigate])
 
-  // 상태 로드/갱신: CALLED면 호출됨 페이지로, 종료면 expired
+  // 상태 로드/갱신: CALLED면 호출됨 페이지로, 종료(ENTERED/NO_SHOW/CANCELLED)면 endedReason
   const loadStatus = useCallback((isInitial: boolean) => {
     if (!waitingId) return
     getWaiting(waitingId)
@@ -39,6 +40,12 @@ function WaitingStatusPage() {
           setLoadError(null)
           if (res.status === 'CALLED') {
             navigate(`/waiting/${waitingId}/called`, {replace: true})
+            return
+          }
+          if (res.status !== 'WAITING') {
+            clearWaitingSession()
+            clearWaiting()
+            setEndedReason(res.status)
             return
           }
           updateStatus({
@@ -52,7 +59,7 @@ function WaitingStatusPage() {
           if (status === 404) {
             clearWaitingSession()
             clearWaiting()
-            setExpired(true)
+            setEndedReason('NOT_FOUND')
           } else if (isInitial) {
             setLoadError('서버에 연결할 수 없습니다. 잠시 후 새로고침해 주세요.')
           }
@@ -67,7 +74,7 @@ function WaitingStatusPage() {
   }, [loadStatus])
 
   useWaitingSse(waitingId, resolvedStoreId, {
-    enabled: !!waitingId && !!resolvedStoreId && !expired,
+    enabled: !!waitingId && !!resolvedStoreId && !endedReason,
     onUpdated: () => loadStatus(false),
     onCalled: () => navigate(`/waiting/${waitingId}/called`),
     onConnectionChange: setConnectionStatus,
@@ -85,12 +92,13 @@ function WaitingStatusPage() {
     )
   }
 
-  if (expired) {
+  if (endedReason) {
+    const message = WAITING_ENDED_MESSAGES[endedReason]
     return (
         <div style={styles.container}>
-          <div style={styles.expiredIcon}>✓</div>
-          <p style={styles.expiredTitle}>웨이팅이 종료되었습니다</p>
-          <p style={styles.expiredDesc}>취소되었거나 이미 입장이 완료된 웨이팅입니다.</p>
+          <div style={styles.expiredIcon}>{endedReason === 'ENTERED' ? '🎉' : '✓'}</div>
+          <p style={styles.expiredTitle}>{message.title}</p>
+          <p style={styles.expiredDesc}>{message.desc}</p>
           <Button onClick={() => navigate(capturedStoreId ? `/wait?storeId=${capturedStoreId}` : '/wait')}>
             처음으로
           </Button>
@@ -111,16 +119,13 @@ function WaitingStatusPage() {
         <div style={styles.card}>
           <p style={styles.label}>내 웨이팅 번호</p>
           <p style={styles.number}>{resolvedWaitingNumber ?? '-'}</p>
+          <p style={styles.numberCaption}>번호는 대기 순서와 다를 수 있어요</p>
         </div>
 
         <div style={styles.infoRow}>
           <div style={styles.infoItem}>
             <p style={styles.infoLabel}>현재 대기 순서</p>
             <p style={styles.infoValue}>{currentRank != null ? `${currentRank}번째` : '-'}</p>
-          </div>
-          <div style={styles.infoItem}>
-            <p style={styles.infoLabel}>앞 대기 팀</p>
-            <p style={styles.infoValue}>{currentRank != null ? `${currentRank - 1}팀` : '-'}</p>
           </div>
           <div style={styles.infoItem}>
             <p style={styles.infoLabel}>총 대기 팀</p>
@@ -183,6 +188,11 @@ const styles: Record<string, React.CSSProperties> = {
     fontWeight: 700,
     color: '#1d4ed8',
     lineHeight: 1,
+  },
+  numberCaption: {
+    fontSize: '0.75rem',
+    color: '#9ca3af',
+    marginTop: '0.5rem',
   },
   infoRow: {
     width: '100%',

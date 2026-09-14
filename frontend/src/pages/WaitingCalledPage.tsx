@@ -4,6 +4,7 @@ import useWaitingStore from '../store/waitingStore'
 import {getStore, getWaiting} from '../api/waiting'
 import {clearWaitingSession, getWaitingSession} from '../utils/session'
 import {useWaitingSse} from '../hooks/useWaitingSse'
+import {WAITING_ENDED_MESSAGES, type WaitingEndedReason} from '../utils/waitingEndedMessages'
 import Button from '../components/Button'
 
 function WaitingCalledPage() {
@@ -19,7 +20,7 @@ function WaitingCalledPage() {
   const goToStart = () => navigate(capturedStoreId ? `/wait?storeId=${capturedStoreId}` : '/wait')
 
   const [initialized, setInitialized] = useState(false)
-  const [ended, setEnded] = useState(false)
+  const [endedReason, setEndedReason] = useState<WaitingEndedReason | null>(null)
   const [graceDeadline, setGraceDeadline] = useState<string | null>(null)
   const [remainingSeconds, setRemainingSeconds] = useState<number | null>(null)
   const [storeName, setStoreName] = useState<string | null>(null)
@@ -32,10 +33,10 @@ function WaitingCalledPage() {
   }, [resolvedStoreId])
 
   // 입장완료/취소/노쇼로 더 이상 CALLED가 아닌 경우 종료 처리
-  const endSession = useCallback(() => {
+  const endSession = useCallback((reason: WaitingEndedReason) => {
     clearWaitingSession()
     clearWaiting()
-    setEnded(true)
+    setEndedReason(reason)
   }, [clearWaiting])
 
   const refresh = useCallback(() => {
@@ -47,12 +48,15 @@ function WaitingCalledPage() {
             navigate(`/waiting/${waitingId}/status`, {replace: true})
             return
           }
-          // CALLED면 그대로 유지
+          if (res.status !== 'CALLED') {
+            endSession(res.status)
+            return
+          }
           setGraceDeadline(res.graceDeadline)
         })
         .catch((err: unknown) => {
           const status = (err as { status?: number }).status
-          if (status === 404) endSession()
+          if (status === 404) endSession('NOT_FOUND')
           // 일시적 오류는 무시 (다음 이벤트/새로고침 때 재시도)
         })
         .finally(() => setInitialized(true))
@@ -74,19 +78,20 @@ function WaitingCalledPage() {
   }, [graceDeadline])
 
   useWaitingSse(waitingId, resolvedStoreId, {
-    enabled: !!waitingId && !!resolvedStoreId && !ended,
+    enabled: !!waitingId && !!resolvedStoreId && !endedReason,
     onUpdated: refresh,
     onPostponed: () => navigate(`/waiting/${waitingId}/status`, {replace: true}),
   })
 
   if (!initialized) return null
 
-  if (ended) {
+  if (endedReason) {
+    const message = WAITING_ENDED_MESSAGES[endedReason]
     return (
         <div style={styles.container}>
-          <div style={styles.endedIcon}>✓</div>
-          <p style={styles.endedTitle}>웨이팅이 종료되었습니다</p>
-          <p style={styles.endedDesc}>입장이 완료되었거나 취소된 웨이팅입니다.</p>
+          <div style={styles.endedIcon}>{endedReason === 'ENTERED' ? '🎉' : '✓'}</div>
+          <p style={styles.endedTitle}>{message.title}</p>
+          <p style={styles.endedDesc}>{message.desc}</p>
           <Button onClick={goToStart}>처음으로</Button>
         </div>
     )
@@ -116,9 +121,6 @@ function WaitingCalledPage() {
         <div style={styles.buttons}>
           <Button variant="secondary" onClick={() => navigate(`/waiting/${waitingId}/cancel`)}>
             웨이팅 취소
-          </Button>
-          <Button variant="secondary" disabled>
-            미루기 (준비 중)
           </Button>
         </div>
       </div>
