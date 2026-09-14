@@ -97,8 +97,11 @@ public class WaitingService {
     WaitingEntry entry = waitingRepository.findById(waitingId)
         .orElseThrow(() -> new WaitingNotFoundException(waitingId));
 
+    // 종료된(ENTERED/NO_SHOW/CANCELLED) 웨이팅은 순위·유예 개념이 없으므로 상태만 반환한다.
+    // 404는 waitingId 자체가 존재하지 않는 경우로 한정한다 — 손님이 자신이 어떻게 끝났는지
+    // (입장/노쇼/취소) 구분해서 볼 수 있어야 한다.
     if (entry.getStatus() != WaitingStatus.WAITING && entry.getStatus() != WaitingStatus.CALLED) {
-      throw new WaitingNotFoundException(waitingId);
+      return new MyWaitingStatusResponse(0, 0, 0, entry.getStatus(), null);
     }
 
     List<WaitingEntry> waitingList = waitingRepository

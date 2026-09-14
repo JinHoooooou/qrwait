@@ -308,7 +308,7 @@ class WaitingServiceTest {
   }
 
   @Test
-  void getStatus_취소된_웨이팅_조회시_예외발생() {
+  void getStatus_취소된_웨이팅_조회시_CANCELLED_상태와_0값들을_반환한다() {
     UUID waitingId = UUID.randomUUID();
     WaitingEntry cancelled = WaitingEntry.restore(
         waitingId, UUID.randomUUID(), "010-9999-9999", 2, 1, WaitingStatus.CANCELLED, LocalDateTime.now(),
@@ -316,8 +316,56 @@ class WaitingServiceTest {
 
     given(waitingRepository.findById(waitingId)).willReturn(Optional.of(cancelled));
 
-    assertThatThrownBy(() -> waitingService.getStatus(waitingId))
-        .isInstanceOf(WaitingNotFoundException.class);
+    MyWaitingStatusResponse response = waitingService.getStatus(waitingId);
+
+    assertThat(response.status()).isEqualTo(WaitingStatus.CANCELLED);
+    assertThat(response.currentRank()).isZero();
+    assertThat(response.totalWaiting()).isZero();
+    assertThat(response.estimatedWaitMinutes()).isZero();
+    assertThat(response.graceDeadline()).isNull();
+  }
+
+  @Test
+  void getStatus_입장완료된_웨이팅_조회시_ENTERED_상태를_반환한다() {
+    UUID waitingId = UUID.randomUUID();
+    WaitingEntry entered = WaitingEntry.restore(
+        waitingId, UUID.randomUUID(), "010-9999-9999", 2, 1, WaitingStatus.ENTERED, LocalDateTime.now(),
+        LocalDate.now(), null, null, null);
+
+    given(waitingRepository.findById(waitingId)).willReturn(Optional.of(entered));
+
+    MyWaitingStatusResponse response = waitingService.getStatus(waitingId);
+
+    assertThat(response.status()).isEqualTo(WaitingStatus.ENTERED);
+  }
+
+  @Test
+  void getStatus_노쇼처리된_웨이팅_조회시_NO_SHOW_상태를_반환한다() {
+    UUID waitingId = UUID.randomUUID();
+    WaitingEntry noShow = WaitingEntry.restore(
+        waitingId, UUID.randomUUID(), "010-9999-9999", 2, 1, WaitingStatus.NO_SHOW, LocalDateTime.now(),
+        LocalDate.now(), null, null, null);
+
+    given(waitingRepository.findById(waitingId)).willReturn(Optional.of(noShow));
+
+    MyWaitingStatusResponse response = waitingService.getStatus(waitingId);
+
+    assertThat(response.status()).isEqualTo(WaitingStatus.NO_SHOW);
+  }
+
+  @Test
+  void getStatus_종료된_웨이팅은_대기목록을_조회하지_않는다() {
+    UUID waitingId = UUID.randomUUID();
+    WaitingEntry cancelled = WaitingEntry.restore(
+        waitingId, UUID.randomUUID(), "010-9999-9999", 2, 1, WaitingStatus.CANCELLED, LocalDateTime.now(),
+        LocalDate.now(), null, null, null);
+
+    given(waitingRepository.findById(waitingId)).willReturn(Optional.of(cancelled));
+
+    waitingService.getStatus(waitingId);
+
+    then(waitingRepository).should(times(0))
+        .findByStoreIdAndStatus(any(), any(), eq(WaitingStatus.WAITING));
   }
 
   // ===== cancel =====
