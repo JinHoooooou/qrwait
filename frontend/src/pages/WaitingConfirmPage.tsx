@@ -29,6 +29,7 @@ function WaitingConfirmPage() {
         <div style={styles.card}>
           <p style={styles.label}>내 웨이팅 번호</p>
           <p style={styles.number}>{waitingNumber}</p>
+          <p style={styles.numberCaption}>번호는 대기 순서와 다를 수 있어요</p>
         </div>
 
         <div style={styles.infoRow}>
@@ -93,6 +94,11 @@ const styles: Record<string, React.CSSProperties> = {
     fontWeight: 700,
     color: '#1d4ed8',
     lineHeight: 1,
+  },
+  numberCaption: {
+    fontSize: '0.75rem',
+    color: '#9ca3af',
+    marginTop: '0.5rem',
   },
   infoRow: {
     width: '100%',

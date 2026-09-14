@@ -49,6 +49,8 @@ function DashboardPage() {
   const [actionLoading, setActionLoading] = useState<string | null>(null)
   const [notifPermission, setNotifPermission] = useState<NotificationPermission | null>(null)
   const [alertBanner, setAlertBanner] = useState<string | null>(null)
+  // SMS 실패 배너가 가리키는 손님이 대기 목록에서 사라지면(입장/노쇼/취소 등) 배너도 같이 정리한다.
+  const [smsFailedWaitingNumber, setSmsFailedWaitingNumber] = useState<number | null>(null)
 
   const retryCountRef = useRef(0)
   const retryTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
@@ -70,6 +72,17 @@ function DashboardPage() {
     const list = await getWaitingList()
     setWaitingList(list)
   }, [])
+
+  // SMS 실패 배너가 가리키던 손님이 대기 목록(WAITING/CALLED)을 벗어나면 더 이상 유효하지
+  // 않은 경고이므로 자동으로 닫는다.
+  useEffect(() => {
+    if (smsFailedWaitingNumber === null) return
+    const stillActive = waitingList.some((w) => w.waitingNumber === smsFailedWaitingNumber)
+    if (!stillActive) {
+      setAlertBanner(null)
+      setSmsFailedWaitingNumber(null)
+    }
+  }, [waitingList, smsFailedWaitingNumber])
 
   const fetchSummary = useCallback(async () => {
     const data = await getDailySummary()
@@ -140,6 +153,7 @@ function DashboardPage() {
                     setAlertBanner(
                         `⚠️ #${data.waitingNumber}번 손님 SMS 발송 실패. 직접 연락해주세요. (${data.phoneNumber})`
                     )
+                    setSmsFailedWaitingNumber(data.waitingNumber)
                   } catch {
                     setAlertBanner('⚠️ SMS 발송 실패. 손님에게 직접 연락해주세요.')
                   }
@@ -235,7 +249,15 @@ function DashboardPage() {
         {alertBanner && (
             <div style={styles.alertBanner}>
               <span>{alertBanner}</span>
-              <button style={styles.alertClose} onClick={() => setAlertBanner(null)}>✕</button>
+              <button
+                  style={styles.alertClose}
+                  onClick={() => {
+                    setAlertBanner(null)
+                    setSmsFailedWaitingNumber(null)
+                  }}
+              >
+                ✕
+              </button>
             </div>
         )}
 
@@ -392,7 +414,8 @@ function DashboardPage() {
 
 const styles: Record<string, React.CSSProperties> = {
   container: {
-    maxWidth: 480,
+    // 점주의 운영 화면(데스크톱/태블릿에서도 씀)이라 손님용 480보다 넓게 잡는다.
+    maxWidth: 720,
     margin: '0 auto',
     padding: '1.5rem',
     display: 'flex',
@@ -541,21 +564,26 @@ const styles: Record<string, React.CSSProperties> = {
     fontWeight: 600,
     cursor: 'pointer',
   },
+  // 파스텔 배경만으로는 비활성 버튼처럼 보여서, 텍스트와 같은 색조의 테두리를 더해 클릭 가능함을 드러낸다.
   callBtn: {
     backgroundColor: '#dbeafe',
     color: '#1d4ed8',
+    border: '1px solid #93c5fd',
   },
   enterBtn: {
     backgroundColor: '#dcfce7',
     color: '#16a34a',
+    border: '1px solid #86efac',
   },
   postponeBtn: {
     backgroundColor: '#fef3c7',
     color: '#d97706',
+    border: '1px solid #fcd34d',
   },
   noshowBtn: {
     backgroundColor: '#fee2e2',
     color: '#dc2626',
+    border: '1px solid #fca5a5',
   },
   overlay: {
     position: 'fixed',

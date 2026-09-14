@@ -26,11 +26,15 @@ export interface RegisterWaitingResponse {
   estimatedWaitMinutes: number
 }
 
+// 종료 상태 3가지 — 손님용 GET /waitings/{id}가 이제 이 상태들도 200으로 반환한다
+// (진짜 404는 waitingId 자체가 없는 경우로 한정됨).
+export type WaitingTerminalStatus = 'ENTERED' | 'NO_SHOW' | 'CANCELLED'
+
 export interface WaitingStatusResponse {
   currentRank: number
   totalWaiting: number
   estimatedWaitMinutes: number
-  status: 'WAITING' | 'CALLED'
+  status: 'WAITING' | 'CALLED' | WaitingTerminalStatus
   graceDeadline: string | null
 }
 

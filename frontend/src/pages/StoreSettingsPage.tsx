@@ -18,6 +18,7 @@ function StoreSettingsPage() {
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [saved, setSaved] = useState(false)
 
   useEffect(() => {
     getStoreSettings()
@@ -38,6 +39,7 @@ function StoreSettingsPage() {
   const handleSave = async () => {
     setSaving(true)
     setError(null)
+    setSaved(false)
     try {
       await updateStoreSettings({
         tableCount,
@@ -48,9 +50,10 @@ function StoreSettingsPage() {
         alertEnabled,
         callGraceMinutes,
       })
-      navigate('/owner/dashboard')
+      setSaved(true)
     } catch (err) {
       setError(err instanceof Error ? err.message : '저장에 실패했습니다.')
+    } finally {
       setSaving(false)
     }
   }
@@ -67,6 +70,7 @@ function StoreSettingsPage() {
       </div>
 
       {error && <p style={styles.error}>{error}</p>}
+      {saved && <p style={styles.success}>저장되었습니다.</p>}
 
       {/* 대기 시간 설정 */}
       <section style={styles.section}>
@@ -182,7 +186,8 @@ function StoreSettingsPage() {
 
 const styles: Record<string, React.CSSProperties> = {
   container: {
-    maxWidth: 480,
+    // 점주의 운영 화면(데스크톱/태블릿에서도 씀)이라 손님용 480보다 넓게 잡는다.
+    maxWidth: 720,
     margin: '0 auto',
     padding: '1.5rem',
     display: 'flex',
@@ -260,6 +265,10 @@ const styles: Record<string, React.CSSProperties> = {
   error: {
     fontSize: '0.875rem',
     color: '#dc2626',
+  },
+  success: {
+    fontSize: '0.875rem',
+    color: '#16a34a',
   },
 }
 

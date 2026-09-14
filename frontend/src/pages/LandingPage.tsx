@@ -285,7 +285,7 @@ const styles: Record<string, React.CSSProperties> = {
     color: '#9ca3af',
   },
   subtitle: {
-    color: '#6b7280',
+    color: '#4b5563',
     marginBottom: '1.5rem',
   },
   form: {
