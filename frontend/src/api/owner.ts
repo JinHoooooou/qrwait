@@ -1,4 +1,5 @@
 import axios from 'axios'
+import client from './client'
 import ownerClient from './ownerClient'
 import useOwnerStore from '../store/ownerStore'
 
@@ -26,11 +27,14 @@ export interface LoginResponse {
   storeId: string
 }
 
+// signUp·login은 client(공개 axios 인스턴스)를 거쳐야 인터셉터가 서버 에러 메시지를
+// 한글로 매핑해준다. raw axios로 직접 호출하면 "Request failed with status code 401" 같은
+// axios 원본 문자열이 그대로 화면에 노출된다.
 export const signUp = (body: SignUpRequest): Promise<SignUpResponse> =>
-    axios.post('/api/auth/signup', body).then((res) => res.data)
+    client.post('/auth/signup', body).then((res) => res.data)
 
 export const login = (body: LoginRequest): Promise<LoginResponse> =>
-    axios.post('/api/auth/login', body, {withCredentials: true}).then((res) => res.data)
+    client.post('/auth/login', body, {withCredentials: true}).then((res) => res.data)
 
 export const logout = (): Promise<void> =>
     ownerClient.post('/auth/logout').then(() => {
