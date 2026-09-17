@@ -10,12 +10,14 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.qrwait.api.owner.application.OwnerService;
 import com.qrwait.api.owner.application.dto.LoginResponse;
+import com.qrwait.api.owner.application.dto.RefreshResult;
 import com.qrwait.api.owner.application.dto.SignUpResponse;
 import com.qrwait.api.owner.domain.DuplicateEmailException;
 import com.qrwait.api.owner.domain.InvalidCredentialsException;
 import com.qrwait.api.shared.security.JwtAuthFilter;
 import com.qrwait.api.shared.security.JwtTokenProvider;
 import com.qrwait.api.shared.security.SecurityConfig;
+import jakarta.servlet.http.Cookie;
 import java.util.Map;
 import java.util.UUID;
 import org.junit.jupiter.api.Test;
@@ -111,6 +113,53 @@ class AuthControllerTest {
     mockMvc.perform(post("/api/auth/login")
             .contentType(MediaType.APPLICATION_JSON)
             .content(objectMapper.writeValueAsString(request)))
+        .andExpect(status().isUnauthorized())
+        .andExpect(jsonPath("$.code").value("INVALID_CREDENTIALS"));
+  }
+
+  @Test
+  void 로그인_성공_쿠키에_SameSiteStrict_설정() throws Exception {
+    UUID ownerId = UUID.randomUUID();
+    UUID storeId = UUID.randomUUID();
+    given(ownerService.login(any()))
+        .willReturn(new LoginResponse("access-token", "refresh-token", ownerId, storeId));
+
+    Map<String, String> request = Map.of("email", "owner@test.com", "password", "password123");
+
+    var result = mockMvc.perform(post("/api/auth/login")
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(objectMapper.writeValueAsString(request)))
+        .andExpect(status().isOk())
+        .andReturn();
+
+    jakarta.servlet.http.Cookie cookie = result.getResponse().getCookie(AuthController.REFRESH_TOKEN_COOKIE);
+    org.assertj.core.api.Assertions.assertThat(cookie.getAttribute("SameSite")).isEqualTo("Strict");
+  }
+
+  @Test
+  void 리프레시_성공_200반환_새로운쿠키로교체() throws Exception {
+    given(ownerService.refresh("old-refresh-token"))
+        .willReturn(new RefreshResult("new-access-token", "new-refresh-token", 604800L));
+
+    var result = mockMvc.perform(post("/api/auth/refresh")
+            .cookie(new Cookie(AuthController.REFRESH_TOKEN_COOKIE, "old-refresh-token")))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$.accessToken").value("new-access-token"))
+        .andReturn();
+
+    jakarta.servlet.http.Cookie cookie = result.getResponse().getCookie(AuthController.REFRESH_TOKEN_COOKIE);
+    org.assertj.core.api.Assertions.assertThat(cookie.getValue()).isEqualTo("new-refresh-token");
+    org.assertj.core.api.Assertions.assertThat(cookie.getMaxAge()).isEqualTo(604800);
+    org.assertj.core.api.Assertions.assertThat(cookie.isHttpOnly()).isTrue();
+    org.assertj.core.api.Assertions.assertThat(cookie.getAttribute("SameSite")).isEqualTo("Strict");
+  }
+
+  @Test
+  void 리프레시_유효하지않은토큰_401반환() throws Exception {
+    given(ownerService.refresh("bad-token")).willThrow(new InvalidCredentialsException());
+
+    mockMvc.perform(post("/api/auth/refresh")
+            .cookie(new Cookie(AuthController.REFRESH_TOKEN_COOKIE, "bad-token")))
         .andExpect(status().isUnauthorized())
         .andExpect(jsonPath("$.code").value("INVALID_CREDENTIALS"));
   }

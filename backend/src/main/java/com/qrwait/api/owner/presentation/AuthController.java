@@ -4,6 +4,7 @@ import com.qrwait.api.owner.application.OwnerService;
 import com.qrwait.api.owner.application.dto.AccessTokenResponse;
 import com.qrwait.api.owner.application.dto.LoginRequest;
 import com.qrwait.api.owner.application.dto.LoginResponse;
+import com.qrwait.api.owner.application.dto.RefreshResult;
 import com.qrwait.api.owner.application.dto.SignUpRequest;
 import com.qrwait.api.owner.application.dto.SignUpResponse;
 import jakarta.servlet.http.Cookie;
@@ -30,8 +31,8 @@ public class AuthController {
 
   private final OwnerService ownerService;
 
-  @Value("${jwt.refresh-expiry}")
-  private int refreshExpirySeconds;
+  @Value("${jwt.refresh-idle-expiry}")
+  private int refreshIdleExpirySeconds;
 
   @PostMapping("/signup")
   public ResponseEntity<SignUpResponse> signUp(@Valid @RequestBody SignUpRequest request) {
@@ -43,7 +44,7 @@ public class AuthController {
   @PostMapping("/login")
   public ResponseEntity<LoginResponse> login(@Valid @RequestBody LoginRequest request, HttpServletResponse httpResponse) {
     LoginResponse response = ownerService.login(request);
-    setRefreshTokenCookie(httpResponse, response.refreshToken());
+    setRefreshTokenCookie(httpResponse, response.refreshToken(), refreshIdleExpirySeconds);
     return ResponseEntity.ok(response);
   }
 
@@ -55,16 +56,19 @@ public class AuthController {
   }
 
   @PostMapping("/refresh")
-  public ResponseEntity<AccessTokenResponse> refresh(@CookieValue(REFRESH_TOKEN_COOKIE) String refreshToken) {
-    String newAccessToken = ownerService.refresh(refreshToken);
-    return ResponseEntity.ok(new AccessTokenResponse(newAccessToken));
+  public ResponseEntity<AccessTokenResponse> refresh(
+      @CookieValue(REFRESH_TOKEN_COOKIE) String refreshToken, HttpServletResponse httpResponse) {
+    RefreshResult result = ownerService.refresh(refreshToken);
+    setRefreshTokenCookie(httpResponse, result.refreshToken(), (int) result.refreshTokenTtlSeconds());
+    return ResponseEntity.ok(new AccessTokenResponse(result.accessToken()));
   }
 
-  private void setRefreshTokenCookie(HttpServletResponse response, String refreshToken) {
+  private void setRefreshTokenCookie(HttpServletResponse response, String refreshToken, int maxAgeSeconds) {
     Cookie cookie = new Cookie(REFRESH_TOKEN_COOKIE, refreshToken);
     cookie.setHttpOnly(true);
     cookie.setPath("/api/auth/refresh");
-    cookie.setMaxAge(refreshExpirySeconds);
+    cookie.setMaxAge(maxAgeSeconds);
+    cookie.setAttribute("SameSite", "Strict");
     response.addCookie(cookie);
   }
 
@@ -73,6 +77,7 @@ public class AuthController {
     cookie.setHttpOnly(true);
     cookie.setPath("/api/auth/refresh");
     cookie.setMaxAge(0);
+    cookie.setAttribute("SameSite", "Strict");
     response.addCookie(cookie);
   }
 }

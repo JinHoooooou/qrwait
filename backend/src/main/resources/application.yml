@@ -26,8 +26,9 @@ springdoc:
 
 jwt:
   secret: ${JWT_SECRET}
-  access-expiry: 3600      # 1시간 (초)
-  refresh-expiry: 604800   # 7일 (초)
+  access-expiry: 3600            # 1시간 (초)
+  refresh-idle-expiry: 604800    # 7일 (초) — 마지막 refresh 호출 기준 idle 만료
+  refresh-absolute-expiry: 2592000 # 30일 (초) — 최초 로그인 기준 절대 만료 캡
 
 sms:
   app-key: ${NHN_SMS_APP_KEY:}

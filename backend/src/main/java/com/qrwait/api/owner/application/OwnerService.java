@@ -2,6 +2,7 @@ package com.qrwait.api.owner.application;
 
 import com.qrwait.api.owner.application.dto.LoginRequest;
 import com.qrwait.api.owner.application.dto.LoginResponse;
+import com.qrwait.api.owner.application.dto.RefreshResult;
 import com.qrwait.api.owner.application.dto.SignUpRequest;
 import com.qrwait.api.owner.application.dto.SignUpResponse;
 import com.qrwait.api.owner.domain.DuplicateEmailException;
@@ -10,6 +11,7 @@ import com.qrwait.api.owner.domain.Owner;
 import com.qrwait.api.owner.domain.OwnerRepository;
 import com.qrwait.api.shared.redis.RefreshTokenRepository;
 import com.qrwait.api.shared.security.JwtTokenProvider;
+import com.qrwait.api.shared.security.JwtTokenProvider.RotatedRefreshToken;
 import com.qrwait.api.store.domain.Store;
 import com.qrwait.api.store.domain.StoreNotFoundException;
 import com.qrwait.api.store.domain.StoreRepository;
@@ -36,8 +38,8 @@ public class OwnerService {
   @Value("${app.base-url}")
   private String baseUrl;
 
-  @Value("${jwt.refresh-expiry}")
-  private long refreshExpirySeconds;
+  @Value("${jwt.refresh-idle-expiry}")
+  private long refreshIdleExpirySeconds;
 
   @Transactional
   public SignUpResponse signUp(SignUpRequest request) {
@@ -67,7 +69,7 @@ public class OwnerService {
 
     String accessToken = jwtTokenProvider.generateAccessToken(owner.getId());
     String refreshToken = jwtTokenProvider.generateRefreshToken(owner.getId());
-    refreshTokenRepository.save(owner.getId(), refreshToken, refreshExpirySeconds);
+    refreshTokenRepository.save(owner.getId(), refreshToken, refreshIdleExpirySeconds);
 
     return new LoginResponse(accessToken, refreshToken, owner.getId(), store.getId());
   }
@@ -76,7 +78,7 @@ public class OwnerService {
     refreshTokenRepository.delete(ownerId);
   }
 
-  public String refresh(String refreshToken) {
+  public RefreshResult refresh(String refreshToken) {
     if (!jwtTokenProvider.validateToken(refreshToken)) {
       throw new InvalidCredentialsException();
     }
@@ -90,6 +92,15 @@ public class OwnerService {
       throw new InvalidCredentialsException();
     }
 
-    return jwtTokenProvider.generateAccessToken(ownerId);
+    RotatedRefreshToken rotated = jwtTokenProvider.rotateRefreshToken(refreshToken)
+        .orElseGet(() -> {
+          refreshTokenRepository.delete(ownerId);
+          throw new InvalidCredentialsException();
+        });
+
+    String accessToken = jwtTokenProvider.generateAccessToken(ownerId);
+    refreshTokenRepository.save(ownerId, rotated.token(), rotated.ttlSeconds());
+
+    return new RefreshResult(accessToken, rotated.token(), rotated.ttlSeconds());
   }
 }

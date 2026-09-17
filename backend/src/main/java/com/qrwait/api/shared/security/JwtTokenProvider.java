@@ -6,6 +6,7 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import java.util.Date;
+import java.util.Optional;
 import java.util.UUID;
 import javax.crypto.SecretKey;
 import org.springframework.beans.factory.annotation.Value;
@@ -15,26 +16,66 @@ import org.springframework.stereotype.Component;
 public class JwtTokenProvider {
 
   private static final String CLAIM_OWNER_ID = "ownerId";
+  private static final String CLAIM_LOGIN_AT = "loginAt";
 
   private final SecretKey secretKey;
   private final long accessExpirySeconds;
-  private final long refreshExpirySeconds;
+  private final long refreshIdleExpirySeconds;
+  private final long refreshAbsoluteExpirySeconds;
 
   public JwtTokenProvider(
       @Value("${jwt.secret}") String secret,
       @Value("${jwt.access-expiry}") long accessExpirySeconds,
-      @Value("${jwt.refresh-expiry}") long refreshExpirySeconds) {
+      @Value("${jwt.refresh-idle-expiry}") long refreshIdleExpirySeconds,
+      @Value("${jwt.refresh-absolute-expiry}") long refreshAbsoluteExpirySeconds) {
     this.secretKey = Keys.hmacShaKeyFor(Decoders.BASE64.decode(secret));
     this.accessExpirySeconds = accessExpirySeconds;
-    this.refreshExpirySeconds = refreshExpirySeconds;
+    this.refreshIdleExpirySeconds = refreshIdleExpirySeconds;
+    this.refreshAbsoluteExpirySeconds = refreshAbsoluteExpirySeconds;
   }
 
   public String generateAccessToken(UUID ownerId) {
-    return buildToken(ownerId, accessExpirySeconds);
+    Date now = new Date();
+    Date expiry = new Date(now.getTime() + accessExpirySeconds * 1000);
+    return Jwts.builder()
+        .claim(CLAIM_OWNER_ID, ownerId.toString())
+        .issuedAt(now)
+        .expiration(expiry)
+        .signWith(secretKey)
+        .compact();
   }
 
   public String generateRefreshToken(UUID ownerId) {
-    return buildToken(ownerId, refreshExpirySeconds);
+    long now = System.currentTimeMillis();
+    return buildRefreshToken(ownerId, now, now).token();
+  }
+
+  /**
+   * 매 refresh 호출마다 refresh token을 교체한다. idle(활동 기준)·절대 만료(최초 로그인 기준) 중
+   * 먼저 도달하는 시점으로 새 토큰의 만료를 계산하고, 절대 만료를 이미 넘겼으면 로테이션을 거부한다.
+   */
+  public Optional<RotatedRefreshToken> rotateRefreshToken(String refreshToken) {
+    Claims claims;
+    try {
+      claims = parseClaims(refreshToken);
+    } catch (JwtException | IllegalArgumentException e) {
+      return Optional.empty();
+    }
+
+    String loginAtClaim = claims.get(CLAIM_LOGIN_AT, String.class);
+    if (loginAtClaim == null) {
+      return Optional.empty();
+    }
+
+    long loginAtMillis = Long.parseLong(loginAtClaim);
+    long now = System.currentTimeMillis();
+    long absoluteDeadlineMillis = loginAtMillis + refreshAbsoluteExpirySeconds * 1000;
+    if (now >= absoluteDeadlineMillis) {
+      return Optional.empty();
+    }
+
+    UUID ownerId = UUID.fromString(claims.get(CLAIM_OWNER_ID, String.class));
+    return Optional.of(buildRefreshToken(ownerId, loginAtMillis, now));
   }
 
   public boolean validateToken(String token) {
@@ -51,16 +92,21 @@ public class JwtTokenProvider {
     return UUID.fromString(ownerIdStr);
   }
 
-  private String buildToken(UUID ownerId, long expirySeconds) {
-    Date now = new Date();
-    Date expiry = new Date(now.getTime() + expirySeconds * 1000);
+  private RotatedRefreshToken buildRefreshToken(UUID ownerId, long loginAtMillis, long nowMillis) {
+    long idleDeadlineMillis = nowMillis + refreshIdleExpirySeconds * 1000;
+    long absoluteDeadlineMillis = loginAtMillis + refreshAbsoluteExpirySeconds * 1000;
+    long expiryMillis = Math.min(idleDeadlineMillis, absoluteDeadlineMillis);
 
-    return Jwts.builder()
+    String token = Jwts.builder()
         .claim(CLAIM_OWNER_ID, ownerId.toString())
-        .issuedAt(now)
-        .expiration(expiry)
+        .claim(CLAIM_LOGIN_AT, String.valueOf(loginAtMillis))
+        .issuedAt(new Date(nowMillis))
+        .expiration(new Date(expiryMillis))
         .signWith(secretKey)
         .compact();
+
+    long ttlSeconds = Math.max(0, (expiryMillis - nowMillis) / 1000);
+    return new RotatedRefreshToken(token, ttlSeconds);
   }
 
   private Claims parseClaims(String token) {
@@ -69,5 +115,9 @@ public class JwtTokenProvider {
         .build()
         .parseSignedClaims(token)
         .getPayload();
+  }
+
+  public record RotatedRefreshToken(String token, long ttlSeconds) {
+
   }
 }
