@@ -22,7 +22,8 @@ app:
 jwt:
   secret: dGVzdC1zZWNyZXQta2V5LWZvci11bml0LXRlc3RzLW11c3QtYmUtYXQtbGVhc3QtMzItYnl0ZXM=
   access-expiry: 3600
-  refresh-expiry: 604800
+  refresh-idle-expiry: 604800
+  refresh-absolute-expiry: 2592000
 
 privacy:
   phone-hash-secret: test-phone-hash-secret

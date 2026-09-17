@@ -11,6 +11,7 @@ import static org.mockito.Mockito.verify;
 
 import com.qrwait.api.owner.application.dto.LoginRequest;
 import com.qrwait.api.owner.application.dto.LoginResponse;
+import com.qrwait.api.owner.application.dto.RefreshResult;
 import com.qrwait.api.owner.application.dto.SignUpRequest;
 import com.qrwait.api.owner.application.dto.SignUpResponse;
 import com.qrwait.api.owner.domain.DuplicateEmailException;
@@ -19,6 +20,7 @@ import com.qrwait.api.owner.domain.Owner;
 import com.qrwait.api.owner.domain.OwnerRepository;
 import com.qrwait.api.shared.redis.RefreshTokenRepository;
 import com.qrwait.api.shared.security.JwtTokenProvider;
+import com.qrwait.api.shared.security.JwtTokenProvider.RotatedRefreshToken;
 import com.qrwait.api.store.domain.Store;
 import com.qrwait.api.store.domain.StoreRepository;
 import com.qrwait.api.store.domain.StoreSettings;
@@ -61,7 +63,7 @@ class OwnerServiceTest {
     ownerService = new OwnerService(ownerRepository, storeRepository, storeSettingsRepository,
         refreshTokenRepository, jwtTokenProvider, passwordEncoder);
     ReflectionTestUtils.setField(ownerService, "baseUrl", "http://localhost:5173");
-    ReflectionTestUtils.setField(ownerService, "refreshExpirySeconds", 604800L);
+    ReflectionTestUtils.setField(ownerService, "refreshIdleExpirySeconds", 604800L);
   }
 
   // ===== signUp =====
@@ -155,16 +157,21 @@ class OwnerServiceTest {
   // ===== refresh =====
 
   @Test
-  void refresh_유효한_토큰_새_AccessToken_발급() {
+  void refresh_유효한_토큰_로테이션된_AccessToken과_RefreshToken_발급() {
     String refreshToken = "valid-refresh-token";
+    RotatedRefreshToken rotated = new RotatedRefreshToken("rotated-refresh-token", 604800L);
     given(jwtTokenProvider.validateToken(refreshToken)).willReturn(true);
     given(jwtTokenProvider.extractOwnerId(refreshToken)).willReturn(ownerId);
     given(refreshTokenRepository.findByOwnerId(ownerId)).willReturn(Optional.of(refreshToken));
+    given(jwtTokenProvider.rotateRefreshToken(refreshToken)).willReturn(Optional.of(rotated));
     given(jwtTokenProvider.generateAccessToken(ownerId)).willReturn("new-access-token");
 
-    String newAccessToken = ownerService.refresh(refreshToken);
+    RefreshResult result = ownerService.refresh(refreshToken);
 
-    assertThat(newAccessToken).isEqualTo("new-access-token");
+    assertThat(result.accessToken()).isEqualTo("new-access-token");
+    assertThat(result.refreshToken()).isEqualTo("rotated-refresh-token");
+    assertThat(result.refreshTokenTtlSeconds()).isEqualTo(604800L);
+    verify(refreshTokenRepository).save(ownerId, "rotated-refresh-token", 604800L);
   }
 
   @Test
@@ -195,6 +202,21 @@ class OwnerServiceTest {
 
     assertThatThrownBy(() -> ownerService.refresh(refreshToken))
         .isInstanceOf(InvalidCredentialsException.class);
+  }
+
+  @Test
+  void refresh_절대만료초과로_로테이션거부_Redis토큰삭제후_예외발생() {
+    String refreshToken = "valid-refresh-token";
+    given(jwtTokenProvider.validateToken(refreshToken)).willReturn(true);
+    given(jwtTokenProvider.extractOwnerId(refreshToken)).willReturn(ownerId);
+    given(refreshTokenRepository.findByOwnerId(ownerId)).willReturn(Optional.of(refreshToken));
+    given(jwtTokenProvider.rotateRefreshToken(refreshToken)).willReturn(Optional.empty());
+
+    assertThatThrownBy(() -> ownerService.refresh(refreshToken))
+        .isInstanceOf(InvalidCredentialsException.class);
+
+    verify(refreshTokenRepository).delete(ownerId);
+    verify(jwtTokenProvider, never()).generateAccessToken(any());
   }
 
   private SignUpRequest createSignUpRequest(String email, String password, String storeName, String address) {
