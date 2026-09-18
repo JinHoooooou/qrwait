@@ -45,6 +45,9 @@ desktop.ini
 # ===== Docker =====
 docker-compose.override.yml
 
+# ===== Let's Encrypt ACME 챌린지 (배포 서버에만 존재) =====
+/certbot-www/
+
 # ===== Secrets =====
 *.pem
 *.key
