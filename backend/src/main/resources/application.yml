@@ -17,6 +17,7 @@ spring:
 
 server:
   port: 8080
+  forward-headers-strategy: framework   # nginx가 넘겨주는 X-Forwarded-Proto를 신뢰 — 없으면 HTTPS 요청도 내부적으로 http로 보여 same-origin 판정이 깨짐(CORS 오탐)
 
 springdoc:
   swagger-ui:
