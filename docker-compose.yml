@@ -56,6 +56,8 @@ services:
       context: ./frontend
     ports:
       - "80:80"
+    volumes:
+      - ./certbot-www:/usr/share/nginx/html/.well-known/acme-challenge
     depends_on:
       - backend
 
