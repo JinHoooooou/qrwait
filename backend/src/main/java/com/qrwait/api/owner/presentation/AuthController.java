@@ -34,6 +34,9 @@ public class AuthController {
   @Value("${jwt.refresh-idle-expiry}")
   private int refreshIdleExpirySeconds;
 
+  @Value("${app.cookie-secure}")
+  private boolean cookieSecure;
+
   @PostMapping("/signup")
   public ResponseEntity<SignUpResponse> signUp(@Valid @RequestBody SignUpRequest request) {
     SignUpResponse response = ownerService.signUp(request);
@@ -66,6 +69,7 @@ public class AuthController {
   private void setRefreshTokenCookie(HttpServletResponse response, String refreshToken, int maxAgeSeconds) {
     Cookie cookie = new Cookie(REFRESH_TOKEN_COOKIE, refreshToken);
     cookie.setHttpOnly(true);
+    cookie.setSecure(cookieSecure);
     cookie.setPath("/api/auth/refresh");
     cookie.setMaxAge(maxAgeSeconds);
     cookie.setAttribute("SameSite", "Strict");
@@ -75,6 +79,7 @@ public class AuthController {
   private void clearRefreshTokenCookie(HttpServletResponse response) {
     Cookie cookie = new Cookie(REFRESH_TOKEN_COOKIE, "");
     cookie.setHttpOnly(true);
+    cookie.setSecure(cookieSecure);
     cookie.setPath("/api/auth/refresh");
     cookie.setMaxAge(0);
     cookie.setAttribute("SameSite", "Strict");

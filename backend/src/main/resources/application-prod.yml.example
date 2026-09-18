@@ -19,3 +19,4 @@ cors:
 
 app:
   base-url: ${APP_BASE_URL}
+  cookie-secure: true
