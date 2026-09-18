@@ -56,10 +56,12 @@ services:
       context: ./frontend
     ports:
       - "80:80"
+      - "443:443"
     volumes:
       # certbot webroot(-w ./certbot-www)가 그 밑에 .well-known/acme-challenge/를
       # 직접 생성하므로, 마운트도 그 depth에 맞춰야 한다.
       - ./certbot-www/.well-known/acme-challenge:/usr/share/nginx/html/.well-known/acme-challenge
+      - /etc/letsencrypt:/etc/letsencrypt:ro
     depends_on:
       - backend
 
