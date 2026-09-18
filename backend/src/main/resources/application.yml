@@ -24,6 +24,9 @@ springdoc:
   api-docs:
     path: /v3/api-docs
 
+app:
+  cookie-secure: false   # HTTPS 환경(prod)에서만 true로 오버라이드 — HTTP 로컬 개발에서는 Secure 쿠키가 저장/전송되지 않음
+
 jwt:
   secret: ${JWT_SECRET}
   access-expiry: 3600            # 1시간 (초)

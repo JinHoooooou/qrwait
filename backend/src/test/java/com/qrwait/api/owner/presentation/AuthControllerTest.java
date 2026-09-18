@@ -27,6 +27,7 @@ import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.test.web.servlet.MockMvc;
 
 @WebMvcTest(AuthController.class)
@@ -38,6 +39,8 @@ class AuthControllerTest {
   MockMvc mockMvc;
   @Autowired
   ObjectMapper objectMapper;
+  @Autowired
+  AuthController authController;
 
   @MockitoBean
   JwtTokenProvider jwtTokenProvider;
@@ -134,6 +137,45 @@ class AuthControllerTest {
 
     jakarta.servlet.http.Cookie cookie = result.getResponse().getCookie(AuthController.REFRESH_TOKEN_COOKIE);
     org.assertj.core.api.Assertions.assertThat(cookie.getAttribute("SameSite")).isEqualTo("Strict");
+  }
+
+  @Test
+  void 로그인_성공_test프로필기본값_Secure쿠키아님() throws Exception {
+    given(ownerService.login(any()))
+        .willReturn(new LoginResponse("access-token", "refresh-token", UUID.randomUUID(), UUID.randomUUID()));
+
+    Map<String, String> request = Map.of("email", "owner@test.com", "password", "password123");
+
+    var result = mockMvc.perform(post("/api/auth/login")
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(objectMapper.writeValueAsString(request)))
+        .andExpect(status().isOk())
+        .andReturn();
+
+    jakarta.servlet.http.Cookie cookie = result.getResponse().getCookie(AuthController.REFRESH_TOKEN_COOKIE);
+    org.assertj.core.api.Assertions.assertThat(cookie.getSecure()).isFalse();
+  }
+
+  @Test
+  void 로그인_성공_cookieSecure설정true면_Secure쿠키() throws Exception {
+    ReflectionTestUtils.setField(authController, "cookieSecure", true);
+    try {
+      given(ownerService.login(any()))
+          .willReturn(new LoginResponse("access-token", "refresh-token", UUID.randomUUID(), UUID.randomUUID()));
+
+      Map<String, String> request = Map.of("email", "owner@test.com", "password", "password123");
+
+      var result = mockMvc.perform(post("/api/auth/login")
+              .contentType(MediaType.APPLICATION_JSON)
+              .content(objectMapper.writeValueAsString(request)))
+          .andExpect(status().isOk())
+          .andReturn();
+
+      jakarta.servlet.http.Cookie cookie = result.getResponse().getCookie(AuthController.REFRESH_TOKEN_COOKIE);
+      org.assertj.core.api.Assertions.assertThat(cookie.getSecure()).isTrue();
+    } finally {
+      ReflectionTestUtils.setField(authController, "cookieSecure", false);
+    }
   }
 
   @Test
